@@ -1,0 +1,144 @@
+[gd_scene load_steps=3 format=3 uid="uid://df348vknw3cty"]
+
+[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_e0u2p"]
+[ext_resource type="Script" uid="uid://kmfhyrkvtn1f" path="res://Scenes/farm_price_calc.gd" id="2_uyf8h"]
+
+[node name="FarmPriceCalc" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_e0u2p")
+script = ExtResource("2_uyf8h")
+
+[node name="VBoxInputs" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 320.0
+grow_horizontal = 2
+
+[node name="PrintTime" type="LineEdit" parent="VBoxInputs"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Print Time"
+
+[node name="LaborTime" type="LineEdit" parent="VBoxInputs"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Labor Time"
+
+[node name="FilamentCost" type="LineEdit" parent="VBoxInputs"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Filament Cost (RON)"
+
+[node name="Weight" type="LineEdit" parent="VBoxInputs"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Weight (g)"
+
+[node name="VBoxOutputs" type="VBoxContainer" parent="VBoxInputs"]
+layout_mode = 2
+
+[node name="HBoxFilamentCost" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxFilamentCost"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Filament:"
+
+[node name="FilamentCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxFilamentCost"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxLaborCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxLaborCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Labor:"
+
+[node name="LaborCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxLaborCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxUtilitiesCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxUtilitiesCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Utilities:"
+
+[node name="UtilitiesCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxUtilitiesCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxMachineCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxMachineCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Machine:"
+
+[node name="MachineCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxMachineCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxMaintenanceCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxMaintenanceCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Maintenance:"
+
+[node name="MaintenanceCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxMaintenanceCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxOverheadCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxOverheadCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Overhead:"
+
+[node name="OverheadMultiplierResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxOverheadCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"
+
+[node name="HBoxTotalCostResult" type="HBoxContainer" parent="VBoxInputs/VBoxOutputs"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxTotalCostResult"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Total:"
+
+[node name="TotalCostResult" type="Label" parent="VBoxInputs/VBoxOutputs/HBoxTotalCostResult"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5.59 RON"

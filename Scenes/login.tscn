@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://dra1rnfronsh6"]
+
+[ext_resource type="Script" uid="uid://dmvqnwr2x5op2" path="res://Scenes/Login.cs" id="1_5cd0j"]
+[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_hbxdl"]
+
+[node name="Login" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_hbxdl")
+script = ExtResource("1_5cd0j")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PhoneLineEdit" type="LineEdit" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+40722101097"
+placeholder_text = "Phone Number"
+
+[node name="OTPLineEdit" type="LineEdit" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "OTP"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="RequestOtpButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Send Code"
+
+[node name="VerifyOtpButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Verify Code"

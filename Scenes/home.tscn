@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://b25exjlwsy63g"]
+
+[ext_resource type="Script" uid="uid://dymj3xu07rlj1" path="res://Scenes/Home.gd" id="1_dt112"]
+[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_uq2cn"]
+
+[node name="Home" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dt112")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -298.0
+offset_top = -38.5
+offset_right = 298.0
+offset_bottom = 38.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FarmPrintPriceCalculatorNavButton" type="Button" parent="CenterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("1_uq2cn")
+text = "3D Print Price Calculator"
