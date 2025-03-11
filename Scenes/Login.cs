@@ -3,6 +3,10 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Handles user authentication through OTP (One-Time Password) verification.
+/// Manages the login UI and authentication flow for the POS terminal.
+/// </summary>
 public partial class Login : Control
 {
     // UI elements
@@ -75,6 +79,10 @@ public partial class Login : Control
             _logger.Call("info", $"User already logged in, ID: {_sessionManager.CurrentUser?.Id}");
             // Use CallDeferred to avoid changing scene during _Ready()
             CallDeferred(nameof(ChangeToHomeScene));
+        }
+        else
+        {
+            _logger.Call("debug", "No active session found, showing login form");
         }
     }
 

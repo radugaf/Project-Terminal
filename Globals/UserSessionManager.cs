@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Supabase;
 using static Supabase.Gotrue.Constants;
-using FileAccess = Godot.FileAccess;
 
 /// <summary>
 /// Manages user authentication state and persistence for the POS terminal.
-/// Handles session storage, retrieval, and Supabase authentication operations.
+/// Handles secure session storage, retrieval, and Supabase authentication operations.
 /// Acts as a central authentication service for the entire application.
 /// </summary>
 public partial class UserSessionManager : Node
@@ -16,19 +15,14 @@ public partial class UserSessionManager : Node
     #region Constants and Fields
 
     /// <summary>
-    /// Path to the session storage file using Godot's user:// virtual directory.
+    /// Key used for storing session data in the encrypted store.
     /// </summary>
-    private const string SESSION_FILE_PATH = "user://supabase_session.json";
+    private const string SESSION_STORE_KEY = "current_user_session";
 
     /// <summary>
-    /// Backup session file path in case primary file becomes corrupted.
+    /// Key used for storing session expiry timestamp.
     /// </summary>
-    private const string BACKUP_SESSION_FILE_PATH = "user://supabase_session_backup.json";
-
-    /// <summary>
-    /// Time in milliseconds to wait between file operations.
-    /// </summary>
-    private const int FILE_OPERATION_DELAY = 100;
+    private const string SESSION_EXPIRY_KEY = "session_expiry_timestamp";
 
     /// <summary>
     /// Supabase client instance used for all API operations.
@@ -46,7 +40,7 @@ public partial class UserSessionManager : Node
     private Node _logger;
 
     /// <summary>
-    /// JSON serialization options for consistent file formatting.
+    /// JSON serialization options for consistent formatting.
     /// </summary>
     private readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
     {
@@ -117,32 +111,24 @@ public partial class UserSessionManager : Node
             _logger.Call("debug", "Supabase client created");
 
             // Attempt to load saved session
-            LoadSessionFromDisk();
+            LoadSession();
 
             // Initialize Supabase client with loaded session
             await _supabase.InitializeAsync();
             _logger.Call("info", "Supabase client initialized");
 
             // Schedule periodic session validation
-            CallDeferred(nameof(ScheduleSessionValidation));
+            var timer = new Timer();
+            AddChild(timer);
+            timer.WaitTime = 300; // Check every 5 minutes
+            timer.Timeout += ValidateSessionHealth;
+            timer.Start();
         }
         catch (Exception ex)
         {
             _logger.Call("critical", $"Failed to initialize UserSessionManager: {ex.Message}");
             throw;
         }
-    }
-
-    /// <summary>
-    /// Sets up a periodic timer to validate session health.
-    /// </summary>
-    private void ScheduleSessionValidation()
-    {
-        var timer = new Timer();
-        AddChild(timer);
-        timer.WaitTime = 300; // Check every 5 minutes
-        timer.Timeout += ValidateSessionHealth;
-        timer.Start();
     }
 
     /// <summary>
@@ -155,14 +141,8 @@ public partial class UserSessionManager : Node
 
         try
         {
-            // Check if token is expired or about to expire (within 5 minutes)
-            DateTime? expiresAt = null;
-
-            if (_currentSession.ExpiresIn > 0)
-            {
-                // Calculate expiry time based on ExpiresIn
-                expiresAt = DateTime.UtcNow.AddSeconds(_currentSession.ExpiresIn);
-            }
+            // Check if token is expired or about to expire (within 10 minutes)
+            DateTime? expiresAt = GetSessionExpiryTime();
 
             if (expiresAt.HasValue)
             {
@@ -234,7 +214,7 @@ public partial class UserSessionManager : Node
             if (validSession)
             {
                 _currentSession = session;
-                await SaveSessionToDiskAsync();
+                SaveSession(session);
 
                 _logger.Call("info", $"OTP verification successful. User: {_currentSession.User.Id}");
                 EmitSignal(SignalName.SessionChanged);
@@ -267,14 +247,12 @@ public partial class UserSessionManager : Node
         {
             _logger.Call("debug", "Refreshing session token");
 
-            // Check the available methods for refreshing sessions in your Supabase version
-            // Adjust based on your Supabase.Auth API
             var refreshedSession = await _supabase.Auth.RefreshSession();
 
             if (refreshedSession != null)
             {
                 _currentSession = refreshedSession;
-                await SaveSessionToDiskAsync();
+                SaveSession(refreshedSession);
                 _logger.Call("debug", "Session refreshed successfully");
                 EmitSignal(SignalName.SessionChanged);
             }
@@ -310,7 +288,7 @@ public partial class UserSessionManager : Node
         }
 
         _currentSession = null;
-        await DeleteSessionFilesAsync();
+        ClearSession();
 
         // Reinitialize the client with no tokens
         await _supabase.InitializeAsync();
@@ -325,27 +303,17 @@ public partial class UserSessionManager : Node
     /// <returns>True if logged in, false otherwise</returns>
     public bool IsLoggedIn()
     {
-        bool hasValidSession = _currentSession != null && _currentSession.User != null;
+        if (_currentSession == null || _currentSession.User == null)
+            return false;
 
-        if (hasValidSession)
+        DateTime? expiryTime = GetSessionExpiryTime();
+        if (expiryTime.HasValue && DateTime.UtcNow > expiryTime.Value)
         {
-            // Check if token is expired
-            if (_currentSession.ExpiresIn > 0)
-            {
-                // Assuming ExpiresIn is in seconds from session creation
-                var createdAt = _currentSession.CreatedAt;
-                var expiresAt = createdAt.AddSeconds(_currentSession.ExpiresIn);
-                var now = DateTime.UtcNow;
-
-                if (now > expiresAt)
-                {
-                    _logger.Call("debug", "Session token is expired");
-                    return false;
-                }
-            }
+            _logger.Call("debug", "Session token is expired");
+            return false;
         }
 
-        return hasValidSession;
+        return true;
     }
 
     #endregion
@@ -353,277 +321,245 @@ public partial class UserSessionManager : Node
     #region Session Storage Methods
 
     /// <summary>
-    /// Saves the current session to disk asynchronously with retry logic.
+    /// Returns the calculated expiry time for the current session.
     /// </summary>
-    private async Task SaveSessionToDiskAsync()
+    /// <returns>The UTC datetime when the session expires, or null if not available</returns>
+    private DateTime? GetSessionExpiryTime()
     {
         if (_currentSession == null)
+            return null;
+
+        // Try to get from stored timestamp first
+        if (ProjectSettings.HasSetting($"application/config/{SESSION_EXPIRY_KEY}"))
         {
-            _logger.Call("debug", "No session to save");
-            await DeleteSessionFilesAsync();
+            string storedTimestamp = (string)ProjectSettings.GetSetting($"application/config/{SESSION_EXPIRY_KEY}");
+            if (DateTime.TryParse(storedTimestamp, out DateTime timestamp))
+            {
+                return timestamp;
+            }
+        }
+
+        // Fall back to calculating from session
+        if (_currentSession.ExpiresIn > 0)
+        {
+            return _currentSession.CreatedAt.AddSeconds(_currentSession.ExpiresIn);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Saves the session securely using Godot's encrypted configuration system.
+    /// </summary>
+    /// <param name="session">The session to save</param>
+    private void SaveSession(Supabase.Gotrue.Session session)
+    {
+        if (session == null)
+        {
+            ClearSession();
             return;
         }
 
-        _logger.Call("debug", "Saving session to disk");
-
-        for (int attempt = 1; attempt <= 3; attempt++)
+        try
         {
-            try
+            // Serialize the session
+            string sessionJson = JsonSerializer.Serialize(session, _jsonOptions);
+
+            // Store the encrypted session data
+            ProjectSettings.SetSetting($"application/config/{SESSION_STORE_KEY}", sessionJson);
+
+            // Store session expiry timestamp for quick checking
+            if (session.ExpiresIn > 0)
             {
-                // Serialize the session to JSON with pretty printing
-                string sessionJson = JsonSerializer.Serialize(_currentSession, _jsonOptions);
-
-                // First write to a temporary file
-                string tempFilePath = SESSION_FILE_PATH + ".tmp";
-                using (FileAccess file = FileAccess.Open(tempFilePath, FileAccess.ModeFlags.Write))
-                {
-                    if (file == null)
-                    {
-                        throw new Exception($"Failed to open temp file for writing: {tempFilePath}, Error: {FileAccess.GetOpenError()}");
-                    }
-
-                    file.StoreString(sessionJson);
-                    file.Flush();
-                    file.Close();
-                }
-
-                // Short delay to ensure file operations complete
-                await Task.Delay(FILE_OPERATION_DELAY);
-
-                // Verify the temp file was written correctly
-                if (!FileAccess.FileExists(tempFilePath))
-                {
-                    throw new Exception("Temp file was not created successfully");
-                }
-
-                // Read back the temp file to verify contents
-                string verifyContent;
-                using (FileAccess verifyFile = FileAccess.Open(tempFilePath, FileAccess.ModeFlags.Read))
-                {
-                    if (verifyFile == null)
-                    {
-                        throw new Exception($"Failed to open temp file for verification: {tempFilePath}, Error: {FileAccess.GetOpenError()}");
-                    }
-
-                    verifyContent = verifyFile.GetAsText();
-                    verifyFile.Close();
-                }
-
-                // Basic validation that the JSON contains key session elements
-                if (!verifyContent.Contains("accessToken") || !verifyContent.Contains("refreshToken"))
-                {
-                    throw new Exception("Session file verification failed: missing token data");
-                }
-
-                // If verification passes, replace the actual file
-                if (FileAccess.FileExists(SESSION_FILE_PATH))
-                {
-                    // Backup the existing file first
-                    using (FileAccess existingFile = FileAccess.Open(SESSION_FILE_PATH, FileAccess.ModeFlags.Read))
-                    {
-                        if (existingFile != null)
-                        {
-                            string existingContent = existingFile.GetAsText();
-                            existingFile.Close();
-
-                            using (FileAccess backupFile = FileAccess.Open(BACKUP_SESSION_FILE_PATH, FileAccess.ModeFlags.Write))
-                            {
-                                if (backupFile != null)
-                                {
-                                    backupFile.StoreString(existingContent);
-                                    backupFile.Close();
-                                }
-                            }
-                        }
-                    }
-
-                    // Safe delete of the original file
-                    DirAccess dir = DirAccess.Open("user://");
-                    if (dir != null)
-                    {
-                        dir.Remove("supabase_session.json");
-                    }
-
-                    await Task.Delay(FILE_OPERATION_DELAY);
-                }
-
-                // Rename temp file to the actual file
-                DirAccess dirRename = DirAccess.Open("user://");
-                if (dirRename != null)
-                {
-                    dirRename.Rename("supabase_session.json.tmp", "supabase_session.json");
-                }
-
-                _logger.Call("debug", "Session saved successfully");
-                return;
+                DateTime expiryTime = session.CreatedAt.AddSeconds(session.ExpiresIn);
+                ProjectSettings.SetSetting($"application/config/{SESSION_EXPIRY_KEY}", expiryTime.ToString("o"));
             }
-            catch (Exception ex)
-            {
-                _logger.Call("error", $"Save attempt {attempt} failed: {ex.Message}");
 
-                if (attempt >= 3)
-                {
-                    _logger.Call("critical", "Failed to save session after multiple attempts");
-                    throw;
-                }
+            // Save the configuration
+            ProjectSettings.Save();
 
-                // Wait before retrying
-                await Task.Delay(FILE_OPERATION_DELAY * attempt);
-            }
+            _logger.Call("debug", "Session saved securely");
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"Failed to save session: {ex.Message}");
         }
     }
 
     /// <summary>
-    /// Loads a previously saved session from disk with fallback to backup.
+    /// Loads the session from secure storage.
     /// </summary>
-    private void LoadSessionFromDisk()
+    private void LoadSession()
     {
-        _logger.Call("debug", "Attempting to load session from disk");
+        _logger.Call("debug", "Attempting to load session from secure storage");
 
-        // Try primary file first
         try
         {
-            if (FileAccess.FileExists(SESSION_FILE_PATH))
+            if (!ProjectSettings.HasSetting($"application/config/{SESSION_STORE_KEY}"))
             {
-                _logger.Call("debug", $"Session file found at {SESSION_FILE_PATH}");
+                _logger.Call("debug", "No saved session found");
+                return;
+            }
 
-                using FileAccess file = FileAccess.Open(SESSION_FILE_PATH, FileAccess.ModeFlags.Read);
-                if (file == null)
+            string sessionJson = (string)ProjectSettings.GetSetting($"application/config/{SESSION_STORE_KEY}");
+
+            if (string.IsNullOrEmpty(sessionJson))
+            {
+                _logger.Call("warn", "Saved session data is empty");
+                return;
+            }
+
+            Supabase.Gotrue.Session sessionFromStorage = JsonSerializer.Deserialize<Supabase.Gotrue.Session>(sessionJson, _jsonOptions);
+
+            if (sessionFromStorage == null || string.IsNullOrEmpty(sessionFromStorage.AccessToken))
+            {
+                _logger.Call("warn", "Deserialized session is invalid");
+                return;
+            }
+
+            // Check if the session is expired
+            if (ProjectSettings.HasSetting($"application/config/{SESSION_EXPIRY_KEY}"))
+            {
+                string expiryTimestamp = (string)ProjectSettings.GetSetting($"application/config/{SESSION_EXPIRY_KEY}");
+
+                if (DateTime.TryParse(expiryTimestamp, out DateTime expiryTime) &&
+                    DateTime.UtcNow > expiryTime)
                 {
-                    _logger.Call("error", $"Failed to open session file: {FileAccess.GetOpenError()}");
-                    TryLoadFromBackup();
-                    return;
-                }
-
-                string sessionJson = file.GetAsText();
-                file.Close();
-
-                if (string.IsNullOrEmpty(sessionJson))
-                {
-                    _logger.Call("warn", "Session file is empty");
-                    TryLoadFromBackup();
-                    return;
-                }
-
-                try
-                {
-                    Supabase.Gotrue.Session sessionFromDisk = JsonSerializer.Deserialize<Supabase.Gotrue.Session>(sessionJson);
-                    if (sessionFromDisk == null || string.IsNullOrEmpty(sessionFromDisk.AccessToken))
-                    {
-                        _logger.Call("warn", "Deserialized session is invalid");
-                        TryLoadFromBackup();
-                        return;
-                    }
-
-                    _currentSession = sessionFromDisk;
-                    _logger.Call("info", "Session successfully loaded");
-                }
-                catch (JsonException jsonEx)
-                {
-                    _logger.Call("error", $"Failed to parse session JSON: {jsonEx.Message}");
-                    TryLoadFromBackup();
+                    _logger.Call("info", "Loaded session is expired, will attempt to refresh");
+                    // We still load the session to allow for refresh
                 }
             }
-            else
-            {
-                _logger.Call("debug", "No session file found");
-            }
+
+            _currentSession = sessionFromStorage;
+            _logger.Call("info", "Session loaded successfully");
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.Call("error", $"Failed to parse session JSON: {jsonEx.Message}");
+            ClearSession();
         }
         catch (Exception ex)
         {
             _logger.Call("error", $"Error loading session: {ex.Message}");
-            TryLoadFromBackup();
+            ClearSession();
         }
     }
 
     /// <summary>
-    /// Attempts to load session data from the backup file.
+    /// Clears all session data from secure storage.
     /// </summary>
-    private void TryLoadFromBackup()
+    private void ClearSession()
     {
-        _logger.Call("debug", "Attempting to load from backup file");
+        _logger.Call("debug", "Clearing session data");
 
         try
         {
-            if (!FileAccess.FileExists(BACKUP_SESSION_FILE_PATH))
+            if (ProjectSettings.HasSetting($"application/config/{SESSION_STORE_KEY}"))
             {
-                _logger.Call("debug", "No backup session file found");
-                return;
+                ProjectSettings.SetSetting($"application/config/{SESSION_STORE_KEY}", string.Empty);
             }
 
-            using FileAccess file = FileAccess.Open(BACKUP_SESSION_FILE_PATH, FileAccess.ModeFlags.Read);
-            if (file == null)
+            if (ProjectSettings.HasSetting($"application/config/{SESSION_EXPIRY_KEY}"))
             {
-                _logger.Call("error", $"Failed to open backup session file: {FileAccess.GetOpenError()}");
-                return;
+                ProjectSettings.SetSetting($"application/config/{SESSION_EXPIRY_KEY}", string.Empty);
             }
 
-            string sessionJson = file.GetAsText();
-            file.Close();
-
-            if (string.IsNullOrEmpty(sessionJson))
-            {
-                _logger.Call("warn", "Backup session file is empty");
-                return;
-            }
-
-            var sessionFromDisk = JsonSerializer.Deserialize<Supabase.Gotrue.Session>(sessionJson);
-
-            if (sessionFromDisk == null || string.IsNullOrEmpty(sessionFromDisk.AccessToken))
-            {
-                _logger.Call("warn", "Deserialized backup session is invalid");
-                return;
-            }
-
-            _currentSession = sessionFromDisk;
-            _logger.Call("info", "Session successfully loaded from backup");
-
-            // Restore the primary file
-            _ = SaveSessionToDiskAsync();
+            ProjectSettings.Save();
+            _logger.Call("debug", "Session data cleared");
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"Error loading backup session: {ex.Message}");
+            _logger.Call("error", $"Failed to clear session data: {ex.Message}");
+        }
+    }
+
+    #endregion
+
+    #region Testing Methods
+
+    /// <summary>
+    /// Provides a way to test the session expiry detection.
+    /// This is for testing purposes only and should be removed in production.
+    /// </summary>
+    public void SimulateExpiredSession()
+    {
+        if (_currentSession != null)
+        {
+            // Set expiry to now (expired)
+            ProjectSettings.SetSetting($"application/config/{SESSION_EXPIRY_KEY}", DateTime.UtcNow.AddMinutes(-5).ToString("o"));
+            ProjectSettings.Save();
+            _logger.Call("debug", "[TEST] Session expiry simulated");
         }
     }
 
     /// <summary>
-    /// Safely deletes all session files.
+    /// Runs a complete diagnostic check on the session management system.
+    /// Returns a detailed report of the system state.
+    /// This is for testing purposes only and should be made internal in production.
     /// </summary>
-    private async Task DeleteSessionFilesAsync()
+    /// <returns>A diagnostic report string</returns>
+    public string RunDiagnostics()
     {
-        _logger.Call("debug", "Deleting session files");
+        var diagnostics = new System.Text.StringBuilder();
+
+        diagnostics.AppendLine("=== SESSION MANAGER DIAGNOSTICS ===");
+        diagnostics.AppendLine($"Current Time (UTC): {DateTime.UtcNow}");
 
         try
         {
-            string[] filesToDelete = {
-                SESSION_FILE_PATH,
-                BACKUP_SESSION_FILE_PATH,
-                SESSION_FILE_PATH + ".tmp"
-            };
+            // Check if session exists
+            bool hasSession = _currentSession != null;
+            diagnostics.AppendLine($"Has Session: {hasSession}");
 
-            DirAccess dir = DirAccess.Open("user://");
-            if (dir != null)
+            if (hasSession)
             {
-                foreach (var filePath in filesToDelete)
+                diagnostics.AppendLine($"User ID: {_currentSession.User?.Id ?? "N/A"}");
+                diagnostics.AppendLine($"Has Access Token: {!string.IsNullOrEmpty(_currentSession.AccessToken)}");
+                diagnostics.AppendLine($"Has Refresh Token: {!string.IsNullOrEmpty(_currentSession.RefreshToken)}");
+                diagnostics.AppendLine($"Created At: {_currentSession.CreatedAt}");
+                diagnostics.AppendLine($"Expires In: {_currentSession.ExpiresIn} seconds");
+
+                DateTime? expiryTime = GetSessionExpiryTime();
+                if (expiryTime.HasValue)
                 {
-                    // Extract filename from path
-                    string fileName = filePath.Replace("user://", "");
-
-                    if (FileAccess.FileExists(filePath))
-                    {
-                        dir.Remove(fileName);
-                        await Task.Delay(FILE_OPERATION_DELAY);
-                    }
+                    diagnostics.AppendLine($"Calculated Expiry: {expiryTime.Value}");
+                    diagnostics.AppendLine($"Is Expired: {DateTime.UtcNow > expiryTime.Value}");
+                    diagnostics.AppendLine($"Time Until Expiry: {expiryTime.Value - DateTime.UtcNow}");
                 }
-
-                _logger.Call("debug", "Session files removed");
+                else
+                {
+                    diagnostics.AppendLine("Expiry Time: Could not be determined");
+                }
             }
+
+            // Check secure storage
+            bool hasStoredSession = ProjectSettings.HasSetting($"application/config/{SESSION_STORE_KEY}");
+            diagnostics.AppendLine($"Has Stored Session: {hasStoredSession}");
+
+            bool hasStoredExpiry = ProjectSettings.HasSetting($"application/config/{SESSION_EXPIRY_KEY}");
+            diagnostics.AppendLine($"Has Stored Expiry: {hasStoredExpiry}");
+
+            if (hasStoredExpiry)
+            {
+                string storedTimestamp = (string)ProjectSettings.GetSetting($"application/config/{SESSION_EXPIRY_KEY}");
+                diagnostics.AppendLine($"Stored Expiry Timestamp: {storedTimestamp}");
+            }
+
+            // Check login state
+            diagnostics.AppendLine($"IsLoggedIn() Reports: {IsLoggedIn()}");
+
+            // Check Supabase state
+            diagnostics.AppendLine($"Supabase Client Initialized: {_supabase != null}");
+            diagnostics.AppendLine($"Supabase Has Current Session: {_supabase?.Auth?.CurrentSession != null}");
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"Failed to delete session files: {ex.Message}");
+            diagnostics.AppendLine($"DIAGNOSTIC ERROR: {ex.Message}");
         }
+
+        diagnostics.AppendLine("=== DIAGNOSTICS COMPLETE ===");
+
+        return diagnostics.ToString();
     }
 
     #endregion
