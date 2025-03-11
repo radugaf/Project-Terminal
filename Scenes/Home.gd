@@ -8,4 +8,4 @@ func _ready() -> void:
     farm_price_calc_nav_button.pressed.connect(_on_farm_price_calc_nav_button_pressed)
 
 func _on_farm_price_calc_nav_button_pressed() -> void:
-    get_tree().change_scene_to_file("res://Scenes/FarmPriceCalc.tscn")
+    print("Farm Price Calculator button pressed")

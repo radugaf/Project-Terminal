@@ -1,118 +1,259 @@
 using Godot;
 using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-
-
-/// <summary>
-/// A user interface control for handling phone-based OTP login flow.
-/// Demonstrates requesting a code and verifying it with the global session manager.
-/// If a session is already active, the UI can be bypassed or hidden.
-/// </summary>
 public partial class Login : Control
 {
+    // UI elements
+    private LineEdit _phoneLineEdit;
+    private LineEdit _otpLineEdit;
+    private Button _requestOtpButton;
+    private Button _verifyOtpButton;
+    private Label _statusLabel;
+    private ProgressBar _loadingBar;
 
-	Node _logger;
+    // Service references
+    private Node _logger;
+    private UserSessionManager _sessionManager;
 
-	private LineEdit _phoneLineEdit;
-	private LineEdit _otpLineEdit;
-	private Button _requestOtpButton;
-	private Button _verifyOtpButton;
+    // Input validation
+    /// <summary>
+    /// Regular expression for validating phone numbers in E.164 format (+[country code][number]).
+    /// This is required by Supabase for phone-based authentication.
+    /// </summary>
+    private static readonly Regex _phoneRegex = new(@"^\+[1-9]\d{1,14}$");
 
-	/// <summary>
-	/// Provides an entry point to the global session manager singleton for checking and modifying the user session.
-	/// </summary>
-	private UserSessionManager _sessionManager;
+    // UI state tracking
+    private bool _otpRequested = false;
+    private bool _isProcessing = false;
 
-	/// <summary>
-	/// Retrieves UI references, attaches to button events, and checks whether a session is already active.
-	/// If a session is valid, the login UI may be skipped to provide a smooth experience.
-	/// </summary>
-	public override void _Ready()
-	{
-		_logger = GetNode<Node>("/root/Logger");
-		_logger.Call("info", "Login scene is ready.");
+    /// <summary>
+    /// Initializes the login screen, sets up UI components and event handlers,
+    /// and checks for existing sessions.
+    /// </summary>
+    public override void _Ready()
+    {
+        _logger = GetNode<Node>("/root/Logger");
+        _logger.Call("info", "Login scene initializing");
 
-		// Retrieve UI elements and attach event handlers.
-		_phoneLineEdit = GetNode<LineEdit>("%PhoneLineEdit");
-		_otpLineEdit = GetNode<LineEdit>("%OTPLineEdit");
-		_requestOtpButton = GetNode<Button>("%RequestOtpButton");
-		_verifyOtpButton = GetNode<Button>("%VerifyOtpButton");
+        // Get references to UI components
+        _phoneLineEdit = GetNode<LineEdit>("%PhoneLineEdit");
+        _otpLineEdit = GetNode<LineEdit>("%OTPLineEdit");
+        _requestOtpButton = GetNode<Button>("%RequestOtpButton");
+        _verifyOtpButton = GetNode<Button>("%VerifyOtpButton");
+        _statusLabel = GetNode<Label>("%StatusLabel");
+        _loadingBar = GetNode<ProgressBar>("%LoadingBar");
 
-		_requestOtpButton.Pressed += OnRequestOtpButtonPressed;
-		_verifyOtpButton.Pressed += OnVerifyOtpButtonPressed;
+        // Set initial UI state
+        _otpLineEdit.Visible = false;
+        _verifyOtpButton.Visible = false;
+        _statusLabel.Text = "";
+        _loadingBar.Visible = false;
 
-		_sessionManager = GetNode<UserSessionManager>("/root/UserSessionManager");
+        // Connect signals
+        _requestOtpButton.Pressed += OnRequestOtpButtonPressed;
+        _verifyOtpButton.Pressed += OnVerifyOtpButtonPressed;
+        _phoneLineEdit.TextChanged += OnPhoneTextChanged;
+        _otpLineEdit.TextChanged += OnOtpTextChanged;
 
-		bool isAlreadyLoggedIn = _sessionManager.IsLoggedIn();
-		if (isAlreadyLoggedIn)
-		{
-			GD.Print("A valid session is already present. Current user ID: " + _sessionManager.CurrentUser?.Id);
-			// If desired, the login screen can be hidden or another scene can be loaded here.
-			GetTree().ChangeSceneToFile("res://Scenes/home.tscn");
-		}
-	}
+        // Get reference to session manager
+        _sessionManager = GetNode<UserSessionManager>("/root/UserSessionManager");
 
-	/// <summary>
-	/// Triggered when the user presses the button to request an OTP.
-	/// Sends a request to Supabase to generate and deliver an OTP via SMS for the entered phone number.
-	/// </summary>
-	private async void OnRequestOtpButtonPressed()
-	{
-		string phoneNumber = _phoneLineEdit.Text.Trim();
-		bool missingPhone = string.IsNullOrEmpty(phoneNumber);
+        // Check if already logged in
+        CheckExistingSession();
+    }
 
-		if (missingPhone)
-		{
-			GD.Print("Phone number is empty and cannot be used for OTP requests.");
-			return;
-		}
+    /// <summary>
+    /// Checks if a valid user session already exists and redirects to home screen if it does.
+    /// This allows for persistent login across app restarts.
+    /// </summary>
+    private void CheckExistingSession()
+    {
+        if (_sessionManager.IsLoggedIn())
+        {
+            _logger.Call("info", $"User already logged in, ID: {_sessionManager.CurrentUser?.Id}");
+            // Use CallDeferred to avoid changing scene during _Ready()
+            CallDeferred(nameof(ChangeToHomeScene));
+        }
+    }
 
-		try
-		{
-			await _sessionManager.RequestOtpAsync(phoneNumber);
-			GD.Print("An OTP code has been sent to the provided phone number.");
-		}
-		catch (Exception ex)
-		{
-			GD.PrintErr("Requesting OTP encountered an error: " + ex.Message);
-		}
-	}
+    /// <summary>
+    /// Changes to the home scene after successful authentication.
+    /// Called via CallDeferred to avoid scene change errors during node processes.
+    /// </summary>
+    private void ChangeToHomeScene()
+    {
+        _logger.Call("info", "Changing to home scene");
+        GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+    }
 
-	/// <summary>
-	/// Triggered when the user presses the button to verify the OTP code.
-	/// Calls the session manager to confirm the code is valid and logs the user in if successful.
-	/// </summary>
-	private async void OnVerifyOtpButtonPressed()
-	{
-		string phoneNumber = _phoneLineEdit.Text.Trim();
-		string otpCode = _otpLineEdit.Text.Trim();
+    /// <summary>
+    /// Handles phone number input changes, validating format and updating UI state.
+    /// Resets OTP fields if phone number changes after requesting an OTP.
+    /// </summary>
+    /// <param name="newText">The current text in the phone number field</param>
+    private void OnPhoneTextChanged(string newText)
+    {
+        // Reset OTP form if phone number changes after OTP request
+        if (_otpRequested)
+        {
+            _otpRequested = false;
+            _otpLineEdit.Visible = false;
+            _verifyOtpButton.Visible = false;
+            _statusLabel.Text = "";
+        }
 
-		bool missingData = string.IsNullOrEmpty(phoneNumber) || string.IsNullOrEmpty(otpCode);
-		if (missingData)
-		{
-			GD.Print("Both phone number and OTP code must be provided before verification.");
-			return;
-		}
+        // Validate phone number format
+        bool isValid = _phoneRegex.IsMatch(newText);
+        _requestOtpButton.Disabled = !isValid || _isProcessing;
+    }
 
-		try
-		{
-			var session = await _sessionManager.VerifyOtpAsync(phoneNumber, otpCode);
-			bool isSessionValid = session != null && session.User != null;
+    /// <summary>
+    /// Handles OTP input changes, enabling verification button when format is valid.
+    /// </summary>
+    /// <param name="newText">The current text in the OTP field</param>
+    private void OnOtpTextChanged(string newText)
+    {
+        // Enable verify button when OTP is 6 digits
+        _verifyOtpButton.Disabled = newText.Length != 6 || _isProcessing;
+    }
 
-			if (isSessionValid)
-			{
-				GD.Print("OTP verification succeeded. User ID: " + session.User.Id);
-				// The user is authenticated. This can be followed by scene changes or UI updates.
-				GetTree().ChangeSceneToFile("res://Scenes/home.tscn");
-			}
-			else
-			{
-				GD.Print("The OTP could not be verified. The session is null or missing user information.");
-			}
-		}
-		catch (Exception ex)
-		{
-			GD.PrintErr("Verifying OTP encountered an error: " + ex.Message);
-		}
-	}
+    /// <summary>
+    /// Requests an OTP code be sent to the specified phone number.
+    /// Shows loading indicators and provides user feedback throughout the process.
+    /// </summary>
+    private async void OnRequestOtpButtonPressed()
+    {
+        string phone = _phoneLineEdit.Text.Trim();
+
+        if (!_phoneRegex.IsMatch(phone))
+        {
+            ShowError("Please enter a valid phone number in E.164 format (e.g., +12345678901)");
+            return;
+        }
+
+        SetProcessingState(true);
+
+        try
+        {
+            // Show loading animation
+            _statusLabel.Text = "Sending verification code...";
+            _loadingBar.Visible = true;
+
+            await _sessionManager.RequestOtpAsync(phone);
+
+            // Show OTP input
+            _otpRequested = true;
+            _otpLineEdit.Visible = true;
+            _verifyOtpButton.Visible = true;
+            _otpLineEdit.GrabFocus();
+            _statusLabel.Text = "Verification code sent! Please enter the 6-digit code.";
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"OTP request failed: {ex.Message}", new Godot.Collections.Dictionary { { "phone", phone } });
+            ShowError($"Failed to send verification code: {GetUserFriendlyErrorMessage(ex)}");
+        }
+        finally
+        {
+            _loadingBar.Visible = false;
+            SetProcessingState(false);
+        }
+    }
+
+    /// <summary>
+    /// Verifies the OTP code entered by the user.
+    /// Upon successful verification, transitions to the home screen.
+    /// </summary>
+    private async void OnVerifyOtpButtonPressed()
+    {
+        string phone = _phoneLineEdit.Text.Trim();
+        string otp = _otpLineEdit.Text.Trim();
+
+        if (string.IsNullOrEmpty(otp) || otp.Length != 6)
+        {
+            ShowError("Please enter the 6-digit verification code");
+            return;
+        }
+
+        SetProcessingState(true);
+
+        try
+        {
+            _statusLabel.Text = "Verifying code...";
+            _loadingBar.Visible = true;
+
+            var session = await _sessionManager.VerifyOtpAsync(phone, otp);
+
+            if (session != null && session.User != null)
+            {
+                _logger.Call("info", $"Login successful for user {session.User.Id}");
+                _statusLabel.Text = "Login successful! Redirecting...";
+
+                // Wait a moment to show success message before changing scenes
+                await Task.Delay(1000);
+                CallDeferred(nameof(ChangeToHomeScene));
+            }
+            else
+            {
+                ShowError("Verification failed. Please try again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"OTP verification failed: {ex.Message}", new Godot.Collections.Dictionary { { "phone", phone } });
+            ShowError($"Verification failed: {GetUserFriendlyErrorMessage(ex)}");
+        }
+        finally
+        {
+            _loadingBar.Visible = false;
+            SetProcessingState(false);
+        }
+    }
+
+    /// <summary>
+    /// Updates UI elements to reflect current processing state.
+    /// Disables inputs and buttons during network operations to prevent duplicate requests.
+    /// </summary>
+    /// <param name="isProcessing">Whether a network operation is in progress</param>
+    private void SetProcessingState(bool isProcessing)
+    {
+        _isProcessing = isProcessing;
+        _requestOtpButton.Disabled = isProcessing || !_phoneRegex.IsMatch(_phoneLineEdit.Text);
+        _verifyOtpButton.Disabled = isProcessing || _otpLineEdit.Text.Length != 6;
+        _phoneLineEdit.Editable = !isProcessing;
+        _otpLineEdit.Editable = !isProcessing;
+    }
+
+    /// <summary>
+    /// Displays an error message to the user and logs it for debugging.
+    /// </summary>
+    /// <param name="message">The error message to display</param>
+    private void ShowError(string message)
+    {
+        _statusLabel.Text = message;
+        _logger.Call("warn", $"Login UI error: {message}");
+    }
+
+    /// <summary>
+    /// Translates technical error messages into user-friendly language.
+    /// Helps staff understand authentication issues without exposing technical details.
+    /// </summary>
+    /// <param name="ex">The exception that occurred</param>
+    /// <returns>A user-friendly error message</returns>
+    private string GetUserFriendlyErrorMessage(Exception ex)
+    {
+        // Parse common Supabase errors into user-friendly messages
+        string message = ex.Message.ToLower();
+
+        if (message.Contains("rate limit"))
+            return "Too many attempts. Please try again later.";
+        if (message.Contains("expired"))
+            return "Code expired. Please request a new one.";
+        if (message.Contains("invalid"))
+            return "Invalid code. Please check and try again.";
+
+        return "An error occurred. Please try again.";
+    }
 }
