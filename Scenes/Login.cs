@@ -195,7 +195,6 @@ public partial class Login : Control
 
     private void GoToMainScreen()
     {
-        // TODO: Replace with actual main screen scene
-        GetTree().ChangeSceneToFile("res://Scenes/MainScreen.tscn");
+        GetTree().CallDeferred("change_scene_to_file", "res://Scenes/Home.tscn");
     }
 }

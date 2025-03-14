@@ -5,6 +5,7 @@ using Supabase.Gotrue;
 using static Supabase.Gotrue.Constants;
 using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
+
 /// <summary>
 /// Manages authentication state, user sessions, and permission checking.
 /// Handles staff authentication, session persistence, and authorization.
@@ -79,15 +80,7 @@ public partial class AuthManager : Node
             _supabaseClient.From<Staff>()
                 .Where(s => s.UserId == CurrentUser.Id)
                 .Get()
-                .ContinueWith(response =>
-                {
-                    if (response.Result.Models.Count > 0)
-                    {
-                        return response.Result.Models[0].Role;
-                    }
-
-                    return StaffRole.Staff;
-                });
+                .ContinueWith(response => response.Result.Models.Count > 0 ? response.Result.Models[0].Role : StaffRole.Staff);
 
             return StaffRole.Staff;
         }
@@ -127,7 +120,7 @@ public partial class AuthManager : Node
         // Schedule periodic session validation
         var timer = new Timer();
         AddChild(timer);
-        timer.WaitTime = 300; // Check every 5 minutes
+        timer.WaitTime = 10000; // Check every 2 hours, 46 minutes, and 40 seconds
         timer.Timeout += ValidateSessionHealth;
         timer.Start();
     }
@@ -147,8 +140,10 @@ public partial class AuthManager : Node
 
             if (expiresAt.HasValue)
             {
-                var now = DateTime.UtcNow;
-                var timeUntilExpiry = expiresAt.Value - now;
+                DateTime now = DateTime.UtcNow;
+                TimeSpan timeUntilExpiry = expiresAt.Value - now;
+
+                GD.Print($"AuthManager: Session expires in {timeUntilExpiry.TotalSeconds} seconds");
 
                 if (timeUntilExpiry.TotalSeconds < REFRESH_THRESHOLD_SECONDS)
                 {
@@ -348,15 +343,22 @@ public partial class AuthManager : Node
             return false;
 
         DateTime? expiryTime = GetSessionExpiryTime();
-        if (expiryTime.HasValue && DateTime.UtcNow > expiryTime.Value)
+        if (expiryTime.HasValue)
         {
-            _logger.Call("debug", "AuthManager: Session token is expired");
-            return false;
+            DateTime now = DateTime.UtcNow;
+            bool isExpired = now > expiryTime.Value;
+
+            _logger.Call("debug", $"AuthManager: Session expiry check - Now: {now}, Expiry: {expiryTime.Value}, Expired: {isExpired}");
+
+            if (isExpired)
+            {
+                _logger.Call("debug", "AuthManager: Session token is expired");
+                return false;
+            }
         }
 
         return true;
     }
-
     #endregion
 
     #region Permission Methods
@@ -462,7 +464,12 @@ public partial class AuthManager : Node
         // Fall back to calculating from session
         if (_currentSession.ExpiresIn > 0)
         {
-            return _currentSession.CreatedAt.AddSeconds(_currentSession.ExpiresIn);
+            // Ensure we're working with UTC for both dates
+            var createdAtUtc = _currentSession.CreatedAt.Kind == DateTimeKind.Utc
+                ? _currentSession.CreatedAt
+                : _currentSession.CreatedAt.ToUniversalTime();
+
+            return createdAtUtc.AddSeconds(_currentSession.ExpiresIn);
         }
 
         return null;
@@ -488,8 +495,10 @@ public partial class AuthManager : Node
             // Store session expiry timestamp for quick checking
             if (session.ExpiresIn > 0)
             {
-                DateTime expiryTime = session.CreatedAt.AddSeconds(session.ExpiresIn);
+                // Create an absolute expiry time in UTC and explicitly format it
+                DateTime expiryTime = DateTime.UtcNow.AddSeconds(session.ExpiresIn);
                 _secureStorage.StoreValue(SESSION_EXPIRY_KEY, expiryTime.ToString("o"));
+                _logger.Call("debug", $"AuthManager: Session expiry set to {expiryTime}");
             }
 
             _logger.Call("debug", "AuthManager: User session saved securely");
