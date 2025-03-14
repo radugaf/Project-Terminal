@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b25exjlwsy63g"]
 
-[ext_resource type="Script" uid="uid://dymj3xu07rlj1" path="res://Scenes/Home.gd" id="1_dt112"]
+[ext_resource type="Script" uid="uid://bm6kkd5gvbp1m" path="res://Scenes/Home.gd" id="1_dt112"]
 [ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_uq2cn"]
 
 [node name="Home" type="Control"]

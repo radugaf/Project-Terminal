@@ -14,69 +14,16 @@ config/name="ProjectTerminal"
 run/main_scene="uid://dra1rnfronsh6"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
-config/current_user_session="{
-  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiOTExM2MyYS05NWY2LTRhYjEtOTExNy1lMjljZGU3MDYxNjgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQxNjk1MTIxLCJpYXQiOjE3NDE2OTE1MjEsImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiJiOTExM2MyYS05NWY2LTRhYjEtOTExNy1lMjljZGU3MDYxNjgifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDE2OTE1MjF9XSwic2Vzc2lvbl9pZCI6ImQ0YTZmNDE1LWFjYzMtNDBjOS1hNDk5LTQwZWEyMGFmODdhZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.sU48Mlpgwc3FTqCg44CCUFqYRRwjgGoqdXr3JnYUFF0\",
-  \"expiresIn\": 3600,
-  \"providerToken\": null,
-  \"providerRefreshToken\": null,
-  \"refreshToken\": \"_ibU13z4VHG_of61zvZWPQ\",
-  \"tokenType\": \"bearer\",
-  \"user\": {
-    \"appMetadata\": {
-      \"provider\": \"phone\",
-      \"providers\": [
-        []
-      ]
-    },
-    \"aud\": \"authenticated\",
-    \"confirmationSentAt\": \"2025-03-11T11:11:46.016446Z\",
-    \"confirmedAt\": \"2025-03-11T11:12:01.39545Z\",
-    \"createdAt\": \"2025-03-05T18:36:42.853805Z\",
-    \"email\": \"\",
-    \"emailConfirmedAt\": null,
-    \"id\": \"b9113c2a-95f6-4ab1-9117-e29cde706168\",
-    \"identities\": [
-      {
-        \"id\": \"b9113c2a-95f6-4ab1-9117-e29cde706168\",
-        \"userId\": \"b9113c2a-95f6-4ab1-9117-e29cde706168\",
-        \"identityData\": {
-          \"email_verified\": false,
-          \"phone_verified\": false,
-          \"sub\": \"b9113c2a-95f6-4ab1-9117-e29cde706168\"
-        },
-        \"identityId\": \"e17cefc3-9321-43a6-bf3e-fc6444ca4225\",
-        \"provider\": \"phone\",
-        \"createdAt\": \"2025-03-05T18:36:42.881692Z\",
-        \"lastSignInAt\": \"2025-03-05T18:36:42.881646Z\",
-        \"updatedAt\": \"2025-03-05T18:36:42.881692Z\"
-      }
-    ],
-    \"invitedAt\": null,
-    \"lastSignInAt\": \"2025-03-11T11:12:01.3995973Z\",
-    \"phone\": \"40722101097\",
-    \"phoneConfirmedAt\": \"2025-03-11T11:12:01.39545Z\",
-    \"recoverySentAt\": null,
-    \"role\": \"authenticated\",
-    \"updatedAt\": \"2025-03-11T11:12:01.402627Z\",
-    \"bannedUntil\": null,
-    \"isAnonymous\": false,
-    \"factors\": [],
-    \"userMetadata\": {
-      \"email_verified\": false,
-      \"phone_verified\": false,
-      \"sub\": \"b9113c2a-95f6-4ab1-9117-e29cde706168\"
-    }
-  },
-  \"createdAt\": \"2025-03-11T11:12:01.4366375Z\"
-}"
-config/session_expiry_timestamp="2025-03-11T12:12:01.4366375Z"
 
 [autoload]
 
 EnvLoader="*res://Globals/EnvLoader.gd"
-UserSessionManager="*res://Globals/UserSessionManager.cs"
 UIManager="*res://Globals/UIManager.gd"
 Logger="*res://Globals/Logger.gd"
+SecureStorage="*res://Globals/SecureStorage.cs"
+SupabaseClient="*res://Globals/SupabaseClient.cs"
+AuthManager="*res://Globals/AuthManager.cs"
+TerminalSessionManager="*res://Globals/TerminalSessionManager.cs"
 
 [display]
 
