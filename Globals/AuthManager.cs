@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Supabase.Gotrue;
 using static Supabase.Gotrue.Constants;
 using ProjectTerminal.Resources;
-
+using Supabase.Postgrest.Responses;
 /// <summary>
 /// Manages authentication state, user sessions, and permission checking.
 /// Handles staff authentication, session persistence, and authorization.
@@ -219,6 +219,9 @@ public partial class AuthManager : Node
                 return null;
             }
 
+            // Reinitialize the Supabase client with the new session
+            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
+
             // Verify this user is associated with the terminal's organization
             if (!await VerifyUserOrganizationAccessAsync(session.User.Id))
             {
@@ -254,7 +257,7 @@ public partial class AuthManager : Node
         try
         {
             // Query the database to check if user has access to this organization
-            var response = await _supabaseClient.From<Staff>()
+            ModeledResponse<Staff> response = await _supabaseClient.From<Staff>()
                 .Where(s => s.UserId == userId && s.OrganizationId == _terminalManager.TerminalInfo.OrganizationId)
                 .Get();
 

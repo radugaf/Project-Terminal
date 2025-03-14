@@ -144,20 +144,16 @@ public partial class TerminalSessionManager : Node
     /// <summary>
     /// Called when the authentication session changes.
     /// </summary>
-    private void OnSessionChanged()
-    {
+    private void OnSessionChanged() =>
         // Relay the signal
         EmitSignal(SignalName.SessionChanged);
-    }
 
     /// <summary>
     /// Called when the terminal identity changes.
     /// </summary>
-    private void OnTerminalIdentityChanged()
-    {
+    private void OnTerminalIdentityChanged() =>
         // Relay the signal
         EmitSignal(SignalName.TerminalIdentityChanged);
-    }
 
     #endregion
 

@@ -130,8 +130,23 @@ public partial class SecureStorage : Node
             if (value == null)
                 return ClearValue(key);
 
-            // Convert object to Godot Variant
-            var variant = Variant.From(value);
+            // Convert object to Godot Variant based on its type
+            Variant variant;
+
+            if (value is string strValue)
+                variant = Variant.From(strValue);
+            else if (value is int intValue)
+                variant = Variant.From(intValue);
+            else if (value is float floatValue)
+                variant = Variant.From(floatValue);
+            else if (value is double doubleValue)
+                variant = Variant.From((float)doubleValue);
+            else if (value is bool boolValue)
+                variant = Variant.From(boolValue);
+            else if (value is DateTime dateTime)
+                variant = Variant.From(dateTime.ToString("o")); // ISO 8601 format
+            else
+                throw new ArgumentException($"Unsupported type for conversion: {value.GetType().Name}");
 
             // Store in project settings
             ProjectSettings.SetSetting($"application/config/{key}", variant);
@@ -162,22 +177,37 @@ public partial class SecureStorage : Node
                 return default;
             }
 
-            object value = ProjectSettings.GetSetting($"application/config/{key}");
+            Variant variant = ProjectSettings.GetSetting($"application/config/{key}");
 
-            if (value == null)
+            if (variant.VariantType == Variant.Type.Nil)
             {
                 _logger.Call("debug", $"SecureStorage: Null value for key '{key}'");
                 return default;
             }
 
-            // Try to convert the value to the requested type
             try
             {
-                return (T)Convert.ChangeType(value, typeof(T));
+                Type targetType = typeof(T);
+
+                if (targetType == typeof(string))
+                    return (T)(object)variant.AsString();
+                else if (targetType == typeof(int))
+                    return (T)(object)variant.AsInt32();
+                else if (targetType == typeof(bool))
+                    return (T)(object)variant.AsBool();
+                else if (targetType == typeof(float))
+                    return (T)(object)variant.AsSingle();
+                else if (targetType == typeof(double))
+                    return (T)(object)(double)variant.AsSingle();
+                else if (targetType == typeof(DateTime) && variant.VariantType == Variant.Type.String)
+                    return (T)(object)DateTime.Parse(variant.AsString());
+
+                _logger.Call("warn", $"SecureStorage: Unsupported conversion from {variant.VariantType} to {typeof(T).Name}");
+                return default;
             }
-            catch
+            catch (Exception ex)
             {
-                _logger.Call("warn", $"SecureStorage: Could not convert value for key '{key}' to type {typeof(T).Name}");
+                _logger.Call("warn", $"SecureStorage: Could not convert value for key '{key}' to type {typeof(T).Name}: {ex.Message}");
                 return default;
             }
         }
@@ -224,3 +254,5 @@ public partial class SecureStorage : Node
 
     #endregion
 }
+
+
