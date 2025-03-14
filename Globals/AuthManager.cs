@@ -69,26 +69,25 @@ public partial class AuthManager : Node
     public User CurrentUser => _currentSession?.User;
 
     /// <summary>
-    /// Gets the current staff role based on user metadata or claims.
+    /// Gets the current staff role based on user_id.
     /// </summary>
     public StaffRole CurrentUserRole
     {
         get
         {
-            if (_currentSession?.User == null)
-                return StaffRole.Staff; // Default to lowest privilege
+            // Query Staff table for the user's role based on User ID
+            _supabaseClient.From<Staff>()
+                .Where(s => s.UserId == CurrentUser.Id)
+                .Get()
+                .ContinueWith(response =>
+                {
+                    if (response.Result.Models.Count > 0)
+                    {
+                        return response.Result.Models[0].Role;
+                    }
 
-            // Check user claims or metadata for role information
-            // NOTE: Adjust this according to how roles are stored in your Supabase setup
-            if (_currentSession.User.AppMetadata.TryGetValue("role", out object roleObj))
-            {
-                string role = roleObj.ToString().ToLower();
-
-                if (role.Contains("owner"))
-                    return StaffRole.Owner;
-                else if (role.Contains("manager"))
-                    return StaffRole.Manager;
-            }
+                    return StaffRole.Staff;
+                });
 
             return StaffRole.Staff;
         }

@@ -22,6 +22,7 @@ UIManager="*res://Globals/UIManager.gd"
 Logger="*res://Globals/Logger.gd"
 SecureStorage="*res://Globals/SecureStorage.cs"
 SupabaseClient="*res://Globals/SupabaseClient.cs"
+TerminalManager="*res://Globals/TerminalManager.cs"
 AuthManager="*res://Globals/AuthManager.cs"
 TerminalSessionManager="*res://Globals/TerminalSessionManager.cs"
 
