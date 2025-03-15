@@ -12,6 +12,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_uq2cn")
 script = ExtResource("1_dt112")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
@@ -28,8 +29,15 @@ offset_bottom = 38.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="FarmPrintPriceCalculatorNavButton" type="Button" parent="CenterContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+
+[node name="AdminPanel" type="Button" parent="CenterContainer/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme = ExtResource("1_uq2cn")
-text = "3D Print Price Calculator"
+text = "OWNER / MANAGER ADMIN"
+
+[node name="POSTerminal" type="Button" parent="CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "POSTerminal"

@@ -15,11 +15,11 @@ run/main_scene="uid://dra1rnfronsh6"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 config/current_user_session="{
-  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxMmNlZTUxMy0wMzEzLTQ5YmMtYTY4Yi1lYzk5ODRhMjkzMWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQxOTkxNTE0LCJpYXQiOjE3NDE5ODc5MTQsImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiIxMmNlZTUxMy0wMzEzLTQ5YmMtYTY4Yi1lYzk5ODRhMjkzMWYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDE5ODc5MTR9XSwic2Vzc2lvbl9pZCI6ImVmZmIzMzUyLTdhYjEtNDIzNS1iMDQ4LWEwNDE0ZmNmZGJkZiIsImlzX2Fub255bW91cyI6ZmFsc2V9.12n4RmOFSfcAGNIwyQh32QlhOKjtA8i8x6CbOIC-5CQ\",
+  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIxMmNlZTUxMy0wMzEzLTQ5YmMtYTY4Yi1lYzk5ODRhMjkzMWYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQyMDAyOTcxLCJpYXQiOjE3NDE5OTkzNzEsImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiIxMmNlZTUxMy0wMzEzLTQ5YmMtYTY4Yi1lYzk5ODRhMjkzMWYifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDE5OTkzNzF9XSwic2Vzc2lvbl9pZCI6ImY1ZTA1YjYzLTc2NGQtNGFkZi1iZjkxLThjMTFjZDZmNzY1YyIsImlzX2Fub255bW91cyI6ZmFsc2V9.ZU5Vuuh9dcJTC269UtbnB_rGo2WQlQvNFTliqu50dGo\",
   \"expiresIn\": 3600,
   \"providerToken\": null,
   \"providerRefreshToken\": null,
-  \"refreshToken\": \"Ww3cWvxHhJnDHZL8_cFR-w\",
+  \"refreshToken\": \"kWrRoKcSjKbLrhJgDvTc8A\",
   \"tokenType\": \"bearer\",
   \"user\": {
     \"appMetadata\": {
@@ -29,8 +29,8 @@ config/current_user_session="{
       ]
     },
     \"aud\": \"authenticated\",
-    \"confirmationSentAt\": \"2025-03-14T21:31:40.496209Z\",
-    \"confirmedAt\": \"2025-03-14T21:31:54.457074Z\",
+    \"confirmationSentAt\": \"2025-03-15T00:42:36.693428Z\",
+    \"confirmedAt\": \"2025-03-15T00:42:51.123052Z\",
     \"createdAt\": \"2025-03-14T21:31:40.47973Z\",
     \"email\": \"\",
     \"emailConfirmedAt\": null,
@@ -52,12 +52,12 @@ config/current_user_session="{
       }
     ],
     \"invitedAt\": null,
-    \"lastSignInAt\": \"2025-03-14T21:31:54.4612883Z\",
+    \"lastSignInAt\": \"2025-03-15T00:42:51.1266286Z\",
     \"phone\": \"40722101097\",
-    \"phoneConfirmedAt\": \"2025-03-14T21:31:54.457074Z\",
+    \"phoneConfirmedAt\": \"2025-03-15T00:42:51.123052Z\",
     \"recoverySentAt\": null,
     \"role\": \"authenticated\",
-    \"updatedAt\": \"2025-03-14T21:31:54.466017Z\",
+    \"updatedAt\": \"2025-03-15T00:42:51.140706Z\",
     \"bannedUntil\": null,
     \"isAnonymous\": false,
     \"factors\": [],
@@ -67,9 +67,9 @@ config/current_user_session="{
       \"sub\": \"12cee513-0313-49bc-a68b-ec9984a2931f\"
     }
   },
-  \"createdAt\": \"2025-03-14T21:31:55.2170529Z\"
+  \"createdAt\": \"2025-03-15T00:42:52.2176054Z\"
 }"
-config/session_expiry_timestamp="2025-03-14T22:31:55.3285070Z"
+config/session_expiry_timestamp="2025-03-15T01:42:52.7423048Z"
 
 [autoload]
 

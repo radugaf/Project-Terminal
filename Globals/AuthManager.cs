@@ -120,7 +120,7 @@ public partial class AuthManager : Node
         // Schedule periodic session validation
         var timer = new Timer();
         AddChild(timer);
-        timer.WaitTime = 10000; // Check every 2 hours, 46 minutes, and 40 seconds
+        timer.WaitTime = 600; // Check every 10 minutes
         timer.Timeout += ValidateSessionHealth;
         timer.Start();
     }
