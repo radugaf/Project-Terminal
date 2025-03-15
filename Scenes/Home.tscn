@@ -34,6 +34,7 @@ layout_mode = 2
 
 [node name="AdminPanel" type="Button" parent="CenterContainer/HBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 text = "OWNER / MANAGER ADMIN"
 

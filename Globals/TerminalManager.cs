@@ -159,7 +159,7 @@ public partial class TerminalManager : Node
             string terminalId = Guid.NewGuid().ToString();
 
             // Create a terminal record in the database
-            var response = await _supabaseClient.Supabase.From<Terminal>().Insert(new Terminal
+            var response = await _supabaseClient.From<Terminal>().Insert(new Terminal
             {
                 Id = terminalId,
                 OrganizationId = organizationId,
@@ -241,7 +241,7 @@ public partial class TerminalManager : Node
 
         try
         {
-            var response = await _supabaseClient.Supabase.From<Organization>()
+            var response = await _supabaseClient.From<Organization>()
                 .Where(o => o.Id == _terminalIdentity.OrganizationId)
                 .Single();
 
@@ -268,7 +268,7 @@ public partial class TerminalManager : Node
 
         try
         {
-            var response = await _supabaseClient.Supabase.From<Location>()
+            var response = await _supabaseClient.From<Location>()
                 .Where(l => l.OrganizationId == _terminalIdentity.OrganizationId)
                 .Single();
 
@@ -312,7 +312,7 @@ public partial class TerminalManager : Node
         try
         {
             // Mark the terminal as inactive in the database
-            await _supabaseClient.Supabase.From<Terminal>()
+            await _supabaseClient.From<Terminal>()
                 .Where(t => t.Id == _terminalIdentity.Id)
                 .Set(t => t.Active, false)
                 .Set(t => t.UpdatedAt, DateTime.UtcNow)
