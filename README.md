@@ -1,89 +1,108 @@
 # Project-Terminal
 *A comprehensive POS Terminal powered by Godot*
 
-### How Session Persistence Works
-1. When a user logs in via OTP verification, a session is created with:
-    - Access token (for API requests)
-    - Refresh token (for getting new access tokens)
-    - User information
-    - Expiry time
+```mermaid
+flowchart TD
+    %% Define component groups with clearer organization
+    
+    subgraph UI["UI Layer"]
+        style UI fill:#e6f7ff,stroke:#99d6ff
+        LoginScreen["Login.cs User authentication interface"]
+        MainScreen["Home.tscn Main application interface"]
+    end
 
-
-2. This session is stored in ProjectSettings using:
-```cs
-ProjectSettings.SetSetting($"application/config/{SESSION_STORE_KEY}", sessionJson);
-ProjectSettings.SetSetting($"application/config/{SESSION_EXPIRY_KEY}", expiryTime.ToString("o"));
-ProjectSettings.Save();
-```
-
-3. When the app starts, the session is loaded and validated:
-```cs
-// Load session data
-string sessionJson = (string)ProjectSettings.GetSetting($"application/config/{SESSION_STORE_KEY}");
-
-// Check if it's expired
-string expiryTimestamp = (string)ProjectSettings.GetSetting($"application/config/{SESSION_EXPIRY_KEY}");
-```
-
-4. If the session is expired or about to expire, the system attempts to refresh it automatically
-
-### Working with UserSessionManager
-
-Checking Authentication Status
-```cs
-// Always use IsLoggedIn() to check current authentication status
-if (_sessionManager.IsLoggedIn())
-{
-    // User is authenticated, proceed with protected operations
-}
-else
-{
-    // Redirect to login screen
-    GetTree().ChangeSceneToFile("res://Scenes/Login.tscn");
-}
-```
-
-Accessing User Information
-```cs
-// Get current user ID
-string userId = _sessionManager.CurrentUser?.Id;
-
-// Check user properties
-if (_sessionManager.CurrentUser != null)
-{
-    string phoneNumber = _sessionManager.CurrentUser.Phone;
-    // ...other properties
-}
-```
-
-Handling Session Changes
-```cs
-// Connect to the SessionChanged signal
-_sessionManager.Connect(UserSessionManager.SignalName.SessionChanged, Callable.From(OnSessionChanged));
-
-// Handle session changes
-private void OnSessionChanged()
-{
-    // Update UI or state based on new session status
-    if (_sessionManager.IsLoggedIn())
-    {
-        // Session established or refreshed
-        UpdateUIForLoggedInUser();
-    }
-    else
-    {
-        // Session ended
-        RedirectToLogin();
-    }
-}
-```
-
-Implementing Logout
-```cs
-// Always use LogoutAsync for proper cleanup
-private async void OnLogoutButtonPressed()
-{
-    await _sessionManager.LogoutAsync();
-    // UI will be updated via the SessionChanged signal
-}
+    subgraph Facade["Facade Layer"]
+        style Facade fill:#fff2e6,stroke:#ffcc99
+        TSM["TerminalSessionManager.cs Provides unified API & relays signals"]
+    end
+    
+    subgraph Core["Core Managers"]
+        style Core fill:#e6ffe6,stroke:#99ff99
+        AuthManager["AuthManager.cs Manages authentication state & operations"]
+        TerminalManager["TerminalManager.cs Handles terminal identity & registration"]
+        SecureStorage["SecureStorage.cs Securely stores sensitive application data"]
+        SupabaseClient["SupabaseClient.cs Communicates with Supabase services"]
+    end
+    
+    subgraph External["External Services"]
+        style External fill:#f9e6ff,stroke:#d699ff
+        SupabaseAuth["Supabase Auth API Handles authentication requests"]
+        SupabaseDB["Supabase Database Stores application data"]
+    end
+    
+    subgraph Utility["Utility Components"]
+        style Utility fill:#ffe6e6,stroke:#ff9999
+        Logger["Logger.cs Centralized logging system"]
+        EnvLoader["EnvLoader.gd Loads environment variables"]
+    end
+    
+    subgraph AuthFlow["Authentication Flow"]
+        style AuthFlow fill:#e6f2ff,stroke:#99ccff
+        A1["User enters phone number"] --> A2["Request OTP via Supabase"]
+        A2 --> A3["Supabase sends SMS to user"]
+        A3 --> A4["User enters OTP code"]
+        A4 --> A5["Code verified with Supabase"]
+        A5 --> A6["Session created & stored"]
+        A6 --> A7["Session saved in SecureStorage"]
+        A7 --> A8["SessionChanged signal emitted"]
+        A8 --> A9["UI updates based on session"]
+    end
+    
+    subgraph SessionMgmt["Session Management"]
+        style SessionMgmt fill:#f2ffe6,stroke:#ccff99
+        S1["New session received from Supabase"] --> S2["SetSession() called on Supabase client"]
+        S2 --> S3["UTC expiry timestamp calculated"]
+        S3 --> S4["Session stored securely"]
+        S4 --> S5["Timer checks session every 5 minutes"]
+        S5 --> S6{"Is token expiring?"}
+        S6 -->|Yes| S7["RefreshSessionAsync() called"]
+        S6 -->|No| S5
+        S7 --> S8["New token retrieved"]
+        S8 --> S4
+    end
+    
+    subgraph Registration["Terminal Registration"]
+        style Registration fill:#ffe6f2,stroke:#ff99cc
+        T1["Staff with proper permissions initiates"] --> T2["Permission check via CurrentUserRole"]
+        T2 --> T3["Terminal ID generated (GUID)"]
+        T3 --> T4["Terminal record created in database"]
+        T4 --> T5["Terminal identity stored locally"]
+        T5 --> T6["TerminalIdentityChanged signal emitted"]
+    end
+    
+    %% Define signal connections
+    AuthManager --"SessionChanged Signal (login, logout, refresh)" --> TSM
+    TSM --"SessionChanged Signal (relayed to UI)" --> LoginScreen
+    TerminalManager --"TerminalIdentityChanged Signal (registration, update)" --> TSM
+    
+    %% Method calls with detailed labels
+    LoginScreen -- "RequestStaffLoginOtpAsync(phoneNumber)" --> TSM
+    LoginScreen -- "VerifyStaffLoginOtpAsync(phone, otp)" --> TSM
+    LoginScreen -- "IsStaffLoggedIn() check" --> TSM
+    LoginScreen -- "CallDeferred() to change scene" --> MainScreen
+    
+    %% Facade delegation
+    TSM -- "Delegates authentication requests & session management" --> AuthManager
+    TSM -- "Delegates terminal identity & registration operations" --> TerminalManager
+    
+    %% Core manager interactions
+    AuthManager -- "Stores/retrieves session data & expiry" --> SecureStorage
+    AuthManager -- "Auth API calls (OTP, verification, refresh)" --> SupabaseClient
+    TerminalManager -- "Stores/retrieves terminal identity" --> SecureStorage
+    TerminalManager -- "DB operations (terminal registration, checks)" --> SupabaseClient
+    
+    %% External service communication
+    SupabaseClient -- "Authentication requests (sign in, verify, refresh)" --> SupabaseAuth
+    SupabaseClient -- "Data operations (CRUD on terminal records)" --> SupabaseDB
+    SupabaseClient -- "Retrieves API credentials (URL, key)" --> EnvLoader
+    
+    %% Logging system
+    AuthManager -- "Log auth events (debug, info, error)" --> Logger
+    TerminalManager -- "Log terminal events (registration, updates)" --> Logger
+    SecureStorage -- "Log storage operations (store, retrieve, errors)" --> Logger
+    SupabaseClient -- "Log API operations (requests, responses)" --> Logger
+    
+    %% Key business logic highlights
+    classDef authHighlight fill:#ffecb3,stroke:#ffcc00,stroke-width:2px
+    class AuthManager,VerifyStaffLoginOtpAsync,S2,S3,S6,S7 authHighlight
 ```
