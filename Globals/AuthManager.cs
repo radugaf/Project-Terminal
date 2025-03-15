@@ -24,6 +24,12 @@ public partial class AuthManager : Node
     /// </summary>
     private const string SESSION_EXPIRY_KEY = "session_expiry_timestamp";
 
+
+    /// <summary>
+    /// Key used for storing user new state.
+    /// </summary>
+    private const string USER_NEW_STATE_KEY = "user_new_state";
+
     /// <summary>
     /// Time in seconds before token expiry when we should attempt to refresh it.
     /// </summary>
@@ -53,6 +59,8 @@ public partial class AuthManager : Node
     /// Reference to the terminal manager.
     /// </summary>
     private TerminalManager _terminalManager;
+
+    private bool _isNewUser;
 
     #endregion
 
@@ -86,6 +94,10 @@ public partial class AuthManager : Node
         }
     }
 
+    /// <summary>
+    /// Is brand new user
+    /// </summary>
+    public bool IsNewUser => _isNewUser;
     #endregion
 
     #region Signals
@@ -217,6 +229,18 @@ public partial class AuthManager : Node
             // Reinitialize the Supabase client with the new session
             await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
 
+            // Verify if the user is part of any organization
+            _isNewUser = false; // Reset the value
+            if (!await IsUserPartOfAnyOrganizationAsync(session.User.Id))
+            {
+                _logger.Call("warn", $"AuthManager: User {session.User.Id} is not part of any organization");
+                _isNewUser = true;
+            }
+
+            // Save new user state to secure storage
+            _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
+            _logger.Call("debug", $"AuthManager: Saved new user state: {_isNewUser}");
+
             // Verify this user is associated with the terminal's organization
             if (!await VerifyUserOrganizationAccessAsync(session.User.Id))
             {
@@ -237,6 +261,7 @@ public partial class AuthManager : Node
             throw;
         }
     }
+
 
     /// <summary>
     /// Verifies that a user has access to the organization this terminal belongs to.
@@ -264,6 +289,31 @@ public partial class AuthManager : Node
             _logger.Call("error", $"AuthManager: Failed to verify user organization access: {ex.Message}");
             // In case of error, deny access by default for security
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks if a user is part of any organization.
+    /// </summary>
+    /// <param name="userId">The user ID to check</param>
+    /// <returns>True if the user is part of any organization, false otherwise</returns>
+    /// <exception cref="Exception">Thrown if query fails</exception>
+    private async Task<bool> IsUserPartOfAnyOrganizationAsync(string userId)
+    {
+        try
+        {
+            // Query the database to check if user is part of any organization
+            ModeledResponse<Staff> response = await _supabaseClient.From<Staff>()
+                .Where(s => s.UserId == userId)
+                .Get();
+
+            // Check if we found a result
+            return response.Models.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"AuthManager: Failed to check user organization membership: {ex.Message}");
+            throw;
         }
     }
 
@@ -378,7 +428,7 @@ public partial class AuthManager : Node
             return true;
 
         // Get the terminal location
-        var locationId = _terminalManager.TerminalInfo?.LocationId;
+        string locationId = _terminalManager.TerminalInfo?.LocationId;
         if (string.IsNullOrEmpty(locationId))
             return false;
 
@@ -540,6 +590,14 @@ public partial class AuthManager : Node
             }
 
             _currentSession = sessionFromStorage;
+
+            // Load the "new user" state
+            if (_secureStorage.HasKey(USER_NEW_STATE_KEY))
+            {
+                _isNewUser = _secureStorage.RetrieveValue<bool>(USER_NEW_STATE_KEY);
+                _logger.Call("debug", $"AuthManager: Loaded new user state: {_isNewUser}");
+            }
+
             _logger.Call("info", "AuthManager: User session loaded successfully");
         }
         catch (Exception ex)
@@ -560,6 +618,8 @@ public partial class AuthManager : Node
         {
             _secureStorage.ClearValue(USER_SESSION_KEY);
             _secureStorage.ClearValue(SESSION_EXPIRY_KEY);
+            _secureStorage.ClearValue(USER_NEW_STATE_KEY);
+            _isNewUser = false; // Reset the local variable
             _logger.Call("debug", "AuthManager: User session data cleared");
         }
         catch (Exception ex)
@@ -587,6 +647,7 @@ public partial class AuthManager : Node
         try
         {
             // Check user session
+            diagnostics.AppendLine($"Is New User: {_isNewUser}");
             bool hasUserSession = _currentSession != null;
             diagnostics.AppendLine($"Has User Session: {hasUserSession}");
 

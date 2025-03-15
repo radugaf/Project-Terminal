@@ -48,7 +48,6 @@ var device_name: String
 var device_model: String
 var device_os_name: String
 var device_os_version: String
-var system_name: String
 var is_rooted: bool
 var is_emulator: bool
 
@@ -112,7 +111,6 @@ func gather_device_info() -> void:
     device_model = OS.get_model_name()
     device_os_name = OS.get_name()
     device_os_version = OS.get_version()
-    system_name = DisplayServer.get_name()
     device_unique_id = OS.get_unique_id()
 
     # If unique ID is empty (which happens on web platforms), create a fallback
@@ -155,7 +153,6 @@ func get_device_info() -> Dictionary:
             "device_model": device_model,
             "device_os_name": device_os_name,
             "device_os_version": device_os_version,
-            "system_name": system_name,
             "is_rooted": is_rooted,
             "is_emulator": is_emulator
         },
@@ -224,7 +221,6 @@ func run_diagnostics() -> String:
     diagnostics += "Device Model: %s\n" % device_model
     diagnostics += "OS Name: %s\n" % device_os_name
     diagnostics += "OS Version: %s\n" % device_os_version
-    diagnostics += "System Name: %s\n" % system_name
     diagnostics += "Processor: %s\n" % processor_name
     diagnostics += "Rooted/Jailbroken: %s\n" % ("Yes" if is_rooted else "No")
     diagnostics += "Emulator: %s\n" % ("Yes" if is_emulator else "No")

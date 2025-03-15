@@ -164,6 +164,39 @@ namespace ProjectTerminal.Resources
         [Column("device_id")]
         public string DeviceId { get; set; }
 
+        [Column("device_name")]
+        public string DeviceName { get; set; }
+
+        [Column("device_model")]
+        public string DeviceModel { get; set; }
+
+        [Column("device_os")]
+        public string DeviceOs { get; set; }
+
+        [Column("device_os_version")]
+        public string DeviceOsVersion { get; set; }
+
+        [Column("processor_type")]
+        public string ProcessorType { get; set; }
+
+        [Column("ip_address")]
+        public string IpAddress { get; set; }
+
+        [Column("mac_address")]
+        public string MacAddress { get; set; }
+
+        [Column("screen_dpi")]
+        public string ScreenDpi { get; set; }
+
+        [Column("screen_orientation")]
+        public string ScreenOrientation { get; set; }
+
+        [Column("is_touchscreen")]
+        public bool IsTouchscreen { get; set; }
+
+        [Column("screen_scale")]
+        public float ScreenScale { get; set; }
+
         [Column("active")]
         public bool Active { get; set; }
 

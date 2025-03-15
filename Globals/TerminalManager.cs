@@ -41,6 +41,12 @@ public partial class TerminalManager : Node
     /// </summary>
     private AuthManager _authManager;
 
+    /// <summary>
+    ///  Reference to the device manager
+    /// </summary>
+    private Node _deviceManager;
+
+
     #endregion
 
     #region Properties
@@ -80,15 +86,13 @@ public partial class TerminalManager : Node
 
         // Get required dependencies
         _secureStorage = GetNode<SecureStorage>("/root/SecureStorage");
+        _deviceManager = GetNode<Node>("/root/DeviceManager");
 
         // Load terminal identity
         LoadTerminalIdentity();
 
         // Defer getting references to other managers to avoid circular dependency issues
         CallDeferred(nameof(SetupDependencies));
-
-        // Set up heartbeat timer
-        SetupHeartbeatTimer();
     }
 
     /// <summary>
@@ -98,18 +102,6 @@ public partial class TerminalManager : Node
     {
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
         _authManager = GetNode<AuthManager>("/root/AuthManager");
-    }
-
-    /// <summary>
-    /// Sets up a timer for periodic terminal heartbeats.
-    /// </summary>
-    private void SetupHeartbeatTimer()
-    {
-        var timer = new Timer();
-        AddChild(timer);
-        timer.WaitTime = 300; // Send heartbeat every 5 minutes
-        timer.Timeout += SendHeartbeat;
-        timer.Start();
     }
 
     /// <summary>
@@ -131,11 +123,6 @@ public partial class TerminalManager : Node
     /// Registers this terminal to a specific location and organization.
     /// This should be called during initial setup of the terminal, typically by an owner or manager.
     /// </summary>
-    /// <param name="organizationId">The organization ID to register with</param>
-    /// <param name="locationId">The location ID to register with</param>
-    /// <param name="terminalName">Human-readable name for this terminal</param>
-    /// <param name="terminalType">Type of terminal (e.g., "Checkout", "Kitchen")</param>
-    /// <returns>A task representing the asynchronous operation</returns>
     public async Task RegisterTerminalAsync(string organizationId, string locationId, string terminalName, TerminalType terminalType)
     {
         if (!_authManager.IsStaffLoggedIn())
