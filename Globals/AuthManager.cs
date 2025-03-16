@@ -138,8 +138,6 @@ public partial class AuthManager : Node
 
         // Connect to the SupabaseClient initialization signal
         _supabaseClient.ClientInitialized += SyncSessionWithSupabaseClient;
-
-        GD.Print(RunAuthDiagnostics());
     }
 
     private async void SyncSessionWithSupabaseClient()
@@ -196,6 +194,14 @@ public partial class AuthManager : Node
     #endregion
 
     #region Authentication Methods
+
+
+    public bool UserNotNewAnyMore()
+    {
+        _isNewUser = false;
+        _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
+        return _isNewUser;
+    }
 
     /// <summary>
     /// Requests a one-time password sent via SMS to the specified phone number.

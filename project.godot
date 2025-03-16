@@ -14,6 +14,63 @@ config/name="ProjectTerminal"
 run/main_scene="uid://dra1rnfronsh6"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
+config/user_new_state=false
+config/current_user_session="{
+  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyYjUxZDUzYS05MTM1LTQzYzAtODBkNi04NzQ2YWRkYTNhOWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQyMTYwOTk4LCJpYXQiOjE3NDIxNTczOTgsImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiIyYjUxZDUzYS05MTM1LTQzYzAtODBkNi04NzQ2YWRkYTNhOWUifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDIxNTczOTh9XSwic2Vzc2lvbl9pZCI6Ijg2ZmJiMDgyLTRmODctNDVkNS1hNjIyLWQ4ODJlOGYzODdiNCIsImlzX2Fub255bW91cyI6ZmFsc2V9.9EN0N-7_WN2AV_T0vbJDfYwg0pUb54arjyJDg5Rqx-0\",
+  \"expiresIn\": 3600,
+  \"providerToken\": null,
+  \"providerRefreshToken\": null,
+  \"refreshToken\": \"fqV5fUp3wqut36haY1hVVg\",
+  \"tokenType\": \"bearer\",
+  \"user\": {
+    \"appMetadata\": {
+      \"provider\": \"phone\",
+      \"providers\": [
+        []
+      ]
+    },
+    \"aud\": \"authenticated\",
+    \"confirmationSentAt\": \"2025-03-16T20:36:23.118964Z\",
+    \"confirmedAt\": \"2025-03-16T20:36:38.461821Z\",
+    \"createdAt\": \"2025-03-16T20:36:23.102279Z\",
+    \"email\": \"\",
+    \"emailConfirmedAt\": null,
+    \"id\": \"2b51d53a-9135-43c0-80d6-8746adda3a9e\",
+    \"identities\": [
+      {
+        \"id\": \"2b51d53a-9135-43c0-80d6-8746adda3a9e\",
+        \"userId\": \"2b51d53a-9135-43c0-80d6-8746adda3a9e\",
+        \"identityData\": {
+          \"email_verified\": false,
+          \"phone_verified\": false,
+          \"sub\": \"2b51d53a-9135-43c0-80d6-8746adda3a9e\"
+        },
+        \"identityId\": \"07dccfe3-0883-4140-be4f-a788c13e5ee2\",
+        \"provider\": \"phone\",
+        \"createdAt\": \"2025-03-16T20:36:23.108136Z\",
+        \"lastSignInAt\": \"2025-03-16T20:36:23.108084Z\",
+        \"updatedAt\": \"2025-03-16T20:36:23.108136Z\"
+      }
+    ],
+    \"invitedAt\": null,
+    \"lastSignInAt\": \"2025-03-16T20:36:38.4644114Z\",
+    \"phone\": \"40722101097\",
+    \"phoneConfirmedAt\": \"2025-03-16T20:36:38.461821Z\",
+    \"recoverySentAt\": null,
+    \"role\": \"authenticated\",
+    \"updatedAt\": \"2025-03-16T20:36:38.469615Z\",
+    \"bannedUntil\": null,
+    \"isAnonymous\": false,
+    \"factors\": [],
+    \"userMetadata\": {
+      \"email_verified\": false,
+      \"phone_verified\": false,
+      \"sub\": \"2b51d53a-9135-43c0-80d6-8746adda3a9e\"
+    }
+  },
+  \"createdAt\": \"2025-03-16T20:36:38.8728183Z\"
+}"
+config/session_expiry_timestamp="2025-03-16T21:36:39.5346645Z"
 
 [autoload]
 

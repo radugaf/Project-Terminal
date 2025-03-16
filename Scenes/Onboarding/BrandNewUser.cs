@@ -11,6 +11,7 @@ public partial class BrandNewUser : Control
     private Node _logger;
     private TerminalSessionManager _terminalSessionManager;
     private SupabaseClient _supabaseClient;
+    private AuthManager _authManager;
 
     // UI Elements
     private LineEdit _firstNameLineEdit;
@@ -34,6 +35,7 @@ public partial class BrandNewUser : Control
         // Get references to managers
         _terminalSessionManager = GetNode<TerminalSessionManager>("/root/TerminalSessionManager");
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
+        _authManager = GetNode<AuthManager>("/root/AuthManager");
 
         // Get references to UI components
         _firstNameLineEdit = GetNode<LineEdit>("%FirstNameLineEdit");
@@ -94,6 +96,9 @@ public partial class BrandNewUser : Control
 
             UpdateStatusLabel("Registration complete!");
             _logger.Call("info", "BrandNewUser: Registration completed successfully");
+
+            _authManager.UserNotNewAnyMore();
+            _logger.Call("info", "BrandNewUser: User is no longer new");
 
             // Navigate to appropriate next screen
             GoToNextScreen();
