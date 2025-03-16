@@ -127,7 +127,7 @@ public partial class AuthManager : Node
         _terminalManager = GetNode<TerminalManager>("/root/TerminalManager");
 
         // Attempt to load saved user session
-        LoadUserSession();
+        LoadUserSessionAsync();
 
         // Schedule periodic session validation
         var timer = new Timer();
@@ -409,6 +409,7 @@ public partial class AuthManager : Node
 
         return true;
     }
+
     #endregion
 
     #region Permission Methods
@@ -562,7 +563,7 @@ public partial class AuthManager : Node
     /// <summary>
     /// Loads the user session from secure storage.
     /// </summary>
-    private void LoadUserSession()
+    private async void LoadUserSessionAsync()
     {
         _logger.Call("debug", "AuthManager: Attempting to load user session from secure storage");
 
@@ -576,6 +577,9 @@ public partial class AuthManager : Node
                 return;
             }
 
+            // Store the session temporarily to allow for refresh operations
+            _currentSession = sessionFromStorage;
+
             // Check if the session is expired
             if (_secureStorage.HasKey(SESSION_EXPIRY_KEY))
             {
@@ -584,18 +588,22 @@ public partial class AuthManager : Node
                 if (DateTime.TryParse(expiryTimestamp, out DateTime expiryTime) &&
                     DateTime.UtcNow > expiryTime)
                 {
-                    _logger.Call("info", "AuthManager: Loaded user session is expired, will attempt to refresh");
-                    // We still load the session to allow for refresh
+                    _logger.Call("info", "AuthManager: Loaded user session is expired, attempting to refresh now");
+
+                    // Try to refresh the token immediately
+                    try
+                    {
+                        await RefreshSessionAsync();
+                        return; // RefreshSessionAsync will update _currentSession if successful
+                    }
+                    catch (Exception refreshEx)
+                    {
+                        _logger.Call("error", $"AuthManager: Failed to refresh expired token on load: {refreshEx.Message}");
+                        _currentSession = null; // Clear the expired session
+                        ClearUserSession();
+                        return;
+                    }
                 }
-            }
-
-            _currentSession = sessionFromStorage;
-
-            // Load the "new user" state
-            if (_secureStorage.HasKey(USER_NEW_STATE_KEY))
-            {
-                _isNewUser = _secureStorage.RetrieveValue<bool>(USER_NEW_STATE_KEY);
-                _logger.Call("debug", $"AuthManager: Loaded new user state: {_isNewUser}");
             }
 
             _logger.Call("info", "AuthManager: User session loaded successfully");
@@ -606,7 +614,6 @@ public partial class AuthManager : Node
             ClearUserSession();
         }
     }
-
     /// <summary>
     /// Clears all user session data from secure storage.
     /// </summary>
