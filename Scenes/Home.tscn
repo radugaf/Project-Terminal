@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b25exjlwsy63g"]
 
-[ext_resource type="Script" uid="uid://bm6kkd5gvbp1m" path="res://Scenes/Home.gd" id="1_dt112"]
 [ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_uq2cn"]
+[ext_resource type="Script" uid="uid://3fvwu66dvnf5" path="res://Scenes/Home.cs" id="2_oauki"]
 
 [node name="Home" type="Control"]
 layout_mode = 3
@@ -13,7 +13,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_uq2cn")
-script = ExtResource("1_dt112")
+script = ExtResource("2_oauki")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -41,3 +41,8 @@ text = "OWNER / MANAGER ADMIN"
 unique_name_in_owner = true
 layout_mode = 2
 text = "POSTerminal"
+
+[node name="NewUser" type="Button" parent="CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Brand New User"
