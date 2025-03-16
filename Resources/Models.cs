@@ -2,6 +2,8 @@ using System;
 using System.Text.Json.Serialization;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
+using System.Runtime.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace ProjectTerminal.Resources
 {
@@ -61,7 +63,8 @@ namespace ProjectTerminal.Resources
         public string Name { get; set; }
 
         [Column("business_type")]
-        public BusinessType BusinessType { get; set; }
+        [EnumDataType(typeof(BusinessType))]
+        public string BusinessType { get; set; }
 
         [Column("tax_id")]
         public string TaxId { get; set; }
@@ -82,7 +85,8 @@ namespace ProjectTerminal.Resources
         public string BillingAddressId { get; set; }
 
         [Column("status")]
-        public OrganizationStatus Status { get; set; }
+        [EnumDataType(typeof(OrganizationStatus))]
+        public string Status { get; set; }
 
         [Column("verification_documents")]
         public string VerificationDocuments { get; set; }
@@ -159,7 +163,8 @@ namespace ProjectTerminal.Resources
         public string TerminalName { get; set; }
 
         [Column("terminal_type")]
-        public TerminalType TerminalType { get; set; }
+        [EnumDataType(typeof(TerminalType))]
+        public string TerminalType { get; set; }
 
         [Column("device_id")]
         public string DeviceId { get; set; }
@@ -229,7 +234,8 @@ namespace ProjectTerminal.Resources
         public string OrganizationId { get; set; }
 
         [Column("role")]
-        public StaffRole Role { get; set; }
+        [EnumDataType(typeof(StaffRole))]
+        public string Role { get; set; }
 
         [Column("job_title")]
         public string JobTitle { get; set; }
@@ -312,8 +318,11 @@ namespace ProjectTerminal.Resources
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum StaffRole
     {
+        [EnumMember(Value = "owner")]
         Owner,
+        [EnumMember(Value = "manager")]
         Manager,
+        [EnumMember(Value = "staff")]
         Staff
     }
 
@@ -323,10 +332,19 @@ namespace ProjectTerminal.Resources
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum BusinessType
     {
+        [EnumMember(Value = "restaurant")]
         Restaurant,
+
+        [EnumMember(Value = "cafe")]
         Cafe,
+
+        [EnumMember(Value = "retail")]
         Retail,
+
+        [EnumMember(Value = "grocery")]
         Grocery,
+
+        [EnumMember(Value = "salon")]
         Salon
     }
 
@@ -336,9 +354,13 @@ namespace ProjectTerminal.Resources
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum TerminalType
     {
+        [EnumMember(Value = "checkout")]
         Checkout,
+        [EnumMember(Value = "kitchen")]
         Kitchen,
+        [EnumMember(Value = "manager")]
         Manager,
+        [EnumMember(Value = "inventory")]
         Inventory
     }
 
@@ -348,9 +370,14 @@ namespace ProjectTerminal.Resources
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum OrganizationStatus
     {
-        PendingReview,
+        [EnumMember(Value = "pending_review")]
+        Pending_Review,
+        [EnumMember(Value = "approved")]
         Approved,
+        [EnumMember(Value = "rejected")]
         Rejected,
+        [EnumMember(Value = "suspended")]
         Suspended
     }
 }
+

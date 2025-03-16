@@ -88,7 +88,7 @@ public partial class AuthManager : Node
             _supabaseClient.From<Staff>()
                 .Where(s => s.UserId == CurrentUser.Id)
                 .Get()
-                .ContinueWith(response => response.Result.Models.Count > 0 ? response.Result.Models[0].Role : StaffRole.Staff);
+                .ContinueWith(response => response.Result.Models.Count > 0 ? response.Result.Models[0].Role : StaffRole.Staff.ToString().ToLower());
 
             return StaffRole.Staff;
         }
@@ -135,6 +135,29 @@ public partial class AuthManager : Node
         timer.WaitTime = 600; // Check every 10 minutes
         timer.Timeout += ValidateSessionHealth;
         timer.Start();
+
+        // Connect to the SupabaseClient initialization signal
+        _supabaseClient.ClientInitialized += SyncSessionWithSupabaseClient;
+
+        GD.Print(RunAuthDiagnostics());
+    }
+
+    private async void SyncSessionWithSupabaseClient()
+    {
+        _logger.Call("debug", "AuthManager: SupabaseClient initialized, syncing session");
+
+        if (_currentSession != null && !string.IsNullOrEmpty(_currentSession.AccessToken))
+        {
+            try
+            {
+                await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                _logger.Call("info", "AuthManager: Session synchronized with initialized SupabaseClient");
+            }
+            catch (Exception ex)
+            {
+                _logger.Call("error", $"AuthManager: Failed to sync session with SupabaseClient: {ex.Message}");
+            }
+        }
     }
 
     /// <summary>
@@ -395,10 +418,10 @@ public partial class AuthManager : Node
         DateTime? expiryTime = GetSessionExpiryTime();
         if (expiryTime.HasValue)
         {
-            DateTime now = DateTime.UtcNow;
-            bool isExpired = now > expiryTime.Value;
+            DateTime nowUtc = DateTime.UtcNow;
+            bool isExpired = nowUtc > expiryTime.Value;
 
-            _logger.Call("debug", $"AuthManager: Session expiry check - Now: {now}, Expiry: {expiryTime.Value}, Expired: {isExpired}");
+            _logger.Call("debug", $"AuthManager: Session expiry check - Now: {nowUtc} UTC, Expiry: {expiryTime.Value} UTC, Expired: {isExpired}");
 
             if (isExpired)
             {
@@ -409,7 +432,6 @@ public partial class AuthManager : Node
 
         return true;
     }
-
     #endregion
 
     #region Permission Methods
@@ -508,7 +530,8 @@ public partial class AuthManager : Node
             string storedTimestamp = _secureStorage.RetrieveValue<string>(SESSION_EXPIRY_KEY);
             if (DateTime.TryParse(storedTimestamp, out DateTime timestamp))
             {
-                return timestamp;
+                // FIXED: Ensure the parsed timestamp is treated as UTC
+                return timestamp.Kind == DateTimeKind.Utc ? timestamp : DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
             }
         }
 
@@ -516,9 +539,9 @@ public partial class AuthManager : Node
         if (_currentSession.ExpiresIn > 0)
         {
             // Ensure we're working with UTC for both dates
-            var createdAtUtc = _currentSession.CreatedAt.Kind == DateTimeKind.Utc
+            DateTime createdAtUtc = _currentSession.CreatedAt.Kind == DateTimeKind.Utc
                 ? _currentSession.CreatedAt
-                : _currentSession.CreatedAt.ToUniversalTime();
+                : DateTime.SpecifyKind(_currentSession.CreatedAt, DateTimeKind.Utc);
 
             return createdAtUtc.AddSeconds(_currentSession.ExpiresIn);
         }
@@ -549,7 +572,7 @@ public partial class AuthManager : Node
                 // Create an absolute expiry time in UTC and explicitly format it
                 DateTime expiryTime = DateTime.UtcNow.AddSeconds(session.ExpiresIn);
                 _secureStorage.StoreValue(SESSION_EXPIRY_KEY, expiryTime.ToString("o"));
-                _logger.Call("debug", $"AuthManager: Session expiry set to {expiryTime}");
+                _logger.Call("debug", $"AuthManager: Session expiry set to {expiryTime} UTC");
             }
 
             _logger.Call("debug", "AuthManager: User session saved securely");
@@ -606,6 +629,25 @@ public partial class AuthManager : Node
                 }
             }
 
+            // THIS IS THE KEY ADDITION: Explicitly set the session on SupabaseClient's Auth instance
+            if (_supabaseClient != null && _supabaseClient.Supabase != null)
+            {
+                try
+                {
+                    await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                    _logger.Call("debug", "AuthManager: Session explicitly set on SupabaseClient Auth");
+                }
+                catch (Exception setSessionEx)
+                {
+                    _logger.Call("error", $"AuthManager: Failed to set session on SupabaseClient: {setSessionEx.Message}");
+                    // Continue anyway, we'll try to recover when SupabaseClient is fully initialized
+                }
+            }
+            else
+            {
+                _logger.Call("debug", "AuthManager: SupabaseClient not ready yet, session will be synced when client initializes");
+            }
+
             _logger.Call("info", "AuthManager: User session loaded successfully");
         }
         catch (Exception ex)
@@ -614,6 +656,7 @@ public partial class AuthManager : Node
             ClearUserSession();
         }
     }
+
     /// <summary>
     /// Clears all user session data from secure storage.
     /// </summary>

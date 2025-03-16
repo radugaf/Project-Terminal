@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Threading.Tasks;
 using ProjectTerminal.Resources;
-
+using Supabase.Postgrest.Responses;
 /// <summary>
 /// Manages terminal identity, registration, and location-specific operations.
 /// Handles terminal registration, terminal identity persistence, and related operations.
@@ -142,17 +142,14 @@ public partial class TerminalManager : Node
 
         try
         {
-            // Generate a unique terminal ID
-            string terminalId = Guid.NewGuid().ToString();
 
             // Create a terminal record in the database
-            var response = await _supabaseClient.From<Terminal>().Insert(new Terminal
+            ModeledResponse<Terminal> response = await _supabaseClient.From<Terminal>().Insert(new Terminal
             {
-                Id = terminalId,
                 OrganizationId = organizationId,
                 LocationId = locationId,
                 TerminalName = terminalName,
-                TerminalType = terminalType,
+                TerminalType = terminalType.ToString().ToLower(),
                 Active = true,
                 RegisteredBy = _authManager.CurrentUser.Id
             });
@@ -166,17 +163,16 @@ public partial class TerminalManager : Node
             // Create and save the terminal identity locally
             _terminalIdentity = new Terminal
             {
-                Id = terminalId,
                 OrganizationId = organizationId,
                 LocationId = locationId,
                 TerminalName = terminalName,
-                TerminalType = terminalType,
+                TerminalType = terminalType.ToString().ToLower(),
                 UpdatedAt = DateTime.UtcNow
             };
 
             SaveTerminalIdentity();
 
-            _logger.Call("info", $"TerminalManager: Terminal registered successfully with ID: {terminalId}");
+            _logger.Call("info", $"TerminalManager: Terminal registered successfully with Name: {terminalName}, Type: {terminalType}");
             EmitSignal(SignalName.TerminalIdentityChanged);
         }
         catch (Exception ex)

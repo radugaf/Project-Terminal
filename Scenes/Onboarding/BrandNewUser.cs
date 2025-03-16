@@ -3,8 +3,9 @@ using System;
 using System.Threading.Tasks;
 using Supabase.Gotrue;
 using ProjectTerminal.Resources;
-using System.Collections.Generic;
 using Supabase.Postgrest.Responses;
+using Supabase.Postgrest;
+
 public partial class BrandNewUser : Control
 {
     private Node _logger;
@@ -23,6 +24,7 @@ public partial class BrandNewUser : Control
     private Label _statusLabel;
 
     // State tracking
+    private string _createdOrganizationId;
 
     public override void _Ready()
     {
@@ -85,17 +87,16 @@ public partial class BrandNewUser : Control
             await UpdateUserEmail(currentUser.Id);
 
             // 2. Create organization
-            string organizationId = await CreateOrganization(currentUser.Id);
+            _createdOrganizationId = await CreateOrganization(currentUser.Id);
 
             // 3. Register staff as owner
-            await RegisterStaffOwner(organizationId, currentUser.Id);
-
+            await RegisterStaffOwner(_createdOrganizationId, currentUser.Id);
 
             UpdateStatusLabel("Registration complete!");
             _logger.Call("info", "BrandNewUser: Registration completed successfully");
 
             // Navigate to appropriate next screen
-            GD.Print("Navigate to next screen");
+            GoToNextScreen();
         }
         catch (Exception ex)
         {
@@ -179,29 +180,39 @@ public partial class BrandNewUser : Control
 
             // Get business type from option button
             var businessType = (BusinessType)_businessTypeOptionButton.Selected;
+            _logger.Call("debug", $"BrandNewUser: Selected business type: {businessType}");
 
             // Create organization record
             var organization = new Organization
             {
                 Name = _businessNameLineEdit.Text.Trim(),
-                BusinessType = businessType,
+                BusinessType = businessType.ToString().ToLower(),
                 Phone = GetUserPhoneNumber(),  // Get from current authenticated user
                 Email = _emailLineEdit.Text.Trim(),
-                Status = OrganizationStatus.PendingReview,
+                Status = OrganizationStatus.Pending_Review.ToString().ToLower(),
                 CreatedBy = userId,
                 IsActive = true
             };
 
             // Insert into database
-            ModeledResponse<Organization> response = await _supabaseClient.From<Organization>().Insert(organization);
+            ModeledResponse<Organization> response = await _supabaseClient.From<Organization>().Insert(organization, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
             {
                 throw new Exception("Failed to create organization record");
             }
 
-            _logger.Call("info", $"BrandNewUser: Organization created with ID: {organization.Id}");
-            return organization.Id;
+            string organizationId = response.Model?.Id;
+            _logger.Call("info", $"BrandNewUser: Organization created with ID: {organizationId}");
+
+            // Extra logging to verify ID
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                _logger.Call("error", "BrandNewUser: Organization ID is null or empty after insert");
+                throw new Exception("Organization ID is null or empty after creation");
+            }
+
+            return organizationId;
         }
         catch (Exception ex)
         {
@@ -214,6 +225,12 @@ public partial class BrandNewUser : Control
     {
         try
         {
+            if (string.IsNullOrEmpty(organizationId))
+            {
+                _logger.Call("error", "BrandNewUser: Cannot register staff with null/empty organization ID");
+                throw new Exception("Invalid organization ID");
+            }
+
             _logger.Call("debug", $"BrandNewUser: Registering user as staff owner for organization {organizationId}");
 
             // Create staff record
@@ -221,20 +238,21 @@ public partial class BrandNewUser : Control
             {
                 UserId = userId,
                 OrganizationId = organizationId,
-                Role = StaffRole.Owner,
+                Role = StaffRole.Owner.ToString().ToLower(),
                 JobTitle = "Owner",
                 FirstName = _firstNameLineEdit.Text.Trim(),
                 LastName = _lastNameLineEdit.Text.Trim(),
                 Email = _emailLineEdit.Text.Trim(),
-                Phone = GetUserPhoneNumber(),  // Get from current authenticated user
-                IsActive = true,
+                Phone = GetUserPhoneNumber(),
+                IsActive = true
             };
 
             // Insert into database
-            var response = await _supabaseClient.From<Staff>().Insert(staff);
+            ModeledResponse<Staff> response = await _supabaseClient.From<Staff>().Insert(staff, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
             {
+                _logger.Call("error", $"BrandNewUser: Staff insert response error: {response.ResponseMessage.ReasonPhrase}");
                 throw new Exception("Failed to create staff record");
             }
 
@@ -300,4 +318,9 @@ public partial class BrandNewUser : Control
             _businessTypeOptionButton.Select(0);
     }
 
+    private void GoToNextScreen()
+    {
+        // Wait briefly to show success message before transitioning
+        GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+    }
 }
