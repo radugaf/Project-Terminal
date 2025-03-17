@@ -148,12 +148,29 @@ public partial class AuthManager : Node
         {
             try
             {
-                await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
-                _logger.Call("info", "AuthManager: Session synchronized with initialized SupabaseClient");
+                // Check if token is expired
+                DateTime? expiryTime = GetSessionExpiryTime();
+                bool isExpired = expiryTime.HasValue && DateTime.UtcNow > expiryTime.Value;
+
+                if (isExpired && !string.IsNullOrEmpty(_currentSession.RefreshToken))
+                {
+                    _logger.Call("info", "AuthManager: Token expired, refreshing during sync");
+                    await RefreshSessionAsync();
+                }
+                else
+                {
+                    await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                    _logger.Call("info", "AuthManager: Session synchronized with initialized SupabaseClient");
+                }
             }
             catch (Exception ex)
             {
                 _logger.Call("error", $"AuthManager: Failed to sync session with SupabaseClient: {ex.Message}");
+
+                // If we failed to sync, we should clear the session to force re-login
+                _currentSession = null;
+                ClearUserSession();
+                EmitSignal(SignalName.SessionChanged);
             }
         }
     }
@@ -362,7 +379,14 @@ public partial class AuthManager : Node
         {
             _logger.Call("debug", "AuthManager: Refreshing session token");
 
-            var refreshedSession = await _supabaseClient.Auth.RefreshSession();
+            // First check if SupabaseClient is ready
+            if (_supabaseClient == null || _supabaseClient.Supabase == null || _supabaseClient.Auth == null)
+            {
+                _logger.Call("error", "AuthManager: Cannot refresh session: Supabase client not initialized");
+                throw new InvalidOperationException("Supabase client not initialized");
+            }
+
+            Session refreshedSession = await _supabaseClient.Auth.RefreshSession();
 
             if (refreshedSession != null)
             {
@@ -370,6 +394,11 @@ public partial class AuthManager : Node
                 SaveUserSession(refreshedSession);
                 _logger.Call("debug", "AuthManager: Session refreshed successfully");
                 EmitSignal(SignalName.SessionChanged);
+            }
+            else
+            {
+                _logger.Call("error", "AuthManager: Session refresh returned null");
+                throw new InvalidOperationException("Session refresh returned null");
             }
         }
         catch (Exception ex)
@@ -606,10 +635,11 @@ public partial class AuthManager : Node
                 return;
             }
 
-            // Store the session temporarily to allow for refresh operations
+            // Store the session temporarily
             _currentSession = sessionFromStorage;
 
-            // Check if the session is expired
+            // Check if the session is expired - but DEFER refresh until client is ready
+            bool isExpired = false;
             if (_secureStorage.HasKey(SESSION_EXPIRY_KEY))
             {
                 string expiryTimestamp = _secureStorage.RetrieveValue<string>(SESSION_EXPIRY_KEY);
@@ -617,41 +647,36 @@ public partial class AuthManager : Node
                 if (DateTime.TryParse(expiryTimestamp, out DateTime expiryTime) &&
                     DateTime.UtcNow > expiryTime)
                 {
-                    _logger.Call("info", "AuthManager: Loaded user session is expired, attempting to refresh now");
+                    _logger.Call("info", "AuthManager: Loaded user session is expired, will refresh when client is ready");
+                    isExpired = true;
+                }
+            }
 
-                    // Try to refresh the token immediately
-                    try
+            // Connect to the client initialization signal if we need to refresh
+            if (isExpired && _supabaseClient != null)
+            {
+                // If client is already initialized, refresh now
+                if (_supabaseClient.Supabase != null)
+                {
+                    _logger.Call("debug", "AuthManager: Supabase client already initialized, refreshing token now");
+                    await RefreshSessionAsync();
+                }
+                else
+                {
+                    // Otherwise wait for client to be initialized
+                    _logger.Call("debug", "AuthManager: Waiting for Supabase client initialization before token refresh");
+                    _supabaseClient.ClientInitialized += async () =>
                     {
+                        _logger.Call("debug", "AuthManager: Supabase client initialized, now refreshing expired token");
                         await RefreshSessionAsync();
-                        return; // RefreshSessionAsync will update _currentSession if successful
-                    }
-                    catch (Exception refreshEx)
-                    {
-                        _logger.Call("error", $"AuthManager: Failed to refresh expired token on load: {refreshEx.Message}");
-                        _currentSession = null; // Clear the expired session
-                        ClearUserSession();
-                        return;
-                    }
+                    };
                 }
             }
-
-            // THIS IS THE KEY ADDITION: Explicitly set the session on SupabaseClient's Auth instance
-            if (_supabaseClient != null && _supabaseClient.Supabase != null)
+            else if (!isExpired && _supabaseClient != null && _supabaseClient.Supabase != null)
             {
-                try
-                {
-                    await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
-                    _logger.Call("debug", "AuthManager: Session explicitly set on SupabaseClient Auth");
-                }
-                catch (Exception setSessionEx)
-                {
-                    _logger.Call("error", $"AuthManager: Failed to set session on SupabaseClient: {setSessionEx.Message}");
-                    // Continue anyway, we'll try to recover when SupabaseClient is fully initialized
-                }
-            }
-            else
-            {
-                _logger.Call("debug", "AuthManager: SupabaseClient not ready yet, session will be synced when client initializes");
+                // If not expired and client is ready, set the session
+                await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                _logger.Call("debug", "AuthManager: Session explicitly set on SupabaseClient Auth");
             }
 
             _logger.Call("info", "AuthManager: User session loaded successfully");
