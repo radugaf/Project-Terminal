@@ -1,5 +1,4 @@
 using Godot;
-using ProjectTerminal.Resources;
 
 /// <summary>
 /// Home screen controller handling navigation to main application areas.

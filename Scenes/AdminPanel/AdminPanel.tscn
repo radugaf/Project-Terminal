@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://bua0504jacnfi"]
+
+[node name="AdminPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.154
+anchor_bottom = 1.0
+offset_right = 0.319977
+grow_vertical = 2
+color = Color(1, 1, 0.647059, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.154
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.319977
+grow_horizontal = 0
+grow_vertical = 2
+color = Color(0.568627, 0.670588, 1, 1)
