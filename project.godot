@@ -14,9 +14,6 @@ config/name="ProjectTerminal"
 run/main_scene="uid://dra1rnfronsh6"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
-config/user_new_state=""
-config/current_user_session=""
-config/session_expiry_timestamp=""
 
 [autoload]
 

@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://bua0504jacnfi"]
+[gd_scene load_steps=2 format=3 uid="uid://bua0504jacnfi"]
+
+[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_v8vkq"]
 
 [node name="AdminPanel" type="Control"]
 layout_mode = 3
@@ -7,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_v8vkq")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
@@ -16,6 +19,29 @@ anchor_bottom = 1.0
 offset_right = 0.319977
 grow_vertical = 2
 color = Color(1, 1, 0.647059, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/MarginContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="ColorRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Items"
+
+[node name="Button3" type="Button" parent="ColorRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Staff"
+
+[node name="Button2" type="Button" parent="ColorRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "History"
 
 [node name="ColorRect2" type="ColorRect" parent="."]
 layout_mode = 1

@@ -26,6 +26,7 @@ public partial class BrandNewUser : Control
 
     // State tracking
     private string _createdOrganizationId;
+    private bool _registerAsTerminal = false;
 
     public override void _Ready()
     {
@@ -54,8 +55,29 @@ public partial class BrandNewUser : Control
         if (_statusLabel != null)
             _statusLabel.Text = "";
 
+        _deviceYesButton.ToggleMode = true;
+        _deviceNoButton.ToggleMode = true;
+
         // Connect signals
         _submitButton.Pressed += OnSubmitButtonPressed;
+        _deviceYesButton.Pressed += OnDeviceYesButtonPressed;
+        _deviceNoButton.Pressed += OnDeviceNoButtonPressed;
+    }
+
+    private void OnDeviceYesButtonPressed()
+    {
+        _registerAsTerminal = true;
+        _deviceYesButton.ButtonPressed = true;
+        _deviceNoButton.ButtonPressed = false;
+        _logger.Call("debug", "BrandNewUser: Device will be registered as a terminal");
+    }
+
+    private void OnDeviceNoButtonPressed()
+    {
+        _registerAsTerminal = false;
+        _deviceYesButton.ButtonPressed = false;
+        _deviceNoButton.ButtonPressed = true;
+        _logger.Call("debug", "BrandNewUser: Device will not be registered as a terminal");
     }
 
     private async void OnSubmitButtonPressed()
@@ -91,7 +113,7 @@ public partial class BrandNewUser : Control
             // 2. Create organization
             _createdOrganizationId = await CreateOrganization(currentUser.Id);
 
-            // 3. Register staff as owner
+            // 4. Register staff as owner
             await RegisterStaffOwner(_createdOrganizationId, currentUser.Id);
 
             UpdateStatusLabel("Registration complete!");
@@ -150,6 +172,14 @@ public partial class BrandNewUser : Control
         {
             UpdateStatusLabel("Error: Please select a business type");
             _logger.Call("warn", "BrandNewUser: No business type selected");
+            return false;
+        }
+
+        // Check terminal selection
+        if (!_deviceYesButton.ButtonPressed && !_deviceNoButton.ButtonPressed)
+        {
+            UpdateStatusLabel("Error: Please select whether to use this device as a terminal");
+            _logger.Call("warn", "BrandNewUser: Terminal selection not made");
             return false;
         }
 
@@ -257,11 +287,12 @@ public partial class BrandNewUser : Control
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
             {
-                _logger.Call("error", $"BrandNewUser: Staff insert response error: {response.ResponseMessage.ReasonPhrase}");
+                _logger.Call("error", $"BrandNewUser: Staff insert response error: {response?.ResponseMessage?.ReasonPhrase}");
                 throw new Exception("Failed to create staff record");
             }
 
-            _logger.Call("info", $"BrandNewUser: Staff owner registered with ID: {staff.Id}");
+            string staffId = response.Model?.Id;
+            _logger.Call("info", $"BrandNewUser: Staff owner registered with ID: {staffId}");
         }
         catch (Exception ex)
         {
@@ -269,7 +300,6 @@ public partial class BrandNewUser : Control
             throw new Exception($"Failed to register as staff owner: {ex.Message}", ex);
         }
     }
-
     private string GetUserPhoneNumber()
     {
         // Extract phone number from current user's metadata
@@ -325,6 +355,11 @@ public partial class BrandNewUser : Control
 
     private void GoToNextScreen()
     {
+        if (_registerAsTerminal)
+        {
+            // If registered as terminal, go to Terminal scene
+            GetTree().ChangeSceneToFile("res://Scenes/Onboarding/RegisterThisTerminal.tscn");
+        }
         // Wait briefly to show success message before transitioning
         GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
     }
