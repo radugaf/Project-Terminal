@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
+
 /// <summary>
 /// Manages terminal identity, registration, and location-specific operations.
 /// Handles terminal registration, terminal identity persistence, and related operations.
