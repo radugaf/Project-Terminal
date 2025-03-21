@@ -80,6 +80,10 @@ unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Postal Code"
 
+[node name="TerminalTypeOptionButton" type="OptionButton" parent="ColorRect/MarginContainer/VBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="StatusLabel" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

@@ -359,12 +359,22 @@ public partial class BrandNewUser : Control
 
     private void GoToNextScreen()
     {
-        if (_registerAsTerminal)
+        try
         {
-            // If registered as terminal, go to Terminal scene
-            GetTree().ChangeSceneToFile("res://Scenes/Onboarding/RegisterThisTerminal.tscn");
+            if (_registerAsTerminal)
+            {
+                // If registered as terminal, go to Terminal scene
+                GetTree().ChangeSceneToFile("res://Scenes/Onboarding/RegisterThisTerminal.tscn");
+            }
+            else
+            {
+                // Only set up timer for Home scene if not registering terminal
+                GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+            }
         }
-        // Wait briefly to show success message before transitioning
-        GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"BrandNewUser: Exception in GoToNextScreen: {ex.Message}");
+        }
     }
 }

@@ -20,6 +20,7 @@ public partial class RegisterThisTerminal : Control
     private LineEdit _streetOneLineEdit;
     private LineEdit _streetTwoLineEdit;
     private LineEdit _postalCodeLineEdit;
+    private OptionButton _terminalTypeOptionButton;
     private Label _statusLabel;
     private Button _submitButton;
 
@@ -46,8 +47,12 @@ public partial class RegisterThisTerminal : Control
         _streetOneLineEdit = GetNode<LineEdit>("%StreetOneLineEdit");
         _streetTwoLineEdit = GetNode<LineEdit>("%StreetTwoLineEdit");
         _postalCodeLineEdit = GetNode<LineEdit>("%PostalCodeLineEdit");
+        _terminalTypeOptionButton = GetNode<OptionButton>("%TerminalTypeOptionButton");
         _statusLabel = GetNode<Label>("%StatusLabel");
         _submitButton = GetNode<Button>("%SubmitButton");
+
+        // Populate terminal type options
+        PopulateTerminalTypes();
 
         _submitButton.Pressed += OnSubmitButtonPressed;
     }
@@ -101,6 +106,21 @@ public partial class RegisterThisTerminal : Control
             _statusLabel.Text = message;
             _logger.Call("debug", $"RegisterThisTerminal: Status updated - {message}");
         }
+    }
+
+    private void PopulateTerminalTypes()
+    {
+        _terminalTypeOptionButton.Clear();
+
+        // Add enum values to dropdown
+        foreach (TerminalType type in Enum.GetValues(typeof(TerminalType)))
+        {
+            _terminalTypeOptionButton.AddItem(type.ToString());
+        }
+
+        // Set default selection
+        if (_terminalTypeOptionButton.ItemCount > 0)
+            _terminalTypeOptionButton.Select(0);
     }
 
     private bool ValidateInputs()
@@ -193,6 +213,7 @@ public partial class RegisterThisTerminal : Control
             Phone = _terminalSessionManager.CurrentUser.Phone,
             Email = _terminalSessionManager.CurrentUser.Email,
             AddressId = addressId,
+            BusinessHours = "{}",
             IsActive = false,
         };
 
@@ -212,25 +233,36 @@ public partial class RegisterThisTerminal : Control
 
     private async Task<Terminal> CreateTerminal(string orgId, string locationId, string userId)
     {
+        // Get terminal type from dropdown
+        var terminalType = (TerminalType)_terminalTypeOptionButton.Selected;
+
+        // Get device information from DeviceManager
+        var deviceInfo = _deviceManager.Call("get_device_info").AsGodotDictionary();
+        var basicInfo = deviceInfo["basic_info"].AsGodotDictionary();
+        var screenInfo = deviceInfo["screen_info"].AsGodotDictionary();
+        var networkInfo = deviceInfo["network_info"].AsGodotDictionary();
+
+        // Create the terminal with actual device information
         var terminal = new Terminal
         {
             OrganizationId = orgId,
             LocationId = locationId,
-            TerminalName = "",
-            TerminalType = "",
-            DeviceId = "",
+            TerminalName = $"{_locationNameLineEdit.Text} {terminalType}",
+            TerminalType = terminalType.ToString().ToLower(),
+            DeviceId = basicInfo["device_unique_id"].AsString(),
             Active = true,
             RegisteredBy = userId,
-            DeviceName = "",
-            DeviceModel = "",
-            DeviceOs = "",
-            DeviceOsVersion = "",
-            ProcessorType = "",
-            IpAddress = "",
-            ScreenDpi = "",
-            ScreenOrientation = "",
-            IsTouchscreen = false,
-            ScreenScale = "",
+            DeviceName = basicInfo["device_name"].AsString(),
+            DeviceModel = basicInfo["device_model"].AsString(),
+            DeviceOs = basicInfo["device_os_name"].AsString(),
+            DeviceOsVersion = basicInfo["device_os_version"].AsString(),
+            ProcessorType = deviceInfo["hardware_info"].AsGodotDictionary()["processor_name"].AsString(),
+            IpAddress = networkInfo["ip_address"].AsString(),
+            MacAddress = networkInfo["mac_address"].AsString(),
+            ScreenDpi = screenInfo["screen_dpi"].AsString(),
+            ScreenOrientation = screenInfo["screen_orientation"].AsString(),
+            IsTouchscreen = screenInfo["is_touchscreen"].AsBool(),
+            ScreenScale = screenInfo["screen_scale"].AsString(),
         };
 
         ModeledResponse<Terminal> response = await _supabaseClient.From<Terminal>()
@@ -250,6 +282,27 @@ public partial class RegisterThisTerminal : Control
 
     private void GoToNextScreen()
     {
-        GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+        try
+        {
+            var tree = GetTree();
+            if (tree == null)
+            {
+                _logger.Call("error", "RegisterThisTerminal: SceneTree is null in GoToNextScreen");
+                return;
+            }
+
+            tree.CreateTimer(2.0f).Timeout += () =>
+            {
+                var sceneTree = GetTree();
+                if (sceneTree != null)
+                {
+                    sceneTree.ChangeSceneToFile("res://Scenes/Home.tscn");
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"RegisterThisTerminal: Exception in GoToNextScreen: {ex.Message}");
+        }
     }
 }
