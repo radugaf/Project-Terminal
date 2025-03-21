@@ -182,6 +182,13 @@ public partial class TerminalManager : Node
             throw;
         }
     }
+    public void SetTerminal(Terminal terminal)
+    {
+        _terminalIdentity = terminal;
+        SaveTerminalIdentity();
+        EmitSignal(SignalName.TerminalIdentityChanged);
+        _logger.Call("info", $"TerminalManager: Terminal identity set to {terminal.Id}");
+    }
 
     /// <summary>
     /// Updates the terminal heartbeat to indicate it's still active.
@@ -333,12 +340,8 @@ public partial class TerminalManager : Node
 
         try
         {
-            // Update the last updated timestamp
-            _terminalIdentity.UpdatedAt = DateTime.UtcNow;
-
             // Store the terminal identity
             _secureStorage.StoreObject(TERMINAL_IDENTITY_KEY, _terminalIdentity);
-
             _logger.Call("debug", "TerminalManager: Terminal identity saved securely");
         }
         catch (Exception ex)

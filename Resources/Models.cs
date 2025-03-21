@@ -200,7 +200,7 @@ namespace ProjectTerminal.Resources
         public bool IsTouchscreen { get; set; }
 
         [Column("screen_scale")]
-        public float ScreenScale { get; set; }
+        public string ScreenScale { get; set; }
 
         [Column("active")]
         public bool Active { get; set; }

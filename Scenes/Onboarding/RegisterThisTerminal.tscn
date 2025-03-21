@@ -75,6 +75,11 @@ unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Street Address 2"
 
+[node name="PostalCodeLineEdit" type="LineEdit" parent="ColorRect/MarginContainer/VBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Postal Code"
+
 [node name="StatusLabel" type="Label" parent="ColorRect/MarginContainer/VBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

@@ -116,13 +116,16 @@ public partial class BrandNewUser : Control
             // 4. Register staff as owner
             await RegisterStaffOwner(_createdOrganizationId, currentUser.Id);
 
+            // 5. Set the new organization ID in the session manager
+            _terminalSessionManager.SetOrgId(_createdOrganizationId);
+            _logger.Call("info", $"BrandNewUser: Organization ID set in session manager: {_createdOrganizationId}");
+
             UpdateStatusLabel("Registration complete!");
             _logger.Call("info", "BrandNewUser: Registration completed successfully");
 
             _authManager.UserNotNewAnyMore();
             _logger.Call("info", "BrandNewUser: User is no longer new");
 
-            // Navigate to appropriate next screen
             GoToNextScreen();
         }
         catch (Exception ex)
@@ -300,6 +303,7 @@ public partial class BrandNewUser : Control
             throw new Exception($"Failed to register as staff owner: {ex.Message}", ex);
         }
     }
+
     private string GetUserPhoneNumber()
     {
         // Extract phone number from current user's metadata

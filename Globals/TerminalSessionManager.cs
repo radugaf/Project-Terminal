@@ -34,6 +34,8 @@ public partial class TerminalSessionManager : Node
     /// </summary>
     private SupabaseClient _supabaseClient;
 
+    private string _orgId;
+
     #endregion
 
     #region Properties
@@ -63,6 +65,8 @@ public partial class TerminalSessionManager : Node
     /// Gets the current staff role based on user metadata or claims.
     /// </summary>
     public StaffRole CurrentUserRole => _authManager.CurrentUserRole;
+
+    public string OrgId => _orgId;
 
     #endregion
 
@@ -158,6 +162,12 @@ public partial class TerminalSessionManager : Node
     #endregion
 
     #region Authentication Methods (Delegated to AuthManager)
+
+    /// <summary>
+    /// Set the organization ID for this terminal.
+    /// This is typically set during the registration process.
+    /// </summary>
+    public void SetOrgId(string orgId) => _orgId = orgId;
 
     /// <summary>
     /// Requests a one-time password sent via SMS to the specified phone number.
@@ -262,6 +272,12 @@ public partial class TerminalSessionManager : Node
     {
         return _terminalManager.UnregisterTerminalAsync();
     }
+
+    public void SetTerminal(Terminal terminal)
+    {
+        _terminalManager.SetTerminal(terminal);
+    }
+
 
     #endregion
 
