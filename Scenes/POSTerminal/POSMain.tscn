@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://bw8ug56j263x"]
+
+[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_f4clw"]
+[ext_resource type="Script" uid="uid://1g3l8uf6w2rj" path="res://Scenes/POSTerminal/POSMain.cs" id="2_prvjb"]
+
+[node name="POSMain" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_f4clw")
+script = ExtResource("2_prvjb")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.768627, 0.596078, 1)
+
+[node name="Label" type="Label" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -34.5
+offset_right = 260.0
+offset_bottom = 34.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "POS MAIN INTERFACE"

@@ -81,12 +81,19 @@ public partial class AuthManager : Node
 
     private async void ValidateSessionHealth()
     {
+        _logger.Call("debug", "AuthManager: Validating session health");
+
         if (_currentSession == null)
+        {
+            _logger.Call("debug", "AuthManager: No session to validate");
             return;
+        }
 
         try
         {
             DateTime? expiresAt = GetSessionExpiryTime();
+
+
             if (expiresAt.HasValue)
             {
                 TimeSpan timeUntilExpiry = expiresAt.Value - DateTime.UtcNow;
@@ -96,6 +103,8 @@ public partial class AuthManager : Node
                     _logger.Call("info", $"AuthManager: Token expires in {timeUntilExpiry.TotalSeconds}s, refreshing");
                     await RefreshSessionAsync();
                 }
+
+                _logger.Call("debug", $"AuthManager: Session expires hours: {timeUntilExpiry.TotalHours}");
             }
         }
         catch (Exception ex)
