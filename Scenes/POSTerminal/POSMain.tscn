@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bw8ug56j263x"]
+[gd_scene load_steps=4 format=3 uid="uid://bw8ug56j263x"]
 
 [ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_f4clw"]
 [ext_resource type="Script" uid="uid://1g3l8uf6w2rj" path="res://Scenes/POSTerminal/POSMain.cs" id="2_prvjb"]
+[ext_resource type="Texture2D" uid="uid://dbu05i0m7a1ii" path="res://icon.svg" id="3_40ugq"]
 
 [node name="POSMain" type="Control"]
 layout_mode = 3
@@ -10,29 +11,216 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme = ExtResource("1_f4clw")
 script = ExtResource("2_prvjb")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect6" type="ColorRect" parent="."]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
+anchor_left = 0.759
+anchor_top = 0.097
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -0.280151
+offset_top = 0.239998
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 0.768627, 0.596078, 1)
+color = Color(0, 0.911392, 0.863703, 1)
+metadata/_edit_use_anchors_ = true
 
-[node name="Label" type="Label" parent="ColorRect"]
+[node name="Label" type="Label" parent="ColorRect6"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -260.0
+offset_left = -20.0
 offset_top = -34.5
-offset_right = 260.0
+offset_right = 20.0
 offset_bottom = 34.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "POS MAIN INTERFACE"
+text = "CART"
+
+[node name="ColorRect3" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.097
+anchor_right = 0.758854
+anchor_bottom = 0.215876
+offset_top = 0.239998
+offset_bottom = -0.145813
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.647059, 1, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="ColorRect3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -222.0
+offset_top = -34.5
+offset_right = 222.0
+offset_bottom = 34.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Orders (If present)"
+
+[node name="Navigation" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.758854
+anchor_bottom = 0.0969259
+offset_bottom = 0.319992
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0.768627, 0.596078, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Navigation"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Navigation/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "LOGO"
+
+[node name="LineEdit" type="LineEdit" parent="Navigation/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Seach"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Navigation/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Menu" type="Button" parent="Navigation/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Menu"
+
+[node name="Other" type="Button" parent="Navigation/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Other"
+
+[node name="ItemCategories" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.215444
+anchor_right = 0.758854
+anchor_bottom = 0.325926
+offset_top = 0.319992
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.723903, 0.801103, 0.90768, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ItemCategories"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="ItemCategories/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Breakfast"
+
+[node name="Button2" type="Button" parent="ItemCategories/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Dinner"
+
+[node name="Button3" type="Button" parent="ItemCategories/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Coffee"
+
+[node name="ColorRect4" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.32563
+anchor_right = 0.758854
+anchor_bottom = 1.0
+offset_top = 0.319992
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.790999, 0.821537, 0.552989, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="ColorRect4"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -351.0
+offset_top = -34.5
+offset_right = 351.0
+offset_bottom = 34.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Items from selected category"
+
+[node name="Staff" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.759
+anchor_right = 1.0
+anchor_bottom = 0.097
+offset_left = -0.280151
+offset_bottom = 0.239998
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.583621, 0.799082, 0.300553, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Staff"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="Staff/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_40ugq")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Staff/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+
+[node name="StaffNameLabel" type="Label" parent="Staff/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Radu Gafita"
+
+[node name="StaffTitleLabel" type="Label" parent="Staff/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Owner"
+
+[node name="ExitButton" type="Button" parent="Staff/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "EXIT"
