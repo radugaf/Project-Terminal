@@ -5,7 +5,7 @@ using Supabase.Gotrue;
 public partial class Login : Control
 {
     private Node _logger;
-    private TerminalSessionManager _terminalSessionManager;
+    private AuthManager _authManager;
 
     // UI elements
     private LineEdit _phoneLineEdit;
@@ -41,17 +41,17 @@ public partial class Login : Control
         SetInitialState();
 
         // Get TerminalSessionManager
-        _terminalSessionManager = GetNode<TerminalSessionManager>("/root/TerminalSessionManager");
+        _authManager = GetNode<AuthManager>("/root/AuthManager");
 
         // Connect to SessionChanged signal
-        _terminalSessionManager.Connect(TerminalSessionManager.SignalName.SessionChanged, new Callable(this, nameof(OnSessionChanged)));
+        _authManager.Connect(AuthManager.SignalName.SessionChanged, new Callable(this, nameof(OnSessionChanged)));
 
         // Connect UI event handlers
         _requestOtpButton.Pressed += OnRequestOtpButtonPressed;
         _verifyOtpButton.Pressed += OnVerifyOtpButtonPressed;
 
         // Check if already logged in
-        if (_terminalSessionManager.IsStaffLoggedIn())
+        if (_authManager.IsLoggedIn())
         {
             _logger.Call("debug", "Login: User already logged in, transitioning to main scene");
             GoToMainScreen();
@@ -90,7 +90,7 @@ public partial class Login : Control
             ShowLoading(true);
 
             _logger.Call("debug", $"Login: Requesting OTP for {phoneNumber}");
-            await _terminalSessionManager.RequestStaffLoginOtpAsync(phoneNumber);
+            await _authManager.RequestLoginOtpAsync(phoneNumber);
 
             // Show OTP verification UI
             _otpLabel.Visible = true;
@@ -135,7 +135,7 @@ public partial class Login : Control
             ShowLoading(true);
 
             _logger.Call("debug", $"Login: Verifying OTP for {phoneNumber}");
-            Session session = await _terminalSessionManager.VerifyStaffLoginOtpAsync(phoneNumber, otpCode);
+            Session session = await _authManager.VerifyLoginOtpAsync(phoneNumber, otpCode);
 
             if (session != null)
             {
@@ -168,7 +168,7 @@ public partial class Login : Control
     {
         _logger.Call("debug", "Login: Session changed signal received");
 
-        if (_terminalSessionManager.IsStaffLoggedIn())
+        if (_authManager.IsLoggedIn())
         {
             _logger.Call("debug", "Login: User now logged in, transitioning to main scene");
             GoToMainScreen();

@@ -1,18 +1,15 @@
 using Godot;
 using System;
-using System.Threading.Tasks;
-using Supabase.Gotrue;
 using ProjectTerminal.Resources;
-using Supabase.Postgrest.Responses;
-using Supabase.Postgrest;
 
 public partial class RegisterThisTerminal : Control
 {
     private Node _logger;
     private Node _deviceManager;
-
-    private TerminalSessionManager _terminalSessionManager;
     private SupabaseClient _supabaseClient;
+    private TerminalManager _terminalManager;
+    private AddressManager _addressManager;
+    private OrganizationManager _organizationManager;
 
     private LineEdit _locationNameLineEdit;
     private LineEdit _countryLineEdit;
@@ -24,11 +21,6 @@ public partial class RegisterThisTerminal : Control
     private Label _statusLabel;
     private Button _submitButton;
 
-    // State tracking
-    private string _addressId;
-    private string _locationId;
-    private Terminal _newterminal;
-
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
@@ -36,9 +28,11 @@ public partial class RegisterThisTerminal : Control
         _logger.Call("info", "RegisterThisTerminal: RegisterThisTerminal scene initializing");
 
         // Get references to managers
-        _terminalSessionManager = GetNode<TerminalSessionManager>("/root/TerminalSessionManager");
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
         _deviceManager = GetNode<Node>("/root/DeviceManager");
+        _addressManager = GetNode<AddressManager>("/root/AddressManager");
+        _organizationManager = GetNode<OrganizationManager>("/root/OrganizationManager");
+        _terminalManager = GetNode<TerminalManager>("/root/TerminalManager");
 
         // Initialize UI elements
         _locationNameLineEdit = GetNode<LineEdit>("%LocationNameLineEdit");
@@ -61,37 +55,41 @@ public partial class RegisterThisTerminal : Control
     {
         _logger.Call("info", "RegisterThisTerminal: Submit button pressed, starting registration flow");
 
-        // Disable submit button to prevent multiple submissions
         _submitButton.Disabled = true;
         UpdateStatusLabel("Processing...");
 
-        // Validate input fields
         if (!ValidateInputs())
         {
             _submitButton.Disabled = false;
             return;
         }
 
-        User currentUser = _terminalSessionManager.CurrentUser;
-        if (currentUser == null)
-        {
-            UpdateStatusLabel("Error: Cannot retrieve current user");
-            _logger.Call("error", "RegisterThisTerminal: Cannot retrieve current user");
-            _submitButton.Disabled = false;
-            return;
-        }
-
         // 1. Add the new Address to the database
-        _addressId = await CreateAddress();
+        string addressId = await _addressManager.CreateAddressAsync(
+            _countryLineEdit.Text,
+            _cityLineEdit.Text,
+            _streetOneLineEdit.Text,
+            _streetTwoLineEdit.Text,
+            _postalCodeLineEdit.Text
+        );
 
-        // 2. Create a new Location for the Terminal
-        _locationId = await CreateLocation(_terminalSessionManager.OrgId, _addressId);
+        // 2. Create location
+        string locationId = await _organizationManager.CreateLocationAsync(
+            _organizationManager.GetOrganizationId(),
+            _locationNameLineEdit.Text,
+            addressId,
+            _organizationManager.CurrentUser.Email,
+            _organizationManager.CurrentUser.Phone
+        );
 
-        // 3. Create a new Terminal
-        _newterminal = await CreateTerminal(_terminalSessionManager.OrgId, _locationId, currentUser.Id);
-
-        // 4. Mark the terminal as registered
-        _terminalSessionManager.SetTerminal(_newterminal);
+        // 3. Create terminal
+        var terminalType = (TerminalType)_terminalTypeOptionButton.Selected;
+        Terminal newTerminal = await _terminalManager.CreateTerminalAsync(
+            _organizationManager.GetOrganizationId(),
+            locationId,
+            $"{_locationNameLineEdit.Text} {terminalType}",
+            terminalType
+        );
 
         _logger.Call("info", "RegisterThisTerminal: Terminal registered successfully");
         UpdateStatusLabel("Terminal registered successfully!");
@@ -174,110 +172,6 @@ public partial class RegisterThisTerminal : Control
         }
 
         return true;
-    }
-
-    private async Task<string> CreateAddress()
-    {
-
-        var address = new Address
-        {
-            Country = _countryLineEdit.Text,
-            City = _cityLineEdit.Text,
-            StreetAddress1 = _streetOneLineEdit.Text,
-            StreetAddress2 = _streetTwoLineEdit.Text,
-            PostalCode = _postalCodeLineEdit.Text,
-            IsVerified = false,
-        };
-
-        ModeledResponse<Address> response = await _supabaseClient.From<Address>()
-            .Insert(address, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
-
-        if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
-        {
-            _logger.Call("error", $"RegisterThisTerminal: Failed to create address - {response.ResponseMessage.ReasonPhrase}");
-            throw new Exception($"Failed to create address: {response.ResponseMessage.ReasonPhrase}");
-        }
-
-        string addressId = response.Model?.Id;
-        _logger.Call("info", $"RegisterThisTerminal: Address created with ID: {addressId}");
-
-        return addressId;
-    }
-
-    private async Task<string> CreateLocation(string orgId, string addressId)
-    {
-        var location = new Location
-        {
-            OrganizationId = orgId,
-            Name = _locationNameLineEdit.Text,
-            Phone = _terminalSessionManager.CurrentUser.Phone,
-            Email = _terminalSessionManager.CurrentUser.Email,
-            AddressId = addressId,
-            BusinessHours = "{}",
-            IsActive = false,
-        };
-
-        ModeledResponse<Location> response = await _supabaseClient.From<Location>()
-            .Insert(location, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
-
-        if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
-        {
-            _logger.Call("error", $"RegisterThisTerminal: Failed to create location - {response.ResponseMessage.ReasonPhrase}");
-            throw new Exception($"Failed to create location: {response.ResponseMessage.ReasonPhrase}");
-        }
-
-        string locationId = response.Model?.Id;
-        _logger.Call("info", $"RegisterThisTerminal: Location created with ID: {locationId}");
-        return locationId;
-    }
-
-    private async Task<Terminal> CreateTerminal(string orgId, string locationId, string userId)
-    {
-        // Get terminal type from dropdown
-        var terminalType = (TerminalType)_terminalTypeOptionButton.Selected;
-
-        // Get device information from DeviceManager
-        var deviceInfo = _deviceManager.Call("get_device_info").AsGodotDictionary();
-        var basicInfo = deviceInfo["basic_info"].AsGodotDictionary();
-        var screenInfo = deviceInfo["screen_info"].AsGodotDictionary();
-        var networkInfo = deviceInfo["network_info"].AsGodotDictionary();
-
-        // Create the terminal with actual device information
-        var terminal = new Terminal
-        {
-            OrganizationId = orgId,
-            LocationId = locationId,
-            TerminalName = $"{_locationNameLineEdit.Text} {terminalType}",
-            TerminalType = terminalType.ToString().ToLower(),
-            DeviceId = basicInfo["device_unique_id"].AsString(),
-            Active = true,
-            RegisteredBy = userId,
-            DeviceName = basicInfo["device_name"].AsString(),
-            DeviceModel = basicInfo["device_model"].AsString(),
-            DeviceOs = basicInfo["device_os_name"].AsString(),
-            DeviceOsVersion = basicInfo["device_os_version"].AsString(),
-            ProcessorType = deviceInfo["hardware_info"].AsGodotDictionary()["processor_name"].AsString(),
-            IpAddress = networkInfo["ip_address"].AsString(),
-            MacAddress = networkInfo["mac_address"].AsString(),
-            ScreenDpi = screenInfo["screen_dpi"].AsString(),
-            ScreenOrientation = screenInfo["screen_orientation"].AsString(),
-            IsTouchscreen = screenInfo["is_touchscreen"].AsBool(),
-            ScreenScale = screenInfo["screen_scale"].AsString(),
-        };
-
-        ModeledResponse<Terminal> response = await _supabaseClient.From<Terminal>()
-            .Insert(terminal, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
-
-        if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
-        {
-            _logger.Call("error", $"RegisterThisTerminal: Failed to create terminal - {response.ResponseMessage.ReasonPhrase}");
-            throw new Exception($"Failed to create terminal: {response.ResponseMessage.ReasonPhrase}");
-        }
-
-        string terminalId = response.Model?.Id;
-        _logger.Call("info", $"RegisterThisTerminal: Terminal created with ID: {terminalId}");
-
-        return response.Model;
     }
 
     private void GoToNextScreen()

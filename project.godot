@@ -16,11 +16,11 @@ config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 config/user_new_state=false
 config/current_user_session="{
-  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJmZDI3Yzk3NC0xNDM2LTQyNWQtYjNkOC04NWVjNThmOGFkZWIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQyNTc3MDU4LCJpYXQiOjE3NDI1NzM0NTgsImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiJmZDI3Yzk3NC0xNDM2LTQyNWQtYjNkOC04NWVjNThmOGFkZWIifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDI1NzM0NTh9XSwic2Vzc2lvbl9pZCI6IjJmM2UwMDdmLWYwOTItNDIxZS1iNDE5LTY4NWE1ZWRkMDdjNSIsImlzX2Fub255bW91cyI6ZmFsc2V9.HDhjvv3buAGKGWn0VY5GvxtkhBSP6Lydp02vZozz5hU\",
+  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsImtpZCI6IndybzVNeTYxdHc3R0YydEciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2ZucWl1d2pjb3FyeWh0ZnVubHVhLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4YTIxMDNmNS1jM2ZlLTQ4NzYtODNlNy1jNWY3M2Y3MTg0OTIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQyNzMzMDE5LCJpYXQiOjE3NDI3Mjk0MTksImVtYWlsIjoiIiwicGhvbmUiOiI0MDcyMjEwMTA5NyIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6InBob25lIiwicHJvdmlkZXJzIjpbInBob25lIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiI4YTIxMDNmNS1jM2ZlLTQ4NzYtODNlNy1jNWY3M2Y3MTg0OTIifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvdHAiLCJ0aW1lc3RhbXAiOjE3NDI3Mjk0MTl9XSwic2Vzc2lvbl9pZCI6IjU1NGJhY2M4LTUxY2ItNDI4MS04YTM3LTc3OTU4N2E4NjAyMyIsImlzX2Fub255bW91cyI6ZmFsc2V9.HFBnA01kdMobmOVmsctZ_IGifFleDCrDQwAd_iM42X0\",
   \"expiresIn\": 3600,
   \"providerToken\": null,
   \"providerRefreshToken\": null,
-  \"refreshToken\": \"q6aPhIBUD7q5sQmSJxp4JA\",
+  \"refreshToken\": \"dCwg3cIUMLjcawTSdn3wSw\",
   \"tokenType\": \"bearer\",
   \"user\": {
     \"appMetadata\": {
@@ -30,47 +30,48 @@ config/current_user_session="{
       ]
     },
     \"aud\": \"authenticated\",
-    \"confirmationSentAt\": \"2025-03-21T16:10:13.648728Z\",
-    \"confirmedAt\": \"2025-03-21T16:10:58.650177Z\",
-    \"createdAt\": \"2025-03-21T16:10:13.63717Z\",
+    \"confirmationSentAt\": \"2025-03-23T11:30:05.368126Z\",
+    \"confirmedAt\": \"2025-03-23T11:30:19.777659Z\",
+    \"createdAt\": \"2025-03-23T11:30:05.348447Z\",
     \"email\": \"\",
     \"emailConfirmedAt\": null,
-    \"id\": \"fd27c974-1436-425d-b3d8-85ec58f8adeb\",
+    \"id\": \"8a2103f5-c3fe-4876-83e7-c5f73f718492\",
     \"identities\": [
       {
-        \"id\": \"fd27c974-1436-425d-b3d8-85ec58f8adeb\",
-        \"userId\": \"fd27c974-1436-425d-b3d8-85ec58f8adeb\",
+        \"id\": \"8a2103f5-c3fe-4876-83e7-c5f73f718492\",
+        \"userId\": \"8a2103f5-c3fe-4876-83e7-c5f73f718492\",
         \"identityData\": {
           \"email_verified\": false,
           \"phone_verified\": false,
-          \"sub\": \"fd27c974-1436-425d-b3d8-85ec58f8adeb\"
+          \"sub\": \"8a2103f5-c3fe-4876-83e7-c5f73f718492\"
         },
-        \"identityId\": \"9d52d2ab-ff5b-4865-86ba-5ffbb4399b57\",
+        \"identityId\": \"b44edaa0-a3c4-450e-86c9-9071aa674d48\",
         \"provider\": \"phone\",
-        \"createdAt\": \"2025-03-21T16:10:13.642653Z\",
-        \"lastSignInAt\": \"2025-03-21T16:10:13.642604Z\",
-        \"updatedAt\": \"2025-03-21T16:10:13.642653Z\"
+        \"createdAt\": \"2025-03-23T11:30:05.359477Z\",
+        \"lastSignInAt\": \"2025-03-23T11:30:05.359417Z\",
+        \"updatedAt\": \"2025-03-23T11:30:05.359477Z\"
       }
     ],
     \"invitedAt\": null,
-    \"lastSignInAt\": \"2025-03-21T16:10:58.6530334Z\",
+    \"lastSignInAt\": \"2025-03-23T11:30:19.781011Z\",
     \"phone\": \"40722101097\",
-    \"phoneConfirmedAt\": \"2025-03-21T16:10:58.650177Z\",
+    \"phoneConfirmedAt\": \"2025-03-23T11:30:19.777659Z\",
     \"recoverySentAt\": null,
     \"role\": \"authenticated\",
-    \"updatedAt\": \"2025-03-21T16:10:58.656512Z\",
+    \"updatedAt\": \"2025-03-23T11:30:36.580553Z\",
     \"bannedUntil\": null,
     \"isAnonymous\": false,
     \"factors\": [],
     \"userMetadata\": {
       \"email_verified\": false,
       \"phone_verified\": false,
-      \"sub\": \"fd27c974-1436-425d-b3d8-85ec58f8adeb\"
+      \"sub\": \"8a2103f5-c3fe-4876-83e7-c5f73f718492\"
     }
   },
-  \"createdAt\": \"2025-03-21T16:11:00.4973594Z\"
+  \"createdAt\": \"2025-03-23T11:30:21.1934126Z\"
 }"
-config/session_expiry_timestamp="2025-03-21T17:11:00.7764471Z"
+config/session_expiry_timestamp="2025-03-23T12:30:37.9993737Z"
+config/organization_id="e3d31161-13a1-4722-a282-3a550085d8c4"
 
 [autoload]
 
@@ -82,7 +83,8 @@ DeviceManager="*res://Globals/DeviceManager.gd"
 SupabaseClient="*res://Globals/SupabaseClient.cs"
 AuthManager="*res://Globals/AuthManager.cs"
 TerminalManager="*res://Globals/TerminalManager.cs"
-TerminalSessionManager="*res://Globals/TerminalSessionManager.cs"
+OrganizationManager="*res://Globals/OrganizationManager.cs"
+AddressManager="*res://Globals/AddressManager.cs"
 
 [display]
 

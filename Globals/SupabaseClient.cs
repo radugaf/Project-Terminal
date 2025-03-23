@@ -9,81 +9,41 @@ using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
 using Supabase.Interfaces;
 
-/// <summary>
-/// Manages the Supabase client connection and provides access to Supabase services.
-/// Acts as a centralized point for all Supabase-related operations.
-/// </summary>
+
 public partial class SupabaseClient : Node
 {
-    #region Constants and Fields
-
-    /// <summary>
-    /// The Supabase client instance used for all API operations.
-    /// </summary>
-    private Supabase.Client _supabase;
-
-    /// <summary>
-    /// Reference to the application logger.
-    /// </summary>
     private Node _logger;
-
-    /// <summary>
-    /// Supabase configuration options.
-    /// </summary>
+    private Supabase.Client _supabase;
     private SupabaseOptions _options;
 
-    #endregion
-
-    #region Properties
-
-    /// <summary>
-    /// Gets the Supabase client instance.
-    /// </summary>
     public Supabase.Client Supabase => _supabase;
-
-    /// <summary>
-    /// Gets the Supabase Auth client.
-    /// </summary>
     public IGotrueClient<User, Session> Auth => _supabase?.Auth;
 
-    #endregion
-
-    #region Signals
-
-    /// <summary>
-    /// Emitted when the Supabase client is fully initialized.
-    /// </summary>
     [Signal]
     public delegate void ClientInitializedEventHandler();
-
-    /// <summary>
-    /// Emitted when the Supabase client initialization fails.
-    /// </summary>
     [Signal]
     public delegate void ClientInitializationFailedEventHandler(string errorMessage);
 
-    #endregion
-
-    #region Lifecycle Methods
-
-    /// <summary>
-    /// Initializes the SupabaseClient node, reads configuration, and creates the Supabase client.
-    /// </summary>
     public override void _Ready()
     {
         // Get a reference to the logger
         _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "SupabaseClient: Initializing SupabaseClient...");
+        _logger.Call("info", "SupabaseClient: Initializing...");
+        CallDeferred(nameof(AutoInitialize));
     }
 
-    #endregion
+    private async void AutoInitialize()
+    {
+        try
+        {
+            await InitializeClientAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("critical", $"SupabaseClient: Auto-initialization failed: {ex.Message}");
+        }
+    }
 
-    #region Client Initialization
-
-    /// <summary>
-    /// Initializes the Supabase client with the given credentials.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation</returns>
     public async Task InitializeClientAsync()
     {
         try
@@ -125,10 +85,6 @@ public partial class SupabaseClient : Node
         }
     }
 
-    /// <summary>
-    /// Reinitializes the Supabase client, typically after session changes.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation</returns>
     public async Task ReinitializeClientAsync()
     {
         if (_supabase != null)
@@ -139,13 +95,6 @@ public partial class SupabaseClient : Node
         }
     }
 
-    #endregion
-
-    #region Database Operations
-
-    /// <summary>
-    /// Gets a reference to a database table for querying.
-    /// </summary>
     public ISupabaseTable<T, RealtimeChannel> From<T>() where T : BaseModel, new()
     {
         if (_supabase == null)
@@ -157,9 +106,6 @@ public partial class SupabaseClient : Node
         return _supabase.From<T>();
     }
 
-    /// <summary>
-    /// Executes a stored procedure in the database.
-    /// </summary>
     public async Task<BaseResponse> Rpc(string procedureName, object parameters)
     {
         if (_supabase == null)
@@ -171,5 +117,4 @@ public partial class SupabaseClient : Node
         return await _supabase.Rpc(procedureName, parameters);
     }
 
-    #endregion
 }
