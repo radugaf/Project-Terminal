@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://8tts3eqsdav8"]
+[gd_scene load_steps=3 format=3 uid="uid://8tts3eqsdav8"]
 
 [ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_7c7nv"]
+[ext_resource type="Script" uid="uid://cd7vuqrlqk5o0" path="res://Scenes/AdminPanel/Items.cs" id="2_x4ym2"]
 
 [node name="Items" type="Control"]
 layout_mode = 3
@@ -10,10 +11,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_7c7nv")
+script = ExtResource("2_x4ym2")
 metadata/_edit_use_anchors_ = true
 
 [node name="ContentContainer" type="ColorRect" parent="."]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -32,93 +33,44 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="AddCategoryButton" type="Button" parent="ContentContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Add Category"
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="CategoryArea" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.087963
 anchor_right = 1.0
-anchor_bottom = 0.315741
+anchor_bottom = 1.0
 color = Color(1, 0.552941, 0.576471, 0.615686)
 metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+[node name="CategoryList" type="VBoxContainer" parent="CategoryArea"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/VBoxContainer"]
+[node name="CategoryLine" type="HBoxContainer" parent="CategoryArea/CategoryList"]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Label" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="CategoryArea/CategoryList/CategoryLine"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "#1"
 
-[node name="Label2" type="Label" parent="ColorRect/VBoxContainer/HBoxContainer"]
+[node name="Label2" type="Label" parent="CategoryArea/CategoryList/CategoryLine"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Coffee"
 
-[node name="EditButton" type="Button" parent="ColorRect/VBoxContainer/HBoxContainer"]
+[node name="EditButton" type="Button" parent="CategoryArea/CategoryList/CategoryLine"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "EDIT"
-
-[node name="DeleteButton" type="Button" parent="ColorRect/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "DEL"
-
-[node name="ColorRect2" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.315741
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(1, 1, 0.615686, 0.454902)
-metadata/_edit_use_anchors_ = true
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Button" type="Button" parent="ColorRect2/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Add Item"
-
-[node name="ItemList" type="VBoxContainer" parent="ColorRect2/VBoxContainer"]
-layout_mode = 2
-
-[node name="ItemLine" type="HBoxContainer" parent="ColorRect2/VBoxContainer/ItemList"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="ColorRect2/VBoxContainer/ItemList/ItemLine"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "#1"
-
-[node name="Label2" type="Label" parent="ColorRect2/VBoxContainer/ItemList/ItemLine"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Espresso"
-
-[node name="EditButton" type="Button" parent="ColorRect2/VBoxContainer/ItemList/ItemLine"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "EDIT"
-
-[node name="DeleteButton" type="Button" parent="ColorRect2/VBoxContainer/ItemList/ItemLine"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "DEL"

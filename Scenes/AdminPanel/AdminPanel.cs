@@ -1,5 +1,5 @@
 using Godot;
-using System.Collections.Generic;
+using ProjectTerminal.Resources;
 
 public partial class AdminPanel : Control
 {
@@ -10,8 +10,8 @@ public partial class AdminPanel : Control
     private Button _staffButton;
     private Button _exitButton;
 
-    private Node _currentContent;
-    private Dictionary<string, PackedScene> _contentScenes;
+
+    private ContentManager _contentManager;
 
     public override void _Ready()
     {
@@ -24,64 +24,67 @@ public partial class AdminPanel : Control
         _staffButton = GetNode<Button>("%StaffButton");
         _exitButton = GetNode<Button>("%ExitButton");
 
+        // Initialize ContentManager
+        _contentManager = new ContentManager();
+        AddChild(_contentManager); // Add to scene tree
+        _contentManager.Initialize(_contentContainer);
+
+        // Register content scenes with ContentManager
+        _contentManager.RegisterContent("Dashboard", GD.Load<PackedScene>("res://Scenes/AdminPanel/Dashboard.tscn"));
+        _contentManager.RegisterContent("Items", GD.Load<PackedScene>("res://Scenes/AdminPanel/Items.tscn"));
+        _contentManager.RegisterContent("Staff", GD.Load<PackedScene>("res://Scenes/AdminPanel/Staff.tscn"));
+        _contentManager.RegisterContent("AddCategory", GD.Load<PackedScene>("res://Scenes/AdminPanel/AddCategory.tscn"));
+
+        // Connect to ContentChanged signal to update UI
+        _contentManager.ContentChanged += OnContentChanged;
+
         // Connect button signals
-        _itemsButton.Pressed += () => LoadContent("Items");
-        _staffButton.Pressed += () => LoadContent("Staff");
-        _dashboardButton.Pressed += () => LoadContent("Dashboard");
+        _itemsButton.Pressed += () => _contentManager.ShowContent("Items");
+        _staffButton.Pressed += () => _contentManager.ShowContent("Staff");
+        _dashboardButton.Pressed += () => _contentManager.ShowContent("Dashboard");
         _exitButton.Pressed += OnExitButtonPressed;
 
-        // Initialize content scenes dictionary
-        _contentScenes = new Dictionary<string, PackedScene>
-        {
-            { "Dashboard", GD.Load<PackedScene>("res://Scenes/AdminPanel/Dashboard.tscn") },
-            { "Items", GD.Load<PackedScene>("res://Scenes/AdminPanel/Items.tscn") },
-            { "Staff", GD.Load<PackedScene>("res://Scenes/AdminPanel/Staff.tscn") },
-        };
-
         // Load default content
-        LoadContent("Dashboard");
+        _contentManager.ShowContent("Dashboard", false); // Don't add to history since it's initial content
         _logger.Call("info", "AdminPanel: AdminPanel scene initialized");
     }
 
-    private void LoadContent(string contentName)
+    private void OnContentChanged(string contentName, Control contentNode)
     {
-        _logger.Call("debug", $"AdminPanel: Loading content: {contentName}");
+        _logger.Call("info", $"AdminPanel: Content changed to: {contentName}");
 
-        // Clear existing content
-        if (_currentContent != null)
+        // Update the UI to reflect the active section - but only for top-level sections
+        if (contentName == "Dashboard" || contentName == "Items" || contentName == "Staff")
         {
-            _currentContent.QueueFree();
-            _currentContent = null;
+            UpdateActiveButton(contentName);
         }
 
-        // Check if the content scene exists in the dictionary and load it
-        if (!_contentScenes.TryGetValue(contentName, out PackedScene contentScene))
+        // If this is a sub-content node (like AddCategory), we might need to set up additional navigation
+        if (contentName == "AddCategory")
         {
-            _logger.Call("error", $"AdminPanel: Content scene not found: {contentName}");
-            return;
+            // We can access the node directly from the parameter
+            AddCategory addCategoryNode = contentNode as AddCategory;
+            if (addCategoryNode != null)
+            {
+                // Set up back navigation (we'll add this method to AddCategory)
+                addCategoryNode.SetContentManager(_contentManager);
+            }
         }
-
-        Node contentInstance = contentScene.Instantiate();
-        _contentContainer.AddChild(contentInstance);
-
-
-
-        _currentContent = contentInstance;
-        _logger.Call("info", $"AdminPanel: Content loaded: {contentName}");
-
-        // Update the UI to reflect the active section
-        UpdateActiveButton(contentName);
     }
 
     private void UpdateActiveButton(string contentName)
     {
         // Reset all buttons
+        _dashboardButton.ThemeTypeVariation = "";
         _itemsButton.ThemeTypeVariation = "";
         _staffButton.ThemeTypeVariation = "";
 
         // Set active button
         switch (contentName)
         {
+            case "Dashboard":
+                _dashboardButton.ThemeTypeVariation = "ActiveButton";
+                break;
             case "Items":
                 _itemsButton.ThemeTypeVariation = "ActiveButton";
                 break;
