@@ -7,7 +7,16 @@ public partial class Login : Control
     private Node _logger;
     private AuthManager _authManager;
 
-    // UI elements
+    // Email based auth - UI elements
+    private LineEdit _loginEmailLineEdit;
+    private LineEdit _loginPasswordLineEdit;
+    private Button _loginButton;
+    private LineEdit _registerEmailLineEdit;
+    private LineEdit _registerPasswordLineEdit;
+    private LineEdit _registerPasswordConfirmLineEdit;
+    private Button _registerButton;
+
+    // Phone based auth - UI elements
     private LineEdit _phoneLineEdit;
     private LineEdit _otpLineEdit;
     private Button _requestOtpButton;
@@ -28,7 +37,7 @@ public partial class Login : Control
         _logger = GetNode<Node>("/root/Logger");
         _logger.Call("info", "Login: Login scene initializing");
 
-        // Get references to UI components
+        // Get references to phone-based auth UI elements
         _phoneLineEdit = GetNode<LineEdit>("%PhoneLineEdit");
         _otpLabel = GetNode<Label>("%OtpLabel");
         _otpLineEdit = GetNode<LineEdit>("%OTPLineEdit");
@@ -36,6 +45,15 @@ public partial class Login : Control
         _verifyOtpButton = GetNode<Button>("%VerifyOtpButton");
         _statusLabel = GetNode<Label>("%StatusLabel");
         _loadingBar = GetNode<ProgressBar>("%LoadingBar");
+
+        // Get references to email-based auth UI elements
+        _loginEmailLineEdit = GetNode<LineEdit>("%LoginEmailLineEdit");
+        _loginPasswordLineEdit = GetNode<LineEdit>("%LoginPasswordLineEdit");
+        _loginButton = GetNode<Button>("%LoginButton");
+        _registerEmailLineEdit = GetNode<LineEdit>("%RegisterEmailLineEdit");
+        _registerPasswordLineEdit = GetNode<LineEdit>("%RegisterPasswordLineEdit");
+        _registerPasswordConfirmLineEdit = GetNode<LineEdit>("%RegisterPasswordConfirmLineEdit");
+        _registerButton = GetNode<Button>("%RegisterButton");
 
         // Set initial UI state
         SetInitialState();
@@ -49,6 +67,7 @@ public partial class Login : Control
         // Connect UI event handlers
         _requestOtpButton.Pressed += OnRequestOtpButtonPressed;
         _verifyOtpButton.Pressed += OnVerifyOtpButtonPressed;
+        _registerButton.Pressed += OnRegisterButtonPressed;
 
         // Check if already logged in
         if (_authManager.IsLoggedIn())
@@ -164,6 +183,69 @@ public partial class Login : Control
         }
     }
 
+    private async void OnRegisterButtonPressed()
+    {
+        if (_isProcessing)
+            return;
+
+        string email = _registerEmailLineEdit.Text.Trim();
+        string password = _registerPasswordLineEdit.Text.Trim();
+        string confirmPassword = _registerPasswordConfirmLineEdit.Text.Trim();
+
+        // Validate inputs
+        if (string.IsNullOrEmpty(email) || !email.Contains('@'))
+        {
+            UpdateStatus("Please enter a valid email address", true);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(password) || password.Length < 6)
+        {
+            UpdateStatus("Password must be at least 6 characters", true);
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            UpdateStatus("Passwords do not match", true);
+            return;
+        }
+
+        try
+        {
+            _isProcessing = true;
+            UpdateStatus("Registering account...", false);
+            ShowLoading(true);
+
+            _logger.Call("debug", $"Login: Registering new user with email {email}");
+            Session session = await _authManager.RegisterWithEmailAsync(email, password);
+
+            if (session != null)
+            {
+                _logger.Call("info", "Login: Registration successful");
+                UpdateStatus("Registration successful!", false);
+
+                // Wait briefly to show success message before transitioning
+                await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+                GoToMainScreen();
+            }
+            else
+            {
+                _logger.Call("warn", "Login: Registration failed - null session returned");
+                UpdateStatus("Registration failed. Please try again.", true);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _logger.Call("error", $"Login: Registration failed: {ex.Message}");
+            UpdateStatus($"Registration failed: {ex.Message}", true);
+        }
+        finally
+        {
+            _isProcessing = false;
+            ShowLoading(false);
+        }
+    }
     private void OnSessionChanged()
     {
         _logger.Call("debug", "Login: Session changed signal received");
@@ -189,8 +271,14 @@ public partial class Login : Control
     private void ShowLoading(bool show)
     {
         _loadingBar.Visible = show;
+
+        // Phone auth buttons
         _requestOtpButton.Disabled = show;
         _verifyOtpButton.Disabled = show;
+
+        // Email auth buttons
+        _loginButton.Disabled = show;
+        _registerButton.Disabled = show;
     }
 
     private void GoToMainScreen()

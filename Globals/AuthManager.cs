@@ -236,6 +236,76 @@ public partial class AuthManager : Node
     }
 
     // ------------------- Public Methods ------------------
+
+    public async Task<Session> RegisterWithEmailAsync(string email, string password)
+    {
+        _logger.Call("info", $"AuthManager: Registering new user with email {email}");
+
+        try
+        {
+            // Sign up with Supabase Auth
+            Session session = await _supabaseClient.Auth.SignUp(email, password);
+
+            if (session?.User == null)
+            {
+                _logger.Call("warn", "AuthManager: Invalid session returned from registration");
+                return null;
+            }
+
+            // Set the user as new
+            _isNewUser = true;
+            _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
+
+            // Store session
+            _currentSession = session;
+            SaveUserSession(session);
+
+            _logger.Call("info", $"AuthManager: Registration successful for user {session.User.Id}");
+            EmitSignal(SignalName.SessionChanged);
+            return session;
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"AuthManager: Registration failed: {ex.Message}",
+                new Godot.Collections.Dictionary { { "email", email } });
+            throw;
+        }
+    }
+
+    public async Task<Session> VerifyLoginOtpAsync(string phoneNumber, string otpCode)
+    {
+        _logger.Call("info", $"AuthManager: Verifying OTP for {phoneNumber}");
+
+        try
+        {
+            Session session = await _supabaseClient.Auth.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
+
+            if (session?.User == null)
+            {
+                _logger.Call("warn", "AuthManager: Invalid session returned from OTP verification");
+                return null;
+            }
+
+            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
+
+            _isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
+            _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
+
+            _currentSession = session;
+            SaveUserSession(session);
+
+            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}");
+            EmitSignal(SignalName.SessionChanged);
+            return session;
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"AuthManager: OTP verification failed: {ex.Message}",
+                new Godot.Collections.Dictionary { { "phone", phoneNumber } });
+            throw;
+        }
+    }
+
     public async Task<User> UpdateUserEmailAsync(string email)
     {
         try
@@ -305,39 +375,6 @@ public partial class AuthManager : Node
         }
     }
 
-    public async Task<Session> VerifyLoginOtpAsync(string phoneNumber, string otpCode)
-    {
-        _logger.Call("info", $"AuthManager: Verifying OTP for {phoneNumber}");
-
-        try
-        {
-            Session session = await _supabaseClient.Auth.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
-
-            if (session?.User == null)
-            {
-                _logger.Call("warn", "AuthManager: Invalid session returned from OTP verification");
-                return null;
-            }
-
-            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
-
-            _isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
-            _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
-
-            _currentSession = session;
-            SaveUserSession(session);
-
-            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}");
-            EmitSignal(SignalName.SessionChanged);
-            return session;
-        }
-        catch (Exception ex)
-        {
-            _logger.Call("error", $"AuthManager: OTP verification failed: {ex.Message}",
-                new Godot.Collections.Dictionary { { "phone", phoneNumber } });
-            throw;
-        }
-    }
 
     public async Task RefreshSessionAsync()
     {

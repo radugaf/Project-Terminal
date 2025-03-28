@@ -44,6 +44,14 @@ public partial class BrandNewUser : Control
         _submitButton = GetNode<Button>("%SubmitButton");
         _statusLabel = GetNode<Label>("%StatusLabel");
 
+        if (_authManager.CurrentUser != null && !string.IsNullOrEmpty(_authManager.CurrentUser.Email))
+        {
+            _emailLineEdit.Text = _authManager.CurrentUser.Email;
+            _emailLineEdit.Editable = false; // Make it read-only as it's already verified
+            _logger.Call("debug", "BrandNewUser: Pre-populated email from authenticated user");
+        }
+
+
         PopulateBusinessTypeOptions();
 
         // Clear status label
@@ -93,7 +101,10 @@ public partial class BrandNewUser : Control
             }
 
             // 1. Update user email
-            await _authManager.UpdateUserEmailAsync(_emailLineEdit.Text.Trim());
+            if (_emailLineEdit.Editable)
+            {
+                await _authManager.UpdateUserEmailAsync(_emailLineEdit.Text.Trim());
+            }
 
             // 2. Create organization
             var businessType = (BusinessType)_businessTypeOptionButton.Selected;
@@ -180,7 +191,6 @@ public partial class BrandNewUser : Control
         return true;
     }
 
-
     private void UpdateStatusLabel(string message)
     {
         if (_statusLabel != null)
@@ -217,7 +227,7 @@ public partial class BrandNewUser : Control
             else
             {
                 // Only set up timer for Home scene if not registering terminal
-                GetTree().CreateTimer(2.0f).Timeout += () => GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
+                GetTree().ChangeSceneToFile("res://Scenes/Home.tscn");
             }
         }
         catch (Exception ex)
