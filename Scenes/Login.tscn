@@ -49,6 +49,63 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "Please log in with your phone number"
 
+[node name="VSplitContainer" type="VSplitContainer" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EmailContainer" type="HBoxContainer" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LoginContainer" type="VBoxContainer" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LoginLabel" type="Label" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/LoginContainer"]
+layout_mode = 2
+text = "Login"
+
+[node name="LoginEmailLineEdit" type="LineEdit" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/LoginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "radugf@gmail.com"
+
+[node name="LoginPasswordLineEdit" type="LineEdit" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/LoginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Password"
+
+[node name="LoginButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/LoginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Submit"
+
+[node name="RegisterContainer" type="VBoxContainer" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RegisterLabel" type="Label" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/RegisterContainer"]
+layout_mode = 2
+text = "Register"
+
+[node name="RegisterEmailLineEdit" type="LineEdit" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/RegisterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "radugf@gmail.com"
+
+[node name="RegisterPasswordLineEdit" type="LineEdit" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/RegisterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Password"
+
+[node name="RegisterPasswordConfirmLineEdit" type="LineEdit" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/RegisterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Confirm Password"
+
+[node name="RegisterButton" type="Button" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer/EmailContainer/RegisterContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Submit"
+
 [node name="PhoneContainer" type="VBoxContainer" parent="ColorRect/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
