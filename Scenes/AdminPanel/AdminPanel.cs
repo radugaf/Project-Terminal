@@ -1,5 +1,5 @@
 using Godot;
-using ProjectTerminal.Resources;
+using ProjectTerminal.Resources.Admin;
 
 public partial class AdminPanel : Control
 {
@@ -10,7 +10,8 @@ public partial class AdminPanel : Control
     private Button _staffButton;
     private Button _exitButton;
 
-
+    // Services
+    private AdminPanelService _adminService;
     private ContentManager _contentManager;
 
     public override void _Ready()
@@ -18,61 +19,94 @@ public partial class AdminPanel : Control
         _logger = GetNode<Node>("/root/Logger");
         _logger.Call("info", "AdminPanel: Initializing AdminPanel scene");
 
+        // Get UI references
         _contentContainer = GetNode<Control>("%ContentContainer");
         _dashboardButton = GetNode<Button>("%DashboardButton");
         _itemsButton = GetNode<Button>("%ItemsButton");
         _staffButton = GetNode<Button>("%StaffButton");
         _exitButton = GetNode<Button>("%ExitButton");
 
-        // Initialize ContentManager
-        _contentManager = new ContentManager();
-        AddChild(_contentManager); // Add to scene tree
-        _contentManager.Initialize(_contentContainer);
+        // Initialize services
+        InitializeServices();
 
-        // Register content scenes with ContentManager
-        _contentManager.RegisterContent("Dashboard", GD.Load<PackedScene>("res://Scenes/AdminPanel/Dashboard.tscn"));
-        _contentManager.RegisterContent("Items", GD.Load<PackedScene>("res://Scenes/AdminPanel/Items.tscn"));
-        _contentManager.RegisterContent("Staff", GD.Load<PackedScene>("res://Scenes/AdminPanel/Staff.tscn"));
-        _contentManager.RegisterContent("AddCategory", GD.Load<PackedScene>("res://Scenes/AdminPanel/AddCategory.tscn"));
+        // Register content
+        RegisterContent();
 
-        // Connect to ContentChanged signal to update UI
-        _contentManager.ContentChanged += OnContentChanged;
+        // Connect signals
+        ConnectSignals();
 
-        // Connect button signals
-        _itemsButton.Pressed += () => _contentManager.ShowContent("Items");
-        _staffButton.Pressed += () => _contentManager.ShowContent("Staff");
-        _dashboardButton.Pressed += () => _contentManager.ShowContent("Dashboard");
-        _exitButton.Pressed += OnExitButtonPressed;
+        // Load initial content
+        CallDeferred(nameof(InitializeContent));
 
-        // Load default content
-        _contentManager.ShowContent("Dashboard", false); // Don't add to history since it's initial content
         _logger.Call("info", "AdminPanel: AdminPanel scene initialized");
     }
 
-    private void OnContentChanged(string contentName, Control contentNode)
+    private void InitializeServices()
     {
-        _logger.Call("info", $"AdminPanel: Content changed to: {contentName}");
+        // Create AdminPanelService
+        _adminService = new AdminPanelService();
+        AddChild(_adminService);
 
-        // Update the UI to reflect the active section - but only for top-level sections
-        if (contentName == "Dashboard" || contentName == "Items" || contentName == "Staff")
-        {
-            UpdateActiveButton(contentName);
-        }
+        // Create ContentManager
+        _contentManager = new ContentManager();
+        AddChild(_contentManager);
+        _contentManager.Initialize(_contentContainer);
 
-        // If this is a sub-content node (like AddCategory), we might need to set up additional navigation
-        if (contentName == "AddCategory")
+        // Register ContentManager with service AFTER the service is ready
+        CallDeferred(nameof(InitializeAdminServiceDeferred));
+    }
+
+    private void InitializeAdminServiceDeferred()
+    {
+        _adminService.Initialize(_contentManager);
+    }
+
+    private void InitializeContent()
+    {
+        _ = _contentManager.ShowContentAsync("Dashboard", false);
+        UpdateActiveButton("Dashboard");
+    }
+
+    private void RegisterContent()
+    {
+        // Register all admin panel content
+        _contentManager.RegisterContent("Dashboard",
+            GD.Load<PackedScene>("res://Scenes/AdminPanel/Dashboard.tscn"));
+
+        _contentManager.RegisterContent("Items",
+            GD.Load<PackedScene>("res://Scenes/AdminPanel/Items.tscn"));
+
+        _contentManager.RegisterContent("Staff",
+            GD.Load<PackedScene>("res://Scenes/AdminPanel/Staff.tscn"));
+
+        _contentManager.RegisterContent("AddCategory",
+            GD.Load<PackedScene>("res://Scenes/AdminPanel/AddCategory.tscn"));
+    }
+
+    private void ConnectSignals()
+    {
+        // Connect ContentManager signals
+        _contentManager.ContentChanged += OnContentChanged;
+
+        // Connect button signals
+        _itemsButton.Pressed += async () => await _contentManager.ShowContentAsync("Items");
+        _staffButton.Pressed += async () => await _contentManager.ShowContentAsync("Staff");
+        _dashboardButton.Pressed += async () => await _contentManager.ShowContentAsync("Dashboard");
+        _exitButton.Pressed += OnExitButtonPressed;
+    }
+
+    private void OnContentChanged(string contentId, Control contentNode)
+    {
+        _logger.Call("info", $"AdminPanel: Content changed to: {contentId}");
+
+        // Update the UI to reflect the active section - only for top-level sections
+        if (contentId == "Dashboard" || contentId == "Items" || contentId == "Staff")
         {
-            // We can access the node directly from the parameter
-            AddCategory addCategoryNode = contentNode as AddCategory;
-            if (addCategoryNode != null)
-            {
-                // Set up back navigation (we'll add this method to AddCategory)
-                addCategoryNode.SetContentManager(_contentManager);
-            }
+            UpdateActiveButton(contentId);
         }
     }
 
-    private void UpdateActiveButton(string contentName)
+    private void UpdateActiveButton(string contentId)
     {
         // Reset all buttons
         _dashboardButton.ThemeTypeVariation = "";
@@ -80,7 +114,7 @@ public partial class AdminPanel : Control
         _staffButton.ThemeTypeVariation = "";
 
         // Set active button
-        switch (contentName)
+        switch (contentId)
         {
             case "Dashboard":
                 _dashboardButton.ThemeTypeVariation = "ActiveButton";

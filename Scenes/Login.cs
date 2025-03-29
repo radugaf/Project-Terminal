@@ -8,6 +8,7 @@ public partial class Login : Control
     private AuthManager _authManager;
 
     // Email based auth - UI elements
+    private CheckBox _rememberMeCheckBox;
     private LineEdit _loginEmailLineEdit;
     private LineEdit _loginPasswordLineEdit;
     private Button _loginButton;
@@ -38,6 +39,7 @@ public partial class Login : Control
         _logger.Call("info", "Login: Login scene initializing");
 
         // Get references to phone-based auth UI elements
+        _rememberMeCheckBox = GetNode<CheckBox>("%RememberMeCheckBox");
         _phoneLineEdit = GetNode<LineEdit>("%PhoneLineEdit");
         _otpLabel = GetNode<Label>("%OtpLabel");
         _otpLineEdit = GetNode<LineEdit>("%OTPLineEdit");
@@ -68,6 +70,7 @@ public partial class Login : Control
         _requestOtpButton.Pressed += OnRequestOtpButtonPressed;
         _verifyOtpButton.Pressed += OnVerifyOtpButtonPressed;
         _registerButton.Pressed += OnRegisterButtonPressed;
+        _loginButton.Pressed += OnLoginButtonPressed;
 
         // Check if already logged in
         if (_authManager.IsLoggedIn())
@@ -154,7 +157,7 @@ public partial class Login : Control
             ShowLoading(true);
 
             _logger.Call("debug", $"Login: Verifying OTP for {phoneNumber}");
-            Session session = await _authManager.VerifyLoginOtpAsync(phoneNumber, otpCode);
+            Session session = await _authManager.VerifyLoginOtpAsync(phoneNumber, otpCode, _rememberMeCheckBox.ButtonPressed);
 
             if (session != null)
             {
@@ -218,7 +221,7 @@ public partial class Login : Control
             ShowLoading(true);
 
             _logger.Call("debug", $"Login: Registering new user with email {email}");
-            Session session = await _authManager.RegisterWithEmailAsync(email, password);
+            Session session = await _authManager.RegisterWithEmailAsync(email, password, _rememberMeCheckBox.ButtonPressed);
 
             if (session != null)
             {
@@ -246,6 +249,64 @@ public partial class Login : Control
             ShowLoading(false);
         }
     }
+
+    private async void OnLoginButtonPressed()
+    {
+        if (_isProcessing)
+            return;
+
+        string email = _loginEmailLineEdit.Text.Trim();
+        string password = _loginPasswordLineEdit.Text.Trim();
+
+        // Validate inputs
+        if (string.IsNullOrEmpty(email) || !email.Contains('@'))
+        {
+            UpdateStatus("Please enter a valid email address", true);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(password) || password.Length < 6)
+        {
+            UpdateStatus("Password must be at least 6 characters", true);
+            return;
+        }
+
+        try
+        {
+            _isProcessing = true;
+            UpdateStatus("Logging in...", false);
+            ShowLoading(true);
+
+            _logger.Call("debug", $"Login: Logging in user with email {email}");
+            Session session = await _authManager.LoginWithEmailAsync(email, password);
+
+            if (session != null)
+            {
+                _logger.Call("info", "Login: Login successful");
+                UpdateStatus("Login successful!", false);
+
+                // Wait briefly to show success message before transitioning
+                await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+                GoToMainScreen();
+            }
+            else
+            {
+                _logger.Call("warn", "Login: Login failed - null session returned");
+                UpdateStatus("Login failed. Please try again.", true);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            _logger.Call("error", $"Login: Login failed: {ex.Message}");
+            UpdateStatus($"Login failed: {ex.Message}", true);
+        }
+        finally
+        {
+            _isProcessing = false;
+            ShowLoading(false);
+        }
+    }
+
     private void OnSessionChanged()
     {
         _logger.Call("debug", "Login: Session changed signal received");
