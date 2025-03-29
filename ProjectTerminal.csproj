@@ -2,8 +2,11 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Supabase" Version="1.1.1" />
+    <PackageReference Include="gdUnit4.api" Version="4.3.1" />
+    <PackageReference Include="gdUnit4.test.adapter" Version="2.0.0" />
   </ItemGroup>
 </Project>
