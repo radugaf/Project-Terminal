@@ -6,6 +6,8 @@ using static Supabase.Gotrue.Constants;
 using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
 using System.Collections.Generic;
+using ProjectTerminal.Globals.Interfaces;
+using ProjectTerminal.Globals.Wrappers;
 
 public partial class AuthManager : Node
 {
@@ -13,7 +15,6 @@ public partial class AuthManager : Node
     private const string USER_SESSION_KEY = "current_user_session";
     private const string SESSION_EXPIRY_KEY = "session_expiry_timestamp";
     private const string USER_NEW_STATE_KEY = "user_new_state";
-    private const int REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
     private const string PERSISTENT_SESSION_KEY = "is_persistent_session";
     private const int STANDARD_REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
     private const int PERSISTENT_REFRESH_THRESHOLD_SECONDS = 3600 * 24 * 6; // ~6 days
@@ -21,15 +22,16 @@ public partial class AuthManager : Node
     // State
     private Session _currentSession;
     private bool _isNewUser;
+    private bool _isClientInitialized = false;
 
     // Dependencies
     private Logger _logger;
-    private SecureStorage _secureStorage;
-    private SupabaseClient _supabaseClient;
+    private ISecureStorageWrapper _secureStorage;
+    private ISupabaseClientWrapper _supabaseClient;
 
     // Public properties
     public Session CurrentSession => _currentSession;
-    public User CurrentUser => _currentSession?.User;
+    public User CurrentUser => _currentSession.User;
     public bool IsNewUser => _isNewUser;
 
 
@@ -42,7 +44,10 @@ public partial class AuthManager : Node
         _logger.Info("AuthManager: Initializing");
 
         _secureStorage = GetNode<SecureStorage>("/root/SecureStorage");
-        _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
+        SupabaseClient supabaseClientNode = GetNode<SupabaseClient>("/root/SupabaseClient");
+        _supabaseClient = supabaseClientNode;
+
+        supabaseClientNode.ClientInitialized += OnClientInitialized;
 
         LoadUserSessionAsync();
 
@@ -51,15 +56,19 @@ public partial class AuthManager : Node
         timer.WaitTime = 600;
         timer.Timeout += ValidateSessionHealth;
         timer.Start();
+    }
 
-        _supabaseClient.ClientInitialized += SyncSessionWithSupabaseClient;
+    private void OnClientInitialized()
+    {
+        _isClientInitialized = true;
+        SyncSessionWithSupabaseClient();
     }
 
     private async void SyncSessionWithSupabaseClient()
     {
         _logger.Debug("AuthManager: Syncing session with Supabase client");
 
-        if (_currentSession == null || string.IsNullOrEmpty(_currentSession.AccessToken))
+        if (_currentSession == null || string.IsNullOrEmpty(_currentSession.AccessToken) || !_isClientInitialized)
             return;
 
         try
@@ -70,7 +79,8 @@ public partial class AuthManager : Node
             }
             else
             {
-                await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                // Use the interface method instead of Auth property
+                await _supabaseClient.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
                 _logger.Info("AuthManager: Session synced with Supabase client");
             }
         }
@@ -87,9 +97,9 @@ public partial class AuthManager : Node
     {
         _logger.Debug("AuthManager: Validating session health");
 
-        if (_currentSession == null)
+        if (_currentSession == null || !_isClientInitialized)
         {
-            _logger.Debug("AuthManager: No session to validate");
+            _logger.Debug("AuthManager: No session to validate or client not initialized");
             return;
         }
 
@@ -223,26 +233,20 @@ public partial class AuthManager : Node
             bool isPersistent = _secureStorage.RetrieveValue<bool>(PERSISTENT_SESSION_KEY);
             bool needsRefresh = IsSessionExpired();
 
-            if (_supabaseClient.Supabase != null)
+            // Check if client is initialized
+            if (_isClientInitialized)
             {
                 if (needsRefresh)
                 {
                     bool refreshSucceeded = await RefreshSessionAsync();
-                    // if (!refreshSucceeded && isPersistent)
-                    // {
-                    //     // For persistent sessions, we'll try harder to recover
-                    //     await TryRecoverExpiredSession();
-                    // }
                 }
                 else
                 {
-                    await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                    // Use interface method instead of Auth property
+                    await _supabaseClient.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
                 }
             }
-            else if (needsRefresh)
-            {
-                _supabaseClient.ClientInitialized += async () => await RefreshSessionAsync();
-            }
+            // No need for the else clause as we're using the OnClientInitialized signal handler
 
             _logger.Info($"AuthManager: Session loaded successfully, persistent: {isPersistent}");
         }
@@ -252,6 +256,7 @@ public partial class AuthManager : Node
             ClearUserSession();
         }
     }
+
     private void ClearUserSession()
     {
         try
@@ -276,7 +281,7 @@ public partial class AuthManager : Node
         try
         {
             // Sign up with Supabase Auth
-            Session session = await _supabaseClient.Auth.SignUp(email, password);
+            Session session = await _supabaseClient.SignUp(email, password);
 
             if (session?.User == null)
             {
@@ -312,7 +317,7 @@ public partial class AuthManager : Node
 
         try
         {
-            Session session = await _supabaseClient.Auth.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
+            Session session = await _supabaseClient.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
 
             if (session?.User == null)
             {
@@ -320,7 +325,7 @@ public partial class AuthManager : Node
                 return null;
             }
 
-            await _supabaseClient.Auth.SetSession(session.AccessToken, session.RefreshToken);
+            await _supabaseClient.SetSession(session.AccessToken, session.RefreshToken);
 
             _isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
             _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
@@ -358,7 +363,7 @@ public partial class AuthManager : Node
             var attrs = new UserAttributes { Email = email.Trim() };
 
             // Update user email
-            User response = await _supabaseClient.Auth.Update(attrs) ??
+            User response = await _supabaseClient.Update(attrs) ??
                 throw new Exception("Failed to update user email");
 
             _logger.Info($"AuthManager: Email updated successfully for user {CurrentUser.Id}");
@@ -400,7 +405,7 @@ public partial class AuthManager : Node
 
         try
         {
-            await _supabaseClient.Auth.SignIn(SignInType.Phone, phoneNumber);
+            await _supabaseClient.SignIn(SignInType.Phone, phoneNumber);
             _logger.Debug($"AuthManager: OTP sent to {phoneNumber}");
         }
         catch (Exception ex)
@@ -414,21 +419,15 @@ public partial class AuthManager : Node
 
     public async Task<bool> RefreshSessionAsync()
     {
-        if (_currentSession == null || string.IsNullOrEmpty(_currentSession.RefreshToken))
+        if (_currentSession == null || string.IsNullOrEmpty(_currentSession.RefreshToken) || !_isClientInitialized)
         {
-            _logger.Warn("AuthManager: No refresh token available");
+            _logger.Warn("AuthManager: No refresh token available or client not initialized");
             return false;
         }
 
         try
         {
-            if (_supabaseClient?.Auth == null)
-            {
-                _logger.Error("AuthManager: Supabase client not initialized");
-                return false; // Don't throw, just return failure
-            }
-
-            Session refreshedSession = await _supabaseClient.Auth.RefreshSession();
+            Session refreshedSession = await _supabaseClient.RefreshSession();
 
             if (refreshedSession != null)
             {
@@ -459,24 +458,14 @@ public partial class AuthManager : Node
         }
     }
 
-    // private async Task<bool> TryRecoverExpiredSession()
-    // {
-    //     // This would attempt to use stored credentials to get a new session without user action
-    //     // Implementation depends on your authentication flow - this is a placeholder
-    //     _logger.Info("AuthManager: Attempting session recovery...");
-
-    //     // For now, we'll return false to indicate we couldn't recover
-    //     return false;
-    // }
-
     public async Task LogoutAsync()
     {
         _logger.Info("AuthManager: Logging out user");
 
         try
         {
-            if (_supabaseClient.Auth?.CurrentSession != null)
-                await _supabaseClient.Auth.SignOut();
+            if (_isClientInitialized && _currentSession != null)
+                await _supabaseClient.SignOut();
         }
         catch (Exception ex)
         {
@@ -487,7 +476,7 @@ public partial class AuthManager : Node
         _currentSession = null;
         ClearUserSession();
 
-        await _supabaseClient.ReinitializeClientAsync();
+        await _supabaseClient.Initialize();
         EmitSignal(SignalName.SessionChanged);
     }
 
@@ -497,7 +486,7 @@ public partial class AuthManager : Node
 
         try
         {
-            Session session = await _supabaseClient.Auth.SignIn(email, password);
+            Session session = await _supabaseClient.SignIn(email, password);
 
             if (session?.User == null)
             {
@@ -522,15 +511,14 @@ public partial class AuthManager : Node
         }
         catch (Exception ex)
         {
-            _logger.Error($"AuthManager: Login failed: {ex.Message}",
-                new Dictionary<string, object> { { "email", email } });
+            _logger.Error($"AuthManager: Login failed: {ex.Message}", new Dictionary<string, object> { { "email", email } });
             throw;
         }
     }
 
     public bool IsLoggedIn()
     {
-        return _currentSession?.User != null && !IsSessionExpired();
+        return _currentSession.User != null && !IsSessionExpired();
     }
 
     private bool IsSessionExpired()
