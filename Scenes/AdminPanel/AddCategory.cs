@@ -3,7 +3,7 @@ using ProjectTerminal.Resources;
 
 public partial class AddCategory : Control
 {
-    private Node _logger;
+    private Logger _logger;
     private LineEdit _categoryName;
     private ColorPickerButton _categoryColor;
     private Button _submitButton;
@@ -14,8 +14,8 @@ public partial class AddCategory : Control
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "AddCategory: Initializing AddCategory scene");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("AddCategory: Initializing AddCategory scene");
 
         _categoryName = GetNode<LineEdit>("%NameLineEdit");
         _categoryColor = GetNode<ColorPickerButton>("%ColorPickerButton");
@@ -45,7 +45,7 @@ public partial class AddCategory : Control
             }
         }
 
-        _logger.Call("info", "AddCategory: AddCategory scene initialized");
+        _logger.Info("AddCategory: AddCategory scene initialized");
     }
 
     // Set the ContentManager reference (called from AdminPanel)
@@ -56,7 +56,7 @@ public partial class AddCategory : Control
 
     private void OnSubmitButtonPressed()
     {
-        _logger.Call("debug", "AddCategory: Submit button pressed");
+        _logger.Debug("AddCategory: Submit button pressed");
 
         // Here you would typically save the category
         // Then navigate back to the Items view
@@ -68,7 +68,7 @@ public partial class AddCategory : Control
 
     private void OnBackButtonPressed()
     {
-        _logger.Call("debug", "AddCategory: Back button pressed");
+        _logger.Debug("AddCategory: Back button pressed");
 
         if (_contentManager != null)
         {

@@ -4,7 +4,7 @@ using Supabase.Gotrue;
 
 public partial class Login : Control
 {
-    private Node _logger;
+    private Logger _logger;
     private AuthManager _authManager;
 
     // Email based auth - UI elements
@@ -35,8 +35,8 @@ public partial class Login : Control
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "Login: Login scene initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("Login: Login scene initializing");
 
         // Get references to phone-based auth UI elements
         _rememberMeCheckBox = GetNode<CheckBox>("%RememberMeCheckBox");
@@ -75,7 +75,7 @@ public partial class Login : Control
         // Check if already logged in
         if (_authManager.IsLoggedIn())
         {
-            _logger.Call("debug", "Login: User already logged in, transitioning to main scene");
+            _logger.Debug("Login: User already logged in, transitioning to main scene");
             GoToMainScreen();
         }
     }
@@ -111,7 +111,7 @@ public partial class Login : Control
             UpdateStatus("Requesting OTP...", false);
             ShowLoading(true);
 
-            _logger.Call("debug", $"Login: Requesting OTP for {phoneNumber}");
+            _logger.Debug($"Login: Requesting OTP for {phoneNumber}");
             await _authManager.RequestLoginOtpAsync(phoneNumber);
 
             // Show OTP verification UI
@@ -122,11 +122,11 @@ public partial class Login : Control
             _otpRequested = true;
 
             UpdateStatus("Verification code sent! Please check your phone.", false);
-            _logger.Call("debug", "Login: OTP requested successfully");
+            _logger.Debug("Login: OTP requested successfully");
         }
         catch (System.Exception ex)
         {
-            _logger.Call("error", $"Login: OTP request failed: {ex.Message}");
+            _logger.Error($"Login: OTP request failed: {ex.Message}");
             UpdateStatus($"Failed to request verification code: {ex.Message}", true);
         }
         finally
@@ -156,12 +156,12 @@ public partial class Login : Control
             UpdateStatus("Verifying code...", false);
             ShowLoading(true);
 
-            _logger.Call("debug", $"Login: Verifying OTP for {phoneNumber}");
+            _logger.Debug($"Login: Verifying OTP for {phoneNumber}");
             Session session = await _authManager.VerifyLoginOtpAsync(phoneNumber, otpCode, _rememberMeCheckBox.ButtonPressed);
 
             if (session != null)
             {
-                _logger.Call("info", "Login: Authentication successful");
+                _logger.Info("Login: Authentication successful");
                 UpdateStatus("Authentication successful!", false);
 
                 // Wait briefly to show success message before transitioning
@@ -170,13 +170,13 @@ public partial class Login : Control
             }
             else
             {
-                _logger.Call("warn", "Login: Authentication failed - null session returned");
+                _logger.Warn("Login: Authentication failed - null session returned");
                 UpdateStatus("Authentication failed. Please try again.", true);
             }
         }
         catch (System.Exception ex)
         {
-            _logger.Call("error", $"Login: OTP verification failed: {ex.Message}");
+            _logger.Error($"Login: OTP verification failed: {ex.Message}");
             UpdateStatus($"Verification failed: {ex.Message}", true);
         }
         finally
@@ -220,12 +220,12 @@ public partial class Login : Control
             UpdateStatus("Registering account...", false);
             ShowLoading(true);
 
-            _logger.Call("debug", $"Login: Registering new user with email {email}");
+            _logger.Debug($"Login: Registering new user with email {email}");
             Session session = await _authManager.RegisterWithEmailAsync(email, password, _rememberMeCheckBox.ButtonPressed);
 
             if (session != null)
             {
-                _logger.Call("info", "Login: Registration successful");
+                _logger.Info("Login: Registration successful");
                 UpdateStatus("Registration successful!", false);
 
                 // Wait briefly to show success message before transitioning
@@ -234,13 +234,13 @@ public partial class Login : Control
             }
             else
             {
-                _logger.Call("warn", "Login: Registration failed - null session returned");
+                _logger.Warn("Login: Registration failed - null session returned");
                 UpdateStatus("Registration failed. Please try again.", true);
             }
         }
         catch (System.Exception ex)
         {
-            _logger.Call("error", $"Login: Registration failed: {ex.Message}");
+            _logger.Error($"Login: Registration failed: {ex.Message}");
             UpdateStatus($"Registration failed: {ex.Message}", true);
         }
         finally
@@ -277,12 +277,12 @@ public partial class Login : Control
             UpdateStatus("Logging in...", false);
             ShowLoading(true);
 
-            _logger.Call("debug", $"Login: Logging in user with email {email}");
+            _logger.Debug($"Login: Logging in user with email {email}");
             Session session = await _authManager.LoginWithEmailAsync(email, password);
 
             if (session != null)
             {
-                _logger.Call("info", "Login: Login successful");
+                _logger.Info("Login: Login successful");
                 UpdateStatus("Login successful!", false);
 
                 // Wait briefly to show success message before transitioning
@@ -291,13 +291,13 @@ public partial class Login : Control
             }
             else
             {
-                _logger.Call("warn", "Login: Login failed - null session returned");
+                _logger.Warn("Login: Login failed - null session returned");
                 UpdateStatus("Login failed. Please try again.", true);
             }
         }
         catch (System.Exception ex)
         {
-            _logger.Call("error", $"Login: Login failed: {ex.Message}");
+            _logger.Error($"Login: Login failed: {ex.Message}");
             UpdateStatus($"Login failed: {ex.Message}", true);
         }
         finally
@@ -309,16 +309,16 @@ public partial class Login : Control
 
     private void OnSessionChanged()
     {
-        _logger.Call("debug", "Login: Session changed signal received");
+        _logger.Debug("Login: Session changed signal received");
 
         if (_authManager.IsLoggedIn())
         {
-            _logger.Call("debug", "Login: User now logged in, transitioning to main scene");
+            _logger.Debug("Login: User now logged in, transitioning to main scene");
             GoToMainScreen();
         }
         else
         {
-            _logger.Call("debug", "Login: User logged out");
+            _logger.Debug("Login: User logged out");
             SetInitialState();
         }
     }

@@ -12,7 +12,7 @@ using Supabase.Interfaces;
 
 public partial class SupabaseClient : Node
 {
-    private Node _logger;
+    private Logger _logger;
     private Supabase.Client _supabase;
     private SupabaseOptions _options;
 
@@ -27,8 +27,8 @@ public partial class SupabaseClient : Node
     public override void _Ready()
     {
         // Get a reference to the logger
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "SupabaseClient: Initializing...");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("SupabaseClient: Initializing...");
         CallDeferred(nameof(AutoInitialize));
     }
 
@@ -69,11 +69,11 @@ public partial class SupabaseClient : Node
             };
 
             _supabase = new Supabase.Client(supabaseUrl, supabaseKey, _options);
-            _logger.Call("debug", "SupabaseClient: Supabase client created");
+            _logger.Debug("SupabaseClient: Supabase client created");
 
             // Initialize Supabase client
             await _supabase.InitializeAsync();
-            _logger.Call("info", "SupabaseClient: Supabase client initialized");
+            _logger.Info("SupabaseClient: Supabase client initialized");
 
             EmitSignal(SignalName.ClientInitialized);
         }
@@ -89,9 +89,9 @@ public partial class SupabaseClient : Node
     {
         if (_supabase != null)
         {
-            _logger.Call("debug", "SupabaseClient: Reinitializing Supabase client");
+            _logger.Debug("SupabaseClient: Reinitializing Supabase client");
             await _supabase.InitializeAsync();
-            _logger.Call("debug", "SupabaseClient: Supabase client reinitialized");
+            _logger.Debug("SupabaseClient: Supabase client reinitialized");
         }
     }
 
@@ -99,7 +99,7 @@ public partial class SupabaseClient : Node
     {
         if (_supabase == null)
         {
-            _logger.Call("error", "SupabaseClient: Attempted to access database before initialization");
+            _logger.Error("SupabaseClient: Attempted to access database before initialization");
             throw new InvalidOperationException("Supabase client not initialized");
         }
 
@@ -110,7 +110,7 @@ public partial class SupabaseClient : Node
     {
         if (_supabase == null)
         {
-            _logger.Call("error", "SupabaseClient: Attempted to call RPC before initialization");
+            _logger.Error("SupabaseClient: Attempted to call RPC before initialization");
             throw new InvalidOperationException("Supabase client not initialized");
         }
 

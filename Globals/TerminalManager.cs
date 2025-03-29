@@ -8,7 +8,7 @@ using Godot.Collections;
 
 public partial class TerminalManager : Node
 {
-    private Node _logger;
+    private Logger _logger;
     private SecureStorage _secureStorage;
     private SupabaseClient _supabaseClient;
     private AuthManager _authManager;
@@ -20,8 +20,8 @@ public partial class TerminalManager : Node
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "TerminalManager: Initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("TerminalManager: Initializing");
 
         _secureStorage = GetNode<SecureStorage>("/root/SecureStorage");
         _deviceManager = GetNode<Node>("/root/DeviceManager");
@@ -35,11 +35,11 @@ public partial class TerminalManager : Node
         {
             if (!_authManager.IsLoggedIn())
             {
-                _logger.Call("error", "TerminalManager: Cannot create terminal - user not logged in");
+                _logger.Error("TerminalManager: Cannot create terminal - user not logged in");
                 throw new InvalidOperationException("User must be logged in to create a terminal");
             }
 
-            _logger.Call("debug", $"TerminalManager: Creating terminal '{terminalName}' for location {locationId}");
+            _logger.Debug($"TerminalManager: Creating terminal '{terminalName}' for location {locationId}");
 
             // Get device information from DeviceManager
             Dictionary deviceInfo = _deviceManager.Call("get_device_info").AsGodotDictionary();
@@ -76,19 +76,19 @@ public partial class TerminalManager : Node
 
             if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
             {
-                _logger.Call("error", $"TerminalManager: Failed to create terminal: {response?.ResponseMessage.ReasonPhrase}");
+                _logger.Error($"TerminalManager: Failed to create terminal: {response?.ResponseMessage.ReasonPhrase}");
                 throw new Exception("Failed to create terminal");
             }
 
             string terminalId = response.Model?.Id;
-            _logger.Call("info", $"TerminalManager: Terminal created with ID: {terminalId}");
+            _logger.Info($"TerminalManager: Terminal created with ID: {terminalId}");
 
             EmitSignal(SignalName.TerminalCreated, terminalId);
             return response.Model;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"TerminalManager: Failed to create terminal: {ex.Message}");
+            _logger.Error($"TerminalManager: Failed to create terminal: {ex.Message}");
             throw;
         }
     }

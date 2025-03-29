@@ -7,7 +7,7 @@ using Supabase.Postgrest;
 
 public partial class AddressManager : Node
 {
-    private Node _logger;
+    private Logger _logger;
     private SupabaseClient _supabaseClient;
 
     [Signal]
@@ -15,8 +15,8 @@ public partial class AddressManager : Node
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "AddressManager: Initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("AddressManager: Initializing");
 
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
     }
@@ -41,19 +41,19 @@ public partial class AddressManager : Node
 
             if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
             {
-                _logger.Call("error", $"AddressManager: Failed to create address: {response?.ResponseMessage.ReasonPhrase}");
+                _logger.Error($"AddressManager: Failed to create address: {response?.ResponseMessage.ReasonPhrase}");
                 throw new Exception($"Failed to create address");
             }
 
             string addressId = response.Model?.Id;
-            _logger.Call("info", $"AddressManager: Address created with ID: {addressId}");
+            _logger.Info($"AddressManager: Address created with ID: {addressId}");
 
             EmitSignal(SignalName.AddressCreated, addressId);
             return addressId;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"AddressManager: Address creation failed: {ex.Message}");
+            _logger.Error($"AddressManager: Address creation failed: {ex.Message}");
             throw;
         }
     }

@@ -8,7 +8,7 @@ using Supabase.Gotrue;
 public partial class OrganizationManager : Node
 {
     private const string ORGANIZATION_ID = "organization_id";
-    private Node _logger;
+    private Logger _logger;
     private SupabaseClient _supabaseClient;
     private AuthManager _authManager;
     private SecureStorage _secureStorage;
@@ -29,8 +29,8 @@ public partial class OrganizationManager : Node
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "OrganizationManager: Initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("OrganizationManager: Initializing");
 
         _secureStorage = GetNode<SecureStorage>("/root/SecureStorage");
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
@@ -43,11 +43,11 @@ public partial class OrganizationManager : Node
         {
             if (!_authManager.IsLoggedIn())
             {
-                _logger.Call("error", "OrganizationManager: Cannot create organization - user not logged in");
+                _logger.Error("OrganizationManager: Cannot create organization - user not logged in");
                 throw new InvalidOperationException("User must be logged in to create an organization");
             }
 
-            _logger.Call("debug", $"OrganizationManager: Creating new organization '{name}'");
+            _logger.Debug($"OrganizationManager: Creating new organization '{name}'");
 
             var organization = new Organization
             {
@@ -72,21 +72,21 @@ public partial class OrganizationManager : Node
 
             if (string.IsNullOrEmpty(organizationId))
             {
-                _logger.Call("error", "OrganizationManager: Organization ID is null or empty after insert");
+                _logger.Error("OrganizationManager: Organization ID is null or empty after insert");
                 throw new Exception("Organization ID is null or empty after creation");
             }
 
-            _logger.Call("info", $"OrganizationManager: Organization '{name}' created with ID: {organizationId}");
+            _logger.Info($"OrganizationManager: Organization '{name}' created with ID: {organizationId}");
 
             _secureStorage.StoreValue(ORGANIZATION_ID, organizationId);
-            _logger.Call("info", $"OrganizationManager: Organization ID '{organizationId}' stored in secure storage");
+            _logger.Info($"OrganizationManager: Organization ID '{organizationId}' stored in secure storage");
 
             EmitSignal(SignalName.OrganizationCreated, organizationId);
             return organizationId;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"OrganizationManager: Failed to create organization: {ex.Message}");
+            _logger.Error($"OrganizationManager: Failed to create organization: {ex.Message}");
             throw new Exception($"Failed to create organization: {ex.Message}", ex);
         }
     }
@@ -97,11 +97,11 @@ public partial class OrganizationManager : Node
         {
             if (string.IsNullOrEmpty(organizationId))
             {
-                _logger.Call("error", "OrganizationManager: Cannot register staff with null/empty organization ID");
+                _logger.Error("OrganizationManager: Cannot register staff with null/empty organization ID");
                 throw new Exception("Invalid organization ID");
             }
 
-            _logger.Call("debug", $"OrganizationManager: Registering user as owner for organization {organizationId}");
+            _logger.Debug($"OrganizationManager: Registering user as owner for organization {organizationId}");
 
             // Get phone from current user
             string phone = _authManager.CurrentUser?.Phone ?? "";
@@ -126,19 +126,19 @@ public partial class OrganizationManager : Node
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
             {
-                _logger.Call("error", $"OrganizationManager: Staff insert failed: {response?.ResponseMessage?.ReasonPhrase}");
+                _logger.Error($"OrganizationManager: Staff insert failed: {response?.ResponseMessage?.ReasonPhrase}");
                 throw new Exception("Failed to create staff record");
             }
 
             string staffId = response.Model?.Id;
-            _logger.Call("info", $"OrganizationManager: Staff owner registered with ID: {staffId}");
+            _logger.Info($"OrganizationManager: Staff owner registered with ID: {staffId}");
 
             EmitSignal(SignalName.StaffMemberAdded, staffId, organizationId);
             return staffId;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"OrganizationManager: Failed to register staff owner: {ex.Message}");
+            _logger.Error($"OrganizationManager: Failed to register staff owner: {ex.Message}");
             throw new Exception($"Failed to register staff owner: {ex.Message}", ex);
         }
     }
@@ -149,11 +149,11 @@ public partial class OrganizationManager : Node
         {
             if (string.IsNullOrEmpty(organizationId))
             {
-                _logger.Call("error", "OrganizationManager: Cannot create location with null/empty organization ID");
+                _logger.Error("OrganizationManager: Cannot create location with null/empty organization ID");
                 throw new Exception("Invalid organization ID");
             }
 
-            _logger.Call("debug", $"OrganizationManager: Creating location '{name}' for organization {organizationId}");
+            _logger.Debug($"OrganizationManager: Creating location '{name}' for organization {organizationId}");
 
             var location = new Location
             {
@@ -171,19 +171,19 @@ public partial class OrganizationManager : Node
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
             {
-                _logger.Call("error", $"OrganizationManager: Failed to create location: {response?.ResponseMessage?.ReasonPhrase}");
+                _logger.Error($"OrganizationManager: Failed to create location: {response?.ResponseMessage?.ReasonPhrase}");
                 throw new Exception("Failed to create location");
             }
 
             string locationId = response.Model?.Id;
-            _logger.Call("info", $"OrganizationManager: Location '{name}' created with ID: {locationId}");
+            _logger.Info($"OrganizationManager: Location '{name}' created with ID: {locationId}");
 
             EmitSignal(SignalName.LocationCreated, locationId, organizationId);
             return locationId;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"OrganizationManager: Failed to create location: {ex.Message}");
+            _logger.Error($"OrganizationManager: Failed to create location: {ex.Message}");
             throw;
         }
     }
@@ -193,7 +193,7 @@ public partial class OrganizationManager : Node
         string organizationId = _secureStorage.RetrieveValue<string>(ORGANIZATION_ID);
         if (string.IsNullOrEmpty(organizationId))
         {
-            _logger.Call("error", "OrganizationManager: Organization ID is null or empty");
+            _logger.Error("OrganizationManager: Organization ID is null or empty");
             throw new Exception("Organization ID is null or empty");
         }
 

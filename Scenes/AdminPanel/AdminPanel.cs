@@ -3,7 +3,7 @@ using ProjectTerminal.Resources.Admin;
 
 public partial class AdminPanel : Control
 {
-    private Node _logger;
+    private Logger _logger;
     private Control _contentContainer;
     private Button _dashboardButton;
     private Button _itemsButton;
@@ -16,8 +16,8 @@ public partial class AdminPanel : Control
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "AdminPanel: Initializing AdminPanel scene");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("AdminPanel: Initializing AdminPanel scene");
 
         // Get UI references
         _contentContainer = GetNode<Control>("%ContentContainer");
@@ -38,7 +38,7 @@ public partial class AdminPanel : Control
         // Load initial content
         CallDeferred(nameof(InitializeContent));
 
-        _logger.Call("info", "AdminPanel: AdminPanel scene initialized");
+        _logger.Info("AdminPanel: AdminPanel scene initialized");
     }
 
     private void InitializeServices()
@@ -97,7 +97,7 @@ public partial class AdminPanel : Control
 
     private void OnContentChanged(string contentId, Control contentNode)
     {
-        _logger.Call("info", $"AdminPanel: Content changed to: {contentId}");
+        _logger.Info($"AdminPanel: Content changed to: {contentId}");
 
         // Update the UI to reflect the active section - only for top-level sections
         if (contentId == "Dashboard" || contentId == "Items" || contentId == "Staff")

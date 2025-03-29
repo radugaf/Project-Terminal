@@ -24,7 +24,7 @@ namespace ProjectTerminal.Resources.Admin
         private Control _currentView;
 
         // Logger reference
-        private Node _logger;
+        private Logger _logger;
 
         [Signal]
         public delegate void ContentChangingEventHandler(string fromContentId, string toContentId);
@@ -38,21 +38,21 @@ namespace ProjectTerminal.Resources.Admin
         public override void _Ready()
         {
             Instance = this;
-            _logger = GetNode<Node>("/root/Logger");
-            _logger.Call("info", "ContentManager: Initialized");
+            _logger = GetNode<Logger>("/root/Logger");
+            _logger.Info("ContentManager: Initialized");
         }
 
         public void Initialize(Control container)
         {
             _container = container;
-            _logger.Call("debug", "ContentManager: Container set");
+            _logger.Debug("ContentManager: Container set");
         }
 
         public void RegisterContent(string id, PackedScene scene, Dictionary<string, object> metadata = null)
         {
             if (_contentRegistry.ContainsKey(id))
             {
-                _logger.Call("warn", $"ContentManager: Content '{id}' already registered, replacing");
+                _logger.Warn($"ContentManager: Content '{id}' already registered, replacing");
             }
 
             _contentRegistry[id] = new ContentRegistration
@@ -62,7 +62,7 @@ namespace ProjectTerminal.Resources.Admin
                 Metadata = metadata ?? []
             };
 
-            _logger.Call("debug", $"ContentManager: Registered content '{id}'");
+            _logger.Debug($"ContentManager: Registered content '{id}'");
         }
 
         public async Task<Control> ShowContentAsync(string id, bool addToHistory = true, Dictionary<string, object> parameters = null)
@@ -70,7 +70,7 @@ namespace ProjectTerminal.Resources.Admin
             if (!_contentRegistry.ContainsKey(id))
             {
                 string errorMsg = $"ContentManager: Content '{id}' not registered";
-                _logger.Call("error", errorMsg);
+                _logger.Error(errorMsg);
                 EmitSignal(SignalName.NavigationError, errorMsg);
                 return null;
             }
@@ -95,7 +95,7 @@ namespace ProjectTerminal.Resources.Admin
                         Parameters = _currentController?.GetState() ?? new Dictionary<string, object>()
                     });
 
-                    _logger.Call("debug", $"ContentManager: Added '{_currentContentId}' to navigation history");
+                    _logger.Debug($"ContentManager: Added '{_currentContentId}' to navigation history");
                 }
 
                 // Remove current content
@@ -129,13 +129,13 @@ namespace ProjectTerminal.Resources.Admin
 
                 // Emit content changed signal
                 EmitSignal(SignalName.ContentChanged, id, _currentView);
-                _logger.Call("info", $"ContentManager: Switched content to '{id}'");
+                _logger.Info($"ContentManager: Switched content to '{id}'");
 
                 return _currentView;
             }
             catch (System.Exception ex)
             {
-                _logger.Call("error", $"ContentManager: Error showing content '{id}': {ex.Message}");
+                _logger.Error($"ContentManager: Error showing content '{id}': {ex.Message}");
                 EmitSignal(SignalName.NavigationError, $"Failed to load content '{id}': {ex.Message}");
                 return null;
             }
@@ -145,7 +145,7 @@ namespace ProjectTerminal.Resources.Admin
         {
             if (_navigationHistory.Count == 0)
             {
-                _logger.Call("warn", "ContentManager: Can't navigate back - history empty");
+                _logger.Warn("ContentManager: Can't navigate back - history empty");
                 return null;
             }
 

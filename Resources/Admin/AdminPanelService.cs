@@ -8,7 +8,7 @@ namespace ProjectTerminal.Resources.Admin
         private static AdminPanelService _instance;
 
         private ContentManager _contentManager;
-        private Node _logger;
+        private Logger _logger;
 
         public static AdminPanelService Instance => _instance;
 
@@ -23,14 +23,14 @@ namespace ProjectTerminal.Resources.Admin
             }
 
             _instance = this;
-            _logger = GetNode<Node>("/root/Logger");
-            _logger.Call("info", "AdminPanelService: Initialized");
+            _logger = GetNode<Logger>("/root/Logger");
+            _logger.Info("AdminPanelService: Initialized");
         }
 
         public void Initialize(ContentManager contentManager)
         {
             _contentManager = contentManager;
-            _logger.Call("debug", "AdminPanelService: ContentManager registered");
+            _logger.Debug("AdminPanelService: ContentManager registered");
         }
     }
 }

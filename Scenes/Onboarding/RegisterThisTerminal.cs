@@ -4,7 +4,7 @@ using ProjectTerminal.Resources;
 
 public partial class RegisterThisTerminal : Control
 {
-    private Node _logger;
+    private Logger _logger;
     private Node _deviceManager;
     private SupabaseClient _supabaseClient;
     private TerminalManager _terminalManager;
@@ -24,8 +24,8 @@ public partial class RegisterThisTerminal : Control
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "RegisterThisTerminal: RegisterThisTerminal scene initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("RegisterThisTerminal: RegisterThisTerminal scene initializing");
 
         // Get references to managers
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
@@ -53,7 +53,7 @@ public partial class RegisterThisTerminal : Control
 
     private async void OnSubmitButtonPressed()
     {
-        _logger.Call("info", "RegisterThisTerminal: Submit button pressed, starting registration flow");
+        _logger.Info("RegisterThisTerminal: Submit button pressed, starting registration flow");
 
         _submitButton.Disabled = true;
         UpdateStatusLabel("Processing...");
@@ -91,7 +91,7 @@ public partial class RegisterThisTerminal : Control
             terminalType
         );
 
-        _logger.Call("info", "RegisterThisTerminal: Terminal registered successfully");
+        _logger.Info("RegisterThisTerminal: Terminal registered successfully");
         UpdateStatusLabel("Terminal registered successfully!");
 
         GoToNextScreen();
@@ -102,7 +102,7 @@ public partial class RegisterThisTerminal : Control
         if (_statusLabel != null)
         {
             _statusLabel.Text = message;
-            _logger.Call("debug", $"RegisterThisTerminal: Status updated - {message}");
+            _logger.Debug($"RegisterThisTerminal: Status updated - {message}");
         }
     }
 
@@ -127,7 +127,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_locationNameLineEdit.Text))
         {
             UpdateStatusLabel("Error: Location name is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing location name");
+            _logger.Warn("RegisterThisTerminal: Missing location name");
             return false;
         }
 
@@ -135,7 +135,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_countryLineEdit.Text))
         {
             UpdateStatusLabel("Error: Country is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing country");
+            _logger.Warn("RegisterThisTerminal: Missing country");
             return false;
         }
 
@@ -143,7 +143,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_cityLineEdit.Text))
         {
             UpdateStatusLabel("Error: City is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing city");
+            _logger.Warn("RegisterThisTerminal: Missing city");
             return false;
         }
 
@@ -151,7 +151,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_streetOneLineEdit.Text))
         {
             UpdateStatusLabel("Error: Street address is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing street address");
+            _logger.Warn("RegisterThisTerminal: Missing street address");
             return false;
         }
 
@@ -159,7 +159,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_streetTwoLineEdit.Text))
         {
             UpdateStatusLabel("Error: Street address is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing street address");
+            _logger.Warn("RegisterThisTerminal: Missing street address");
             return false;
         }
 
@@ -167,7 +167,7 @@ public partial class RegisterThisTerminal : Control
         if (string.IsNullOrWhiteSpace(_postalCodeLineEdit.Text))
         {
             UpdateStatusLabel("Error: Postal code is required");
-            _logger.Call("warn", "RegisterThisTerminal: Missing postal code");
+            _logger.Warn("RegisterThisTerminal: Missing postal code");
             return false;
         }
 
@@ -181,7 +181,7 @@ public partial class RegisterThisTerminal : Control
             var tree = GetTree();
             if (tree == null)
             {
-                _logger.Call("error", "RegisterThisTerminal: SceneTree is null in GoToNextScreen");
+                _logger.Error("RegisterThisTerminal: SceneTree is null in GoToNextScreen");
                 return;
             }
 
@@ -196,7 +196,7 @@ public partial class RegisterThisTerminal : Control
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"RegisterThisTerminal: Exception in GoToNextScreen: {ex.Message}");
+            _logger.Error($"RegisterThisTerminal: Exception in GoToNextScreen: {ex.Message}");
         }
     }
 }

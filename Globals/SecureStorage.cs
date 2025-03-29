@@ -8,7 +8,7 @@ public partial class SecureStorage : Node
     private const string STORAGE_DIR = "secure_data";
     private const string FILE_EXTENSION = ".dat";
 
-    private Node _logger;
+    private Logger _logger;
     private string _storagePath;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -18,8 +18,8 @@ public partial class SecureStorage : Node
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "SecureStorage: Initializing secure storage...");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("SecureStorage: Initializing secure storage...");
         InitializeStorage();
     }
 
@@ -35,13 +35,13 @@ public partial class SecureStorage : Node
                 Error err = dir.MakeDir(STORAGE_DIR);
                 if (err != Error.Ok)
                 {
-                    _logger.Call("error", $"SecureStorage: Failed to create storage directory: {err}");
+                    _logger.Error($"SecureStorage: Failed to create storage directory: {err}");
                 }
             }
         }
         else
         {
-            _logger.Call("error", $"SecureStorage: Cannot access user directory: {DirAccess.GetOpenError()}");
+            _logger.Error($"SecureStorage: Cannot access user directory: {DirAccess.GetOpenError()}");
         }
     }
 
@@ -66,17 +66,17 @@ public partial class SecureStorage : Node
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
             if (file == null)
             {
-                _logger.Call("error", $"Failed to write file: {FileAccess.GetOpenError()}");
+                _logger.Error($"Failed to write file: {FileAccess.GetOpenError()}");
                 return false;
             }
 
             file.StoreString(json);
-            _logger.Call("debug", $"SecureStorage: Object stored under key '{key}'");
+            _logger.Debug($"SecureStorage: Object stored under key '{key}'");
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"SecureStorage: Failed to store object: {ex.Message}");
+            _logger.Error($"SecureStorage: Failed to store object: {ex.Message}");
             return false;
         }
     }
@@ -89,14 +89,14 @@ public partial class SecureStorage : Node
 
             if (!FileAccess.FileExists(filePath))
             {
-                _logger.Call("debug", $"SecureStorage: No value for key '{key}'");
+                _logger.Debug($"SecureStorage: No value for key '{key}'");
                 return default;
             }
 
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
             if (file == null)
             {
-                _logger.Call("error", $"Failed to read file: {FileAccess.GetOpenError()}");
+                _logger.Error($"Failed to read file: {FileAccess.GetOpenError()}");
                 return default;
             }
 
@@ -111,12 +111,12 @@ public partial class SecureStorage : Node
         }
         catch (JsonException jsonEx)
         {
-            _logger.Call("error", $"SecureStorage: JSON parse error: {jsonEx.Message}");
+            _logger.Error($"SecureStorage: JSON parse error: {jsonEx.Message}");
             return default;
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"SecureStorage: Retrieval error: {ex.Message}");
+            _logger.Error($"SecureStorage: Retrieval error: {ex.Message}");
             return default;
         }
     }
@@ -142,7 +142,7 @@ public partial class SecureStorage : Node
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
             if (file == null)
             {
-                _logger.Call("error", $"Failed to write file: {FileAccess.GetOpenError()}");
+                _logger.Error($"Failed to write file: {FileAccess.GetOpenError()}");
                 return false;
             }
 
@@ -153,7 +153,7 @@ public partial class SecureStorage : Node
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"SecureStorage: Failed to store value: {ex.Message}");
+            _logger.Error($"SecureStorage: Failed to store value: {ex.Message}");
             return false;
         }
     }
@@ -172,7 +172,7 @@ public partial class SecureStorage : Node
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
             if (file == null)
             {
-                _logger.Call("error", $"Failed to read file: {FileAccess.GetOpenError()}");
+                _logger.Error($"Failed to read file: {FileAccess.GetOpenError()}");
                 return default;
             }
 
@@ -203,7 +203,7 @@ public partial class SecureStorage : Node
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"SecureStorage: Retrieval error: {ex.Message}");
+            _logger.Error($"SecureStorage: Retrieval error: {ex.Message}");
             return default;
         }
     }
@@ -226,7 +226,7 @@ public partial class SecureStorage : Node
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"SecureStorage: Clear error: {ex.Message}");
+            _logger.Error($"SecureStorage: Clear error: {ex.Message}");
             return false;
         }
     }

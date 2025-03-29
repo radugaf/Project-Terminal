@@ -6,16 +6,16 @@ namespace ProjectTerminal.Resources.Admin
 {
     public abstract partial class BaseContentController : Control, IContentController
     {
-        protected Node _logger;
+        protected Logger _logger;
         protected ContentManager _contentManager;
 
         public override void _Ready()
         {
-            _logger = GetNode<Node>("/root/Logger");
+            _logger = GetNode<Logger>("/root/Logger");
             _contentManager = AdminPanelService.Instance.ContentManager;
 
             string controllerName = GetType().Name;
-            _logger.Call("debug", $"{controllerName}: Base initialization complete");
+            _logger.Debug($"{controllerName}: Base initialization complete");
 
             OnReady();
         }
@@ -27,14 +27,14 @@ namespace ProjectTerminal.Resources.Admin
         public virtual Task InitializeAsync(Dictionary<string, object> parameters = null)
         {
             string controllerName = GetType().Name;
-            _logger.Call("debug", $"{controllerName}: Initialized");
+            _logger.Debug($"{controllerName}: Initialized");
             return Task.CompletedTask;
         }
 
         public virtual Task PrepareForExitAsync()
         {
             string controllerName = GetType().Name;
-            _logger.Call("debug", $"{controllerName}: Preparing for exit");
+            _logger.Debug($"{controllerName}: Preparing for exit");
             return Task.CompletedTask;
         }
 

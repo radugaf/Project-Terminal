@@ -3,14 +3,14 @@ using System;
 
 public partial class POSMain : Control
 {
-    private Node _logger;
+    private Logger _logger;
 
     private Button _exitButton;
     public override void _Ready()
     {
         // Initialize logger
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "POSMain: Initializing POSMain scene");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("POSMain: Initializing POSMain scene");
 
         // Initialize UI elements
         _exitButton = GetNode<Button>("%ExitButton");
