@@ -13,6 +13,9 @@ public partial class AuthManager : Node
     private const string SESSION_EXPIRY_KEY = "session_expiry_timestamp";
     private const string USER_NEW_STATE_KEY = "user_new_state";
     private const int REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
+    private const string PERSISTENT_SESSION_KEY = "is_persistent_session";
+    private const int STANDARD_REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
+    private const int PERSISTENT_REFRESH_THRESHOLD_SECONDS = 3600 * 24 * 6; // ~6 days
 
     // State
     private Session _currentSession;
@@ -93,23 +96,42 @@ public partial class AuthManager : Node
         {
             DateTime? expiresAt = GetSessionExpiryTime();
 
-
             if (expiresAt.HasValue)
             {
                 TimeSpan timeUntilExpiry = expiresAt.Value - DateTime.UtcNow;
 
-                if (timeUntilExpiry.TotalSeconds < REFRESH_THRESHOLD_SECONDS)
+                // Get if this is a persistent session
+                bool isPersistent = _secureStorage.RetrieveValue<bool>(PERSISTENT_SESSION_KEY);
+                int refreshThreshold = isPersistent ?
+                    PERSISTENT_REFRESH_THRESHOLD_SECONDS :
+                    STANDARD_REFRESH_THRESHOLD_SECONDS;
+
+                if (timeUntilExpiry.TotalSeconds < refreshThreshold)
                 {
                     _logger.Call("info", $"AuthManager: Token expires in {timeUntilExpiry.TotalSeconds}s, refreshing");
                     await RefreshSessionAsync();
                 }
 
-                _logger.Call("debug", $"AuthManager: Session expires hours: {timeUntilExpiry.TotalHours}");
+                _logger.Call("debug", $"AuthManager: Session expires in {timeUntilExpiry.TotalHours} hours, persistent: {isPersistent}");
             }
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"AuthManager: Session validation failed: {ex.Message}");
+            // More resilient error handling - don't throw
+            _logger.Call("error", $"AuthManager: Session validation error: {ex.Message}");
+            // We'll attempt to refresh instead of just failing
+            if (_currentSession?.RefreshToken != null)
+            {
+                try
+                {
+                    await RefreshSessionAsync();
+                }
+                catch
+                {
+                    // Silent failure - we'll try again later
+                    _logger.Call("warn", "AuthManager: Failed to refresh session during recovery");
+                }
+            }
         }
     }
 
@@ -197,21 +219,31 @@ public partial class AuthManager : Node
             _currentSession = sessionFromStorage;
             _isNewUser = _secureStorage.RetrieveValue<bool>(USER_NEW_STATE_KEY);
 
+            bool isPersistent = _secureStorage.RetrieveValue<bool>(PERSISTENT_SESSION_KEY);
             bool needsRefresh = IsSessionExpired();
 
             if (_supabaseClient.Supabase != null)
             {
                 if (needsRefresh)
-                    await RefreshSessionAsync();
+                {
+                    bool refreshSucceeded = await RefreshSessionAsync();
+                    // if (!refreshSucceeded && isPersistent)
+                    // {
+                    //     // For persistent sessions, we'll try harder to recover
+                    //     await TryRecoverExpiredSession();
+                    // }
+                }
                 else
+                {
                     await _supabaseClient.Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                }
             }
             else if (needsRefresh)
             {
                 _supabaseClient.ClientInitialized += async () => await RefreshSessionAsync();
             }
 
-            _logger.Call("info", "AuthManager: Session loaded successfully");
+            _logger.Call("info", $"AuthManager: Session loaded successfully, persistent: {isPersistent}");
         }
         catch (Exception ex)
         {
@@ -219,7 +251,6 @@ public partial class AuthManager : Node
             ClearUserSession();
         }
     }
-
     private void ClearUserSession()
     {
         try
@@ -237,7 +268,7 @@ public partial class AuthManager : Node
 
     // ------------------- Public Methods ------------------
 
-    public async Task<Session> RegisterWithEmailAsync(string email, string password)
+    public async Task<Session> RegisterWithEmailAsync(string email, string password, bool rememberMe = false)
     {
         _logger.Call("info", $"AuthManager: Registering new user with email {email}");
 
@@ -256,11 +287,14 @@ public partial class AuthManager : Node
             _isNewUser = true;
             _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
 
+            // Store the persistent session preference
+            _secureStorage.StoreValue(PERSISTENT_SESSION_KEY, rememberMe);
+
             // Store session
             _currentSession = session;
             SaveUserSession(session);
 
-            _logger.Call("info", $"AuthManager: Registration successful for user {session.User.Id}");
+            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}, persistent: {rememberMe}");
             EmitSignal(SignalName.SessionChanged);
             return session;
         }
@@ -272,7 +306,7 @@ public partial class AuthManager : Node
         }
     }
 
-    public async Task<Session> VerifyLoginOtpAsync(string phoneNumber, string otpCode)
+    public async Task<Session> VerifyLoginOtpAsync(string phoneNumber, string otpCode, bool rememberMe = false)
     {
         _logger.Call("info", $"AuthManager: Verifying OTP for {phoneNumber}");
 
@@ -291,10 +325,13 @@ public partial class AuthManager : Node
             _isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
             _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
 
+            // Store the persistent session preference
+            _secureStorage.StoreValue(PERSISTENT_SESSION_KEY, rememberMe);
+
             _currentSession = session;
             SaveUserSession(session);
 
-            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}");
+            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}, persistent: {rememberMe}");
             EmitSignal(SignalName.SessionChanged);
             return session;
         }
@@ -376,12 +413,12 @@ public partial class AuthManager : Node
     }
 
 
-    public async Task RefreshSessionAsync()
+    public async Task<bool> RefreshSessionAsync()
     {
         if (_currentSession == null || string.IsNullOrEmpty(_currentSession.RefreshToken))
         {
             _logger.Call("warn", "AuthManager: No refresh token available");
-            return;
+            return false;
         }
 
         try
@@ -389,7 +426,7 @@ public partial class AuthManager : Node
             if (_supabaseClient?.Auth == null)
             {
                 _logger.Call("error", "AuthManager: Supabase client not initialized");
-                throw new InvalidOperationException("Supabase client not initialized");
+                return false; // Don't throw, just return failure
             }
 
             Session refreshedSession = await _supabaseClient.Auth.RefreshSession();
@@ -400,19 +437,38 @@ public partial class AuthManager : Node
                 SaveUserSession(refreshedSession);
                 _logger.Call("debug", "AuthManager: Session refreshed successfully");
                 EmitSignal(SignalName.SessionChanged);
+                return true;
             }
             else
             {
                 _logger.Call("error", "AuthManager: Session refresh returned null");
-                throw new InvalidOperationException("Session refresh returned null");
+                return false;
             }
         }
         catch (Exception ex)
         {
             _logger.Call("error", $"AuthManager: Session refresh failed: {ex.Message}");
-            throw;
+
+            // Additional recovery logic for certain types of failures
+            // if (ex.Message.Contains("token expired") || ex.Message.Contains("invalid token"))
+            // {
+            //     // Try to recover with stored credentials if available
+            //     return await TryRecoverExpiredSession();
+            // }
+
+            return false;
         }
     }
+
+    // private async Task<bool> TryRecoverExpiredSession()
+    // {
+    //     // This would attempt to use stored credentials to get a new session without user action
+    //     // Implementation depends on your authentication flow - this is a placeholder
+    //     _logger.Call("info", "AuthManager: Attempting session recovery...");
+
+    //     // For now, we'll return false to indicate we couldn't recover
+    //     return false;
+    // }
 
     public async Task LogoutAsync()
     {
@@ -434,6 +490,43 @@ public partial class AuthManager : Node
 
         await _supabaseClient.ReinitializeClientAsync();
         EmitSignal(SignalName.SessionChanged);
+    }
+
+    public async Task<Session> LoginWithEmailAsync(string email, string password, bool rememberMe = false)
+    {
+        _logger.Call("info", $"AuthManager: Logging in user with email {email}");
+
+        try
+        {
+            Session session = await _supabaseClient.Auth.SignIn(email, password);
+
+            if (session?.User == null)
+            {
+                _logger.Call("warn", "AuthManager: Invalid session returned from login");
+                return null;
+            }
+
+            // Set the user as existing
+            _isNewUser = false;
+            _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
+
+            // Store the persistent session preference
+            _secureStorage.StoreValue(PERSISTENT_SESSION_KEY, rememberMe);
+
+            // Store session
+            _currentSession = session;
+            SaveUserSession(session);
+
+            _logger.Call("info", $"AuthManager: Login successful for user {session.User.Id}, persistent: {rememberMe}");
+            EmitSignal(SignalName.SessionChanged);
+            return session;
+        }
+        catch (Exception ex)
+        {
+            _logger.Call("error", $"AuthManager: Login failed: {ex.Message}",
+                new Godot.Collections.Dictionary { { "email", email } });
+            throw;
+        }
     }
 
     public bool IsLoggedIn()

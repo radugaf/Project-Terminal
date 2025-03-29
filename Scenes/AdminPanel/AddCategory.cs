@@ -24,10 +24,7 @@ public partial class AddCategory : Control
 
         // Connect button signals
         _submitButton.Pressed += OnSubmitButtonPressed;
-        if (_backButton != null)
-        {
-            _backButton.Pressed += OnBackButtonPressed;
-        }
+        _backButton.Pressed += OnBackButtonPressed;
 
         // Attempt to find ContentManager in the parent hierarchy (fallback)
         if (_contentManager == null)
@@ -40,6 +37,7 @@ public partial class AddCategory : Control
                     if (child is ContentManager contentManager)
                     {
                         _contentManager = contentManager;
+                        GD.Print(_contentManager.Name);
                         break;
                     }
                 }
