@@ -1,10 +1,11 @@
 using Godot;
 using System;
 using ProjectTerminal.Resources;
+using System.Collections.Generic;
 
 public partial class BrandNewUser : Control
 {
-    private Node _logger;
+    private Logger _logger;
     private SupabaseClient _supabaseClient;
     private AuthManager _authManager;
     private OrganizationManager _organizationManager;
@@ -25,8 +26,8 @@ public partial class BrandNewUser : Control
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "BrandNewUser: Brand New User scene initializing");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("BrandNewUser: Brand New User scene initializing");
 
         // Get references to managers
         _supabaseClient = GetNode<SupabaseClient>("/root/SupabaseClient");
@@ -48,7 +49,7 @@ public partial class BrandNewUser : Control
         {
             _emailLineEdit.Text = _authManager.CurrentUser.Email;
             _emailLineEdit.Editable = false; // Make it read-only as it's already verified
-            _logger.Call("debug", "BrandNewUser: Pre-populated email from authenticated user");
+            _logger.Debug("BrandNewUser: Pre-populated email from authenticated user");
         }
 
 
@@ -72,7 +73,7 @@ public partial class BrandNewUser : Control
         _registerAsTerminal = true;
         _deviceYesButton.ButtonPressed = true;
         _deviceNoButton.ButtonPressed = false;
-        _logger.Call("debug", "BrandNewUser: Device will be registered as a terminal");
+        _logger.Debug("BrandNewUser: Device will be registered as a terminal");
     }
 
     private void OnDeviceNoButtonPressed()
@@ -80,14 +81,14 @@ public partial class BrandNewUser : Control
         _registerAsTerminal = false;
         _deviceYesButton.ButtonPressed = false;
         _deviceNoButton.ButtonPressed = true;
-        _logger.Call("debug", "BrandNewUser: Device will not be registered as a terminal");
+        _logger.Debug("BrandNewUser: Device will not be registered as a terminal");
     }
 
     private async void OnSubmitButtonPressed()
     {
         try
         {
-            _logger.Call("info", "BrandNewUser: Submit button pressed, starting registration flow");
+            _logger.Info("BrandNewUser: Submit button pressed, starting registration flow");
 
             // Disable submit button to prevent multiple submissions
             _submitButton.Disabled = true;
@@ -123,17 +124,17 @@ public partial class BrandNewUser : Control
             );
 
             UpdateStatusLabel("Registration complete!");
-            _logger.Call("info", "BrandNewUser: Registration completed successfully");
+            _logger.Info("BrandNewUser: Registration completed successfully");
 
             bool isNewUser = _authManager.SetUserAsExisting();
-            _logger.Call("info", $"BrandNewUser: User set as existing: {isNewUser}");
+            _logger.Info($"BrandNewUser: User set as existing: {isNewUser}");
 
             GoToNextScreen();
         }
         catch (Exception ex)
         {
             UpdateStatusLabel($"Error: {ex.Message}");
-            _logger.Call("error", $"BrandNewUser: Registration failed: {ex.Message}", new Godot.Collections.Dictionary { { "stack_trace", ex.StackTrace } });
+            _logger.Error($"BrandNewUser: Registration failed: {ex.Message}", new Dictionary<string, object> { { "stack_trace", ex.StackTrace } });
             _submitButton.Disabled = false;
         }
     }
@@ -144,7 +145,7 @@ public partial class BrandNewUser : Control
         if (string.IsNullOrWhiteSpace(_firstNameLineEdit.Text))
         {
             UpdateStatusLabel("Error: First name is required");
-            _logger.Call("warn", "BrandNewUser: Missing first name");
+            _logger.Warn("BrandNewUser: Missing first name");
             return false;
         }
 
@@ -152,7 +153,7 @@ public partial class BrandNewUser : Control
         if (string.IsNullOrWhiteSpace(_lastNameLineEdit.Text))
         {
             UpdateStatusLabel("Error: Last name is required");
-            _logger.Call("warn", "BrandNewUser: Missing last name");
+            _logger.Warn("BrandNewUser: Missing last name");
             return false;
         }
 
@@ -160,7 +161,7 @@ public partial class BrandNewUser : Control
         if (string.IsNullOrWhiteSpace(_emailLineEdit.Text) || !_emailLineEdit.Text.Contains("@"))
         {
             UpdateStatusLabel("Error: Valid email is required");
-            _logger.Call("warn", "BrandNewUser: Invalid email");
+            _logger.Warn("BrandNewUser: Invalid email");
             return false;
         }
 
@@ -168,7 +169,7 @@ public partial class BrandNewUser : Control
         if (string.IsNullOrWhiteSpace(_businessNameLineEdit.Text))
         {
             UpdateStatusLabel("Error: Business name is required");
-            _logger.Call("warn", "BrandNewUser: Missing business name");
+            _logger.Warn("BrandNewUser: Missing business name");
             return false;
         }
 
@@ -176,7 +177,7 @@ public partial class BrandNewUser : Control
         if (_businessTypeOptionButton.Selected == -1)
         {
             UpdateStatusLabel("Error: Please select a business type");
-            _logger.Call("warn", "BrandNewUser: No business type selected");
+            _logger.Warn("BrandNewUser: No business type selected");
             return false;
         }
 
@@ -184,7 +185,7 @@ public partial class BrandNewUser : Control
         if (!_deviceYesButton.ButtonPressed && !_deviceNoButton.ButtonPressed)
         {
             UpdateStatusLabel("Error: Please select whether to use this device as a terminal");
-            _logger.Call("warn", "BrandNewUser: Terminal selection not made");
+            _logger.Warn("BrandNewUser: Terminal selection not made");
             return false;
         }
 
@@ -196,7 +197,7 @@ public partial class BrandNewUser : Control
         if (_statusLabel != null)
         {
             _statusLabel.Text = message;
-            _logger.Call("debug", $"BrandNewUser: Status updated - {message}");
+            _logger.Debug($"BrandNewUser: Status updated - {message}");
         }
     }
 
@@ -232,7 +233,7 @@ public partial class BrandNewUser : Control
         }
         catch (Exception ex)
         {
-            _logger.Call("error", $"BrandNewUser: Exception in GoToNextScreen: {ex.Message}");
+            _logger.Error($"BrandNewUser: Exception in GoToNextScreen: {ex.Message}");
         }
     }
 }

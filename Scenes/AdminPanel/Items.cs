@@ -4,7 +4,7 @@ using ProjectTerminal.Resources;
 
 public partial class Items : Control
 {
-    private Node _logger;
+    private Logger _logger;
 
     // Category
     private Button _addCategoryButton;
@@ -16,8 +16,8 @@ public partial class Items : Control
 
     public override void _Ready()
     {
-        _logger = GetNode<Node>("/root/Logger");
-        _logger.Call("info", "Items: Initializing Items scene");
+        _logger = GetNode<Logger>("/root/Logger");
+        _logger.Info("Items: Initializing Items scene");
 
         // Category
         _addCategoryButton = GetNode<Button>("%AddCategoryButton");
@@ -50,22 +50,22 @@ public partial class Items : Control
 
         if (_contentManager == null)
         {
-            _logger.Call("error", "Items: Could not find ContentManager in parent hierarchy");
+            _logger.Error("Items: Could not find ContentManager in parent hierarchy");
         }
 
-        _logger.Call("info", "Items: Items scene initialized");
+        _logger.Info("Items: Items scene initialized");
     }
 
     private void OnAddCategoryButtonPressed()
     {
         if (_contentManager != null)
         {
-            _logger.Call("debug", "Items: Navigating to AddCategory");
+            _logger.Debug("Items: Navigating to AddCategory");
             _contentManager.ShowContent("AddCategory");
         }
         else
         {
-            _logger.Call("error", "Items: Cannot navigate, ContentManager is null");
+            _logger.Error("Items: Cannot navigate, ContentManager is null");
         }
     }
 }
