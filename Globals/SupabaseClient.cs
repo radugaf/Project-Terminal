@@ -8,16 +8,22 @@ using System.Threading.Tasks;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
 using Supabase.Interfaces;
-
+using ProjectTerminal.Globals.Interfaces;
+using ProjectTerminal.Globals.Wrappers;
 
 public partial class SupabaseClient : Node
 {
     private Logger _logger;
     private Supabase.Client _supabase;
     private SupabaseOptions _options;
+    private ISupabaseClientWrapper _clientWrapper;
 
+    // Original properties - keep these for backward compatibility
     public Supabase.Client Supabase => _supabase;
     public IGotrueClient<User, Session> Auth => _supabase?.Auth;
+
+    // New property to expose the wrapper
+    public ISupabaseClientWrapper ClientWrapper => _clientWrapper;
 
     [Signal]
     public delegate void ClientInitializedEventHandler();
@@ -37,6 +43,10 @@ public partial class SupabaseClient : Node
         try
         {
             await InitializeClientAsync();
+
+            // Create the wrapper only after successful initialization
+            _clientWrapper = new SupabaseClientWrapper(_supabase, _logger);
+            _logger.Debug("SupabaseClient: Client wrapper created");
         }
         catch (Exception ex)
         {
@@ -95,26 +105,26 @@ public partial class SupabaseClient : Node
         }
     }
 
+    // Keep original methods for backward compatibility
     public ISupabaseTable<T, RealtimeChannel> From<T>() where T : BaseModel, new()
     {
-        if (_supabase == null)
+        if (_clientWrapper == null)
         {
             _logger.Error("SupabaseClient: Attempted to access database before initialization");
             throw new InvalidOperationException("Supabase client not initialized");
         }
 
-        return _supabase.From<T>();
+        return _clientWrapper.From<T>();
     }
 
     public async Task<BaseResponse> Rpc(string procedureName, object parameters)
     {
-        if (_supabase == null)
+        if (_clientWrapper == null)
         {
             _logger.Error("SupabaseClient: Attempted to call RPC before initialization");
             throw new InvalidOperationException("Supabase client not initialized");
         }
 
-        return await _supabase.Rpc(procedureName, parameters);
+        return await _clientWrapper.Rpc(procedureName, parameters);
     }
-
 }

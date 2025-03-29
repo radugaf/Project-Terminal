@@ -130,14 +130,11 @@ public partial class SecureStorage : Node
 
             string filePath = GetPathForKey(key);
             string typeName = value.GetType().FullName;
-            string stringValue;
-
-            if (value is string strValue)
-                stringValue = strValue;
-            else if (value is int or float or double or bool or DateTime)
-                stringValue = value.ToString();
-            else
-                throw new ArgumentException($"Unsupported type: {value.GetType().Name}");
+            string stringValue = value is string strValue
+                ? strValue
+                : value is int or float or double or bool or DateTime
+                ? value.ToString()
+                : throw new ArgumentException($"Unsupported type: {value.GetType().Name}");
 
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
             if (file == null)
@@ -243,7 +240,7 @@ public partial class SecureStorage : Node
             var dir = DirAccess.Open(_storagePath);
             if (dir == null)
             {
-                return Array.Empty<string>();
+                return [];
             }
 
             string[] files = dir.GetFiles();
@@ -251,7 +248,7 @@ public partial class SecureStorage : Node
         }
         catch
         {
-            return Array.Empty<string>();
+            return [];
         }
     }
 }

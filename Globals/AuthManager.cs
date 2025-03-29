@@ -13,7 +13,6 @@ public partial class AuthManager : Node
     private const string USER_SESSION_KEY = "current_user_session";
     private const string SESSION_EXPIRY_KEY = "session_expiry_timestamp";
     private const string USER_NEW_STATE_KEY = "user_new_state";
-    private const int REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
     private const string PERSISTENT_SESSION_KEY = "is_persistent_session";
     private const int STANDARD_REFRESH_THRESHOLD_SECONDS = 300; // 5 minutes
     private const int PERSISTENT_REFRESH_THRESHOLD_SECONDS = 3600 * 24 * 6; // ~6 days

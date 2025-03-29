@@ -77,7 +77,6 @@ public partial class DeviceManager : Node
         _logger = GetNode<Logger>("/root/Logger");
         _uiManager = GetNode<UIManager>("/root/UiManager");
 
-        GD.Print(_logger);
         _logger.Info("DeviceManager: Initializing...");
 
         // Connect to UI Manager signals if available
