@@ -1,11 +1,9 @@
-// SupabaseClientWrapper.cs
-using Godot;
+using System;
+using System.Threading.Tasks;
 using Supabase.Gotrue;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
 using Supabase.Realtime;
-using System;
-using System.Threading.Tasks;
 using static Supabase.Gotrue.Constants;
 using ProjectTerminal.Globals.Interfaces;
 using Supabase.Interfaces;
@@ -14,8 +12,8 @@ namespace ProjectTerminal.Globals.Wrappers
 {
     public class SupabaseClientWrapper(Supabase.Client supabaseClient, Logger logger) : ISupabaseClientWrapper
     {
-        private readonly Supabase.Client _supabaseClient = supabaseClient ?? throw new ArgumentNullException(nameof(supabaseClient));
-        private readonly Logger _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly Supabase.Client _supabaseClient = supabaseClient;
+        private readonly Logger _logger = logger;
 
         public async Task Initialize()
         {

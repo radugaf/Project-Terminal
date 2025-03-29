@@ -9,10 +9,6 @@ using Supabase.Interfaces;
 
 namespace ProjectTerminal.Globals.Interfaces
 {
-    /// <summary>
-    /// Defines the operations that can be performed with Supabase.
-    /// This interface makes testing easier by allowing mock implementations.
-    /// </summary>
     public interface ISupabaseClientWrapper
     {
         // Authentication operations
