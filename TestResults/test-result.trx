@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="609045d9-8bdd-413e-a8a4-bfe14b16ea92" name="radug@PC 2025-03-30 23:28:08" runUser="PC\radug" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Times creation="2025-03-30T23:28:08.3447558+03:00" queuing="2025-03-30T23:28:08.3447559+03:00" start="2025-03-30T23:28:06.2760030+03:00" finish="2025-03-30T23:28:08.3731446+03:00" />
-  <TestSettings name="default" id="e389ae62-e18a-4fd8-b3ef-1fb5efbe3c7e">
-    <Deployment runDeploymentRoot="radug_PC_2025-03-30_23_28_08" />
+<TestRun id="0b0ac92a-e068-4dfd-960a-ac37522fd2f9" name="radug@PC 2025-03-30 23:59:24" runUser="PC\radug" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-03-30T23:59:24.1772189+03:00" queuing="2025-03-30T23:59:24.1772190+03:00" start="2025-03-30T23:59:22.1133398+03:00" finish="2025-03-30T23:59:24.2118674+03:00" />
+  <TestSettings name="default" id="965a941e-fdc4-4018-ab54-7f630dcc904b">
+    <Deployment runDeploymentRoot="radug_PC_2025-03-30_23_59_24" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="081563b9-b837-487c-aab8-684e8cc1d897" testId="acf80dcf-0a39-671e-8c47-9297d31aa126" testName="TestStoreObject_Success" computerName="PC" duration="00:00:00.0160000" startTime="2025-03-30T23:28:08.1656202+03:00" endTime="2025-03-30T23:28:08.1662571+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="081563b9-b837-487c-aab8-684e8cc1d897" />
+    <UnitTestResult executionId="5f3173a2-1006-44f4-9217-5dfa6daf4805" testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" testName="TestStoreObject_NullObject_Fails" computerName="PC" duration="00:00:00.0150000" startTime="2025-03-30T23:59:23.9798130+03:00" endTime="2025-03-30T23:59:23.9804497+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5f3173a2-1006-44f4-9217-5dfa6daf4805" />
   </Results>
   <TestDefinitions>
-    <UnitTest name="TestStoreObject_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="acf80dcf-0a39-671e-8c47-9297d31aa126">
-      <Execution id="081563b9-b837-487c-aab8-684e8cc1d897" />
-      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_Success" />
+    <UnitTest name="TestStoreObject_NullObject_Fails" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="5b05749c-2e12-2ae6-0a43-abcd87407d0b">
+      <Execution id="5f3173a2-1006-44f4-9217-5dfa6daf4805" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_NullObject_Fails" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
-    <TestEntry testId="acf80dcf-0a39-671e-8c47-9297d31aa126" executionId="081563b9-b837-487c-aab8-684e8cc1d897" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" executionId="5f3173a2-1006-44f4-9217-5dfa6daf4805" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
   </TestEntries>
   <TestLists>
     <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
@@ -24,14 +24,12 @@
     <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
       <StdOut>CheckGdUnit4ApiVersion gdUnit4Api, Version=4.3.1.0&#xD;
-Start executing tests, 2 TestCases total.&#xD;
+Start executing tests, 1 TestCases total.&#xD;
 Current directory set to: C:\Users\radug\Documents\GitHub\Project-Terminal&#xD;
-Run with args  --path . res://gdunit4_testadapter/TestAdapterRunner.tscn --testadapter --configfile="C:\Users\radug\Documents\GitHub\Project-Terminal\GdUnitRunner_9f6f06ff-2a19-4eb3-b4fb-8c677eeaa03c.cfg" &#xD;
+Run with args  --path . res://gdunit4_testadapter/TestAdapterRunner.tscn --testadapter --configfile="C:\Users\radug\Documents\GitHub\Project-Terminal\GdUnitRunner_8e8d826e-c868-44be-af98-4a05ba54878d.cfg" &#xD;
 TestEventReportServer:: Wait for connecting GdUnit4 test report client.&#xD;
 TestEventReportServer:: TestAdapterReporter: Successfully connected to GdUnit4 test report server!&#xD;
 TestEventReportServer:: TestAdapterReporter: Disconnecting from GdUnit4 test report server.&#xD;
-Error: WARNING: ObjectDB instances leaked at exit (run with --verbose for details).&#xD;
-Error: at: cleanup (core/object/object.cpp:2378)&#xD;
 Godot ends with exit code: 0&#xD;
 Run TestRunner ends with 0&#xD;
 </StdOut>

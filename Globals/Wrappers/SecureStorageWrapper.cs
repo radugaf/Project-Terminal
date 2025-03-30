@@ -64,7 +64,8 @@ namespace ProjectTerminal.Globals.Wrappers
 
                 if (value == null)
                 {
-                    return ClearValue(key);
+                    _logger.Error("SecureStorageWrapper: Value cannot be null");
+                    return false;
                 }
 
                 string json = JsonSerializer.Serialize(value, _jsonOptions);
@@ -218,6 +219,7 @@ namespace ProjectTerminal.Globals.Wrappers
                 {
                     return _fileSystem.DeleteFile(filePath);
                 }
+
                 return true;
             }
             catch (Exception ex)

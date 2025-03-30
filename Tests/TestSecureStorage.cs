@@ -11,33 +11,50 @@ namespace ProjectTerminal.Tests
     {
         private MockLogger _mockLogger;
         private MockFileSystem _mockFileSystem;
-        private SecureStorageWrapper _wrapper;
+        private SecureStorageWrapper _secureStorageWrapper;
 
         [Before]
         public void Setup()
         {
             _mockLogger = AutoFree(new MockLogger());
             _mockFileSystem = new MockFileSystem(_mockLogger);
-            _wrapper = new SecureStorageWrapper(_mockLogger, _mockFileSystem);
+            _secureStorageWrapper = new SecureStorageWrapper(_mockLogger, _mockFileSystem);
         }
 
-        [After]
+        [AfterTest]
         public void Teardown()
         {
             _mockFileSystem.Reset();
-            _wrapper = null;
+        }
+
+        [After]
+        public void AfterEach()
+        {
+            _secureStorageWrapper = null;
             _mockLogger = null;
         }
 
         [TestCase]
-        public void TestStoreObject_Success()
+        public void TestStoreObject_GenericObject_Success()
         {
             // Arrange
             string key = "testKey";
-            var testObject = new { Name = "Test", Age = 30 };
+            var testObject = new
+            {
+                Name = "Test",
+                Age = 30,
+                IsActive = true,
+                Address = new
+                {
+                    Street = "123 Main St",
+                    City = "Test City",
+                    ZipCode = "12345"
+                },
+                Tags = new[] { "tag1", "tag2", "tag3" }
+            };
 
             // Act
-            bool result = _wrapper.StoreObject(key, testObject);
+            bool result = _secureStorageWrapper.StoreObject(key, testObject);
 
             // Assert
             AssertThat(result).IsTrue();
@@ -54,6 +71,69 @@ namespace ProjectTerminal.Tests
             AssertThat(jsonDoc.RootElement.TryGetProperty("name", out _)).IsTrue();
             AssertThat(jsonDoc.RootElement.TryGetProperty("age", out JsonElement ageProperty)).IsTrue();
             AssertThat(ageProperty.GetInt32()).IsEqual(30);
+            AssertThat(jsonDoc.RootElement.TryGetProperty("isActive", out _)).IsTrue();
+            AssertThat(jsonDoc.RootElement.TryGetProperty("address", out JsonElement addressProperty)).IsTrue();
+            AssertThat(addressProperty.TryGetProperty("street", out _)).IsTrue();
+            AssertThat(addressProperty.TryGetProperty("city", out _)).IsTrue();
+            AssertThat(addressProperty.TryGetProperty("zipCode", out _)).IsTrue();
+            AssertThat(jsonDoc.RootElement.TryGetProperty("tags", out JsonElement tagsProperty)).IsTrue();
+            AssertThat(tagsProperty.ValueKind).IsEqual(JsonValueKind.Array);
+            AssertThat(tagsProperty.GetArrayLength()).IsEqual(3);
+            AssertThat(tagsProperty[0].GetString()).IsEqual("tag1");
+            AssertThat(tagsProperty[1].GetString()).IsEqual("tag2");
+            AssertThat(tagsProperty[2].GetString()).IsEqual("tag3");
+        }
+
+        [TestCase]
+        public void TestStoreObject_NullKey_Fails()
+        {
+            // Arrange
+            string key = null;
+            var testObject = new
+            {
+                Name = "Test",
+                Age = 30,
+                IsActive = true
+            };
+
+            // Act
+            bool result = _secureStorageWrapper.StoreObject(key, testObject);
+
+            // Assert
+            AssertThat(result).IsFalse();
+        }
+
+        [TestCase]
+        public void TestStoreObject_EmptyKey_Fails()
+        {
+            // Arrange
+            string key = string.Empty;
+            var testObject = new
+            {
+                Name = "Test",
+                Age = 30,
+                IsActive = true
+            };
+
+            // Act
+            bool result = _secureStorageWrapper.StoreObject(key, testObject);
+
+            // Assert
+            AssertThat(result).IsFalse();
+        }
+
+        [TestCase]
+        public void TestStoreObject_NullObject_Fails()
+        {
+            // Arrange
+            string key = "testKey";
+            object testObject = null;
+
+            // Act
+            bool result = _secureStorageWrapper.StoreObject(key, testObject);
+
+            // Assert
+            AssertThat(result).IsFalse();
         }
     }
 }
