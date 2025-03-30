@@ -35,7 +35,7 @@ public partial class Logger : Node
     private bool _includeStackTrace = true;
     private bool _truncateLongMessages = false;
     private int _maxMessageLength = 10000;
-    private readonly Dictionary<string, string> _additionalContextData = new();
+    private readonly Dictionary<string, string> _additionalContextData = [];
 
     [Signal]
     public delegate void LogEntryAddedEventHandler(LogLevel level, string message);
