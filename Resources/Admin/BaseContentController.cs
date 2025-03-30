@@ -40,7 +40,7 @@ namespace ProjectTerminal.Resources.Admin
 
         public virtual Dictionary<string, object> GetState()
         {
-            return new Dictionary<string, object>();
+            return [];
         }
 
         // Helper methods for navigation

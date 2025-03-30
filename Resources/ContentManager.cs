@@ -9,10 +9,10 @@ namespace ProjectTerminal.Resources
         private Control _container;
 
         // Registered content scenes
-        private Dictionary<string, PackedScene> _scenes = new();
+        private readonly Dictionary<string, PackedScene> _scenes = [];
 
         // Navigation stack for back functionality
-        private Stack<string> _history = new();
+        private readonly Stack<string> _history = new();
 
         // Currently displayed content
         private string _currentContent;

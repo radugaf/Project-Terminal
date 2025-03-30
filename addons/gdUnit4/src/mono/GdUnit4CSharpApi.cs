@@ -10,19 +10,19 @@ using GdUnit4;
 // GdUnit4 GDScript - C# API wrapper
 public partial class GdUnit4CSharpApi : Godot.GodotObject
 {
-    private static Type? apiType;
+    private static Type? _apiType;
 
     private static Type GetApiType()
     {
-        if (apiType == null)
+        if (_apiType == null)
         {
             var assembly = Assembly.Load("gdUnit4Api");
-            apiType = GdUnit4NetVersion() < new Version(4, 2, 2) ?
+            _apiType = GdUnit4NetVersion() < new Version(4, 2, 2) ?
                 assembly.GetType("GdUnit4.GdUnit4MonoAPI") :
                 assembly.GetType("GdUnit4.GdUnit4NetAPI");
-            Godot.GD.PrintS($"GdUnit4CSharpApi type:{apiType} loaded.");
+            Godot.GD.PrintS($"GdUnit4CSharpApi type:{_apiType} loaded.");
         }
-        return apiType!;
+        return _apiType!;
     }
 
     private static Version GdUnit4NetVersion()

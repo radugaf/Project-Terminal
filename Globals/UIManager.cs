@@ -9,7 +9,7 @@ public partial class UIManager : Node
     // Properties
     public string SystemName { get; private set; }
     public int ScreenCount { get; private set; }
-    public Godot.Collections.Array Screens { get; private set; } = new();
+    public Godot.Collections.Array Screens { get; private set; } = [];
     public Vector2I WindowSize { get; private set; }
     public bool IsTouchscreen { get; private set; }
 

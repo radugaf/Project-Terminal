@@ -92,7 +92,7 @@ namespace ProjectTerminal.Resources.Admin
                     _navigationHistory.Push(new NavigationEntry
                     {
                         ContentId = _currentContentId,
-                        Parameters = _currentController?.GetState() ?? new Dictionary<string, object>()
+                        Parameters = _currentController?.GetState() ?? []
                     });
 
                     _logger.Debug($"ContentManager: Added '{_currentContentId}' to navigation history");
