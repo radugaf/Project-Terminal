@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace ProjectTerminal.Tests.Mocks
 {
-    public partial class MockLogger : Node
+    public partial class MockLogger : Logger
     {
         public class LogEntry
         {
-            public Logger.LogLevel Level { get; set; }
+            public LogLevel Level { get; set; }
             public string Message { get; set; }
             public Dictionary<string, object> Context { get; set; }
             public DateTime Timestamp { get; set; } = DateTime.UtcNow;
@@ -28,17 +28,17 @@ namespace ProjectTerminal.Tests.Mocks
         public List<LogEntry> Entries { get; } = new();
 
         // Flags to check if specific level methods were called
-        public bool DebugCalled => Entries.Any(e => e.Level == Logger.LogLevel.Debug);
-        public bool InfoCalled => Entries.Any(e => e.Level == Logger.LogLevel.Info);
-        public bool WarnCalled => Entries.Any(e => e.Level == Logger.LogLevel.Warn);
-        public bool ErrorCalled => Entries.Any(e => e.Level == Logger.LogLevel.Error);
-        public bool CriticalCalled => Entries.Any(e => e.Level == Logger.LogLevel.Critical);
+        public bool DebugCalled => Entries.Any(e => e.Level == LogLevel.Debug);
+        public bool InfoCalled => Entries.Any(e => e.Level == LogLevel.Info);
+        public bool WarnCalled => Entries.Any(e => e.Level == LogLevel.Warn);
+        public bool ErrorCalled => Entries.Any(e => e.Level == LogLevel.Error);
+        public bool CriticalCalled => Entries.Any(e => e.Level == LogLevel.Critical);
 
         // Get all entries of a specific level
-        public List<LogEntry> GetEntriesOfLevel(Logger.LogLevel level) => Entries.Where(e => e.Level == level).ToList();
+        public List<LogEntry> GetEntriesOfLevel(LogLevel level) => Entries.Where(e => e.Level == level).ToList();
 
         // Check if a specific message was logged
-        public bool ContainsMessage(string message, Logger.LogLevel? level = null)
+        public bool ContainsMessage(string message, LogLevel? level = null)
         {
             return level.HasValue
                 ? Entries.Any(e => e.Message.Contains(message) && e.Level == level.Value)
@@ -55,21 +55,21 @@ namespace ProjectTerminal.Tests.Mocks
         public void Clear() => Entries.Clear();
 
         // Implement logger methods to record calls
-        public void Debug(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = Logger.LogLevel.Debug, Message = message, Context = context });
-        public void Info(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = Logger.LogLevel.Info, Message = message, Context = context });
-        public void Warn(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = Logger.LogLevel.Warn, Message = message, Context = context });
-        public void Error(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = Logger.LogLevel.Error, Message = message, Context = context });
-        public void Critical(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = Logger.LogLevel.Critical, Message = message, Context = context });
+        public new void Debug(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = LogLevel.Debug, Message = message, Context = context });
+        public new void Info(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = LogLevel.Info, Message = message, Context = context });
+        public new void Warn(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = LogLevel.Warn, Message = message, Context = context });
+        public new void Error(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = LogLevel.Error, Message = message, Context = context });
+        public new void Critical(string message, Dictionary<string, object> context = null) => Entries.Add(new LogEntry { Level = LogLevel.Critical, Message = message, Context = context });
 
         // Add the gdscript-style method aliases too
-        public void debug(string message, Dictionary<string, object> context = null) => Debug(message, context);
-        public void info(string message, Dictionary<string, object> context = null) => Info(message, context);
-        public void warn(string message, Dictionary<string, object> context = null) => Warn(message, context);
-        public void error(string message, Dictionary<string, object> context = null) => Error(message, context);
-        public void critical(string message, Dictionary<string, object> context = null) => Critical(message, context);
+        public new void debug(string message, Dictionary<string, object> context = null) => Debug(message, context);
+        public new void info(string message, Dictionary<string, object> context = null) => Info(message, context);
+        public new void warn(string message, Dictionary<string, object> context = null) => Warn(message, context);
+        public new void error(string message, Dictionary<string, object> context = null) => Error(message, context);
+        public new void critical(string message, Dictionary<string, object> context = null) => Critical(message, context);
 
         // Helper for exception logging
-        public void LogException(Exception ex, string message = null, Logger.LogLevel level = Logger.LogLevel.Error)
+        public new void LogException(Exception ex, string message = null, LogLevel level = LogLevel.Error)
         {
             string logMessage = string.IsNullOrEmpty(message)
                 ? $"Exception: {ex.Message}"

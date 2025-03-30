@@ -1,4 +1,4 @@
-// SecureStorageWrapper.cs
+// ProjectTerminal/Globals/Wrappers/SecureStorageWrapper.cs
 using Godot;
 using ProjectTerminal.Globals.Interfaces;
 using System;
@@ -9,9 +9,10 @@ namespace ProjectTerminal.Globals.Wrappers
 {
     public class SecureStorageWrapper : ISecureStorageWrapper
     {
-        public SecureStorageWrapper(Logger logger)
+        public SecureStorageWrapper(Logger logger, IFileSystem fileSystem = null)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
+            _fileSystem = fileSystem ?? new GodotFileSystem();
             _storagePath = "user://" + STORAGE_DIR;
             InitializeStorage();
         }
@@ -20,6 +21,7 @@ namespace ProjectTerminal.Globals.Wrappers
         private const string FILE_EXTENSION = ".dat";
 
         private readonly Logger _logger;
+        private readonly IFileSystem _fileSystem;
         private readonly string _storagePath;
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -29,34 +31,37 @@ namespace ProjectTerminal.Globals.Wrappers
 
         private void InitializeStorage()
         {
-            var dir = DirAccess.Open("user://");
-            if (dir != null)
+            if (!_fileSystem.DirectoryExists(STORAGE_DIR))
             {
-                if (!dir.DirExists(STORAGE_DIR))
+                bool success = _fileSystem.CreateDirectory(STORAGE_DIR);
+                if (!success)
                 {
-                    Error err = dir.MakeDir(STORAGE_DIR);
-                    if (err != Error.Ok)
-                    {
-                        _logger.Error($"SecureStorageWrapper: Failed to create storage directory: {err}");
-                    }
+                    _logger.Error("SecureStorageWrapper: Failed to create storage directory");
                 }
-            }
-            else
-            {
-                _logger.Error($"SecureStorageWrapper: Cannot access user directory: {DirAccess.GetOpenError()}");
             }
         }
 
         private string GetPathForKey(string key)
         {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentException("Key cannot be null or empty", nameof(key));
+            }
+
             string safeKey = key.Replace("/", "_").Replace("\\", "_").Replace(":", "_");
-            return _storagePath.PathJoin(safeKey + FILE_EXTENSION);
+            return _storagePath + "/" + safeKey + FILE_EXTENSION;
         }
 
         public bool StoreObject<T>(string key, T value)
         {
             try
             {
+                if (string.IsNullOrEmpty(key))
+                {
+                    _logger.Error("SecureStorageWrapper: Key cannot be null or empty");
+                    return false;
+                }
+
                 if (value == null)
                 {
                     return ClearValue(key);
@@ -65,14 +70,13 @@ namespace ProjectTerminal.Globals.Wrappers
                 string json = JsonSerializer.Serialize(value, _jsonOptions);
                 string filePath = GetPathForKey(key);
 
-                using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
-                if (file == null)
+                bool success = _fileSystem.WriteAllText(filePath, json);
+                if (!success)
                 {
-                    _logger.Error($"Failed to write file: {FileAccess.GetOpenError()}");
+                    _logger.Error("SecureStorageWrapper: Failed to write file");
                     return false;
                 }
 
-                file.StoreString(json);
                 _logger.Debug($"SecureStorageWrapper: Object stored under key '{key}'");
                 return true;
             }
@@ -89,22 +93,20 @@ namespace ProjectTerminal.Globals.Wrappers
             {
                 string filePath = GetPathForKey(key);
 
-                if (!FileAccess.FileExists(filePath))
+                if (!_fileSystem.FileExists(filePath))
                 {
                     _logger.Debug($"SecureStorageWrapper: No value for key '{key}'");
                     return default;
                 }
 
-                using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
-                if (file == null)
+                string json = _fileSystem.ReadAllText(filePath);
+
+                if (string.IsNullOrEmpty(json))
                 {
-                    _logger.Error($"Failed to read file: {FileAccess.GetOpenError()}");
                     return default;
                 }
 
-                string json = file.GetAsText();
-
-                return string.IsNullOrEmpty(json) ? default : JsonSerializer.Deserialize<T>(json, _jsonOptions);
+                return JsonSerializer.Deserialize<T>(json, _jsonOptions);
             }
             catch (JsonException jsonEx)
             {
@@ -117,6 +119,8 @@ namespace ProjectTerminal.Globals.Wrappers
                 return default;
             }
         }
+
+        // Implement other interface methods similarly...
 
         public bool StoreValue(string key, object value)
         {
@@ -136,15 +140,14 @@ namespace ProjectTerminal.Globals.Wrappers
                 else
                     throw new ArgumentException($"Unsupported type: {value.GetType().Name}");
 
-                using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
-                if (file == null)
+                string content = $"{typeName}\n{stringValue}";
+                bool success = _fileSystem.WriteAllText(filePath, content);
+
+                if (!success)
                 {
-                    _logger.Error($"Failed to write file: {FileAccess.GetOpenError()}");
+                    _logger.Error("SecureStorageWrapper: Failed to write file");
                     return false;
                 }
-
-                file.StoreLine(typeName);
-                file.StoreLine(stringValue);
 
                 return true;
             }
@@ -161,20 +164,21 @@ namespace ProjectTerminal.Globals.Wrappers
             {
                 string filePath = GetPathForKey(key);
 
-                if (!FileAccess.FileExists(filePath))
+                if (!_fileSystem.FileExists(filePath))
                 {
                     return default;
                 }
 
-                using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
-                if (file == null)
+                string content = _fileSystem.ReadAllText(filePath);
+                string[] lines = content.Split('\n');
+
+                if (lines.Length < 2)
                 {
-                    _logger.Error($"Failed to read file: {FileAccess.GetOpenError()}");
                     return default;
                 }
 
-                string typeName = file.GetLine();
-                string stringValue = file.GetLine();
+                string typeName = lines[0];
+                string stringValue = lines[1];
 
                 if (string.IsNullOrEmpty(stringValue))
                 {
@@ -193,7 +197,9 @@ namespace ProjectTerminal.Globals.Wrappers
                     ? (T)(object)floatValue
                     : targetType == typeof(double) && double.TryParse(stringValue, out double doubleValue)
                     ? (T)(object)doubleValue
-                    : targetType == typeof(DateTime) && DateTime.TryParse(stringValue, out DateTime dateValue) ? (T)(object)dateValue : default;
+                    : targetType == typeof(DateTime) && DateTime.TryParse(stringValue, out DateTime dateValue)
+                    ? (T)(object)dateValue
+                    : default;
             }
             catch (Exception ex)
             {
@@ -208,13 +214,9 @@ namespace ProjectTerminal.Globals.Wrappers
             {
                 string filePath = GetPathForKey(key);
 
-                if (FileAccess.FileExists(filePath))
+                if (_fileSystem.FileExists(filePath))
                 {
-                    var dir = DirAccess.Open(_storagePath.GetBaseDir());
-                    if (dir != null)
-                    {
-                        return dir.Remove(filePath) == Error.Ok;
-                    }
+                    return _fileSystem.DeleteFile(filePath);
                 }
                 return true;
             }
@@ -227,26 +229,35 @@ namespace ProjectTerminal.Globals.Wrappers
 
         public bool HasKey(string key)
         {
-            return FileAccess.FileExists(GetPathForKey(key));
+            try
+            {
+                string filePath = GetPathForKey(key);
+                return _fileSystem.FileExists(filePath);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public string[] GetAllKeys()
         {
             try
             {
-                var dir = DirAccess.Open(_storagePath);
-                if (dir == null)
+                if (!_fileSystem.DirectoryExists(STORAGE_DIR))
                 {
-                    return [];
+                    return Array.Empty<string>();
                 }
 
-                string[] files = dir.GetFiles();
-                return files.Select(f => f.TrimSuffix(FILE_EXTENSION)).ToArray();
+                string[] files = _fileSystem.GetFilesInDirectory(_storagePath);
+                return files
+                    .Select(f => System.IO.Path.GetFileNameWithoutExtension(f))
+                    .ToArray();
             }
             catch (Exception ex)
             {
                 _logger.Error($"SecureStorageWrapper: Failed to get all keys: {ex.Message}");
-                return [];
+                return Array.Empty<string>();
             }
         }
     }
