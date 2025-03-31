@@ -1,5 +1,3 @@
-// ProjectTerminal/Globals/Wrappers/SecureStorageWrapper.cs
-using Godot;
 using ProjectTerminal.Globals.Interfaces;
 using System;
 using System.Linq;
