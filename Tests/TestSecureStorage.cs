@@ -48,7 +48,7 @@ namespace ProjectTerminal.Tests
             _mockLogger = null;
         }
 
-        // --- Test StoreObject ---
+        #region Test StoreObject
 
         [TestCase]
         public void TestStoreObject_GenericObject_Success()
@@ -152,7 +152,8 @@ namespace ProjectTerminal.Tests
             AssertThat(result).IsFalse();
         }
 
-        // --- Test RetrieveObject ---
+        #endregion
+        #region Test RetrieveObject
 
         [TestCase]
         public void TestRetrieveObject_Success()
@@ -271,8 +272,8 @@ namespace ProjectTerminal.Tests
             AssertThat(retrievedValue).IsEqual(expectedValue);
         }
 
-
-        // --- Test StoreValue ---
+        #endregion
+        #region Test StoreValue
 
         [TestCase]
         public void TestStoreValue_String_Success()
@@ -429,7 +430,8 @@ namespace ProjectTerminal.Tests
             AssertThat(_mockFileSystem.FileExists(expectedPath)).IsFalse();
         }
 
-        // --- Test RetrieveValue ---
+        #endregion
+        #region Test RetrieveValue
 
         [TestCase]
         public void TestRetrieveValue_String_Success()
@@ -607,5 +609,88 @@ namespace ProjectTerminal.Tests
             // Assert
             AssertThat(retrievedValue).IsEqual(0); // Default for int
         }
+
+        #endregion
+        #region Test ClearValue
+
+        [TestCase]
+        public void TestClearValue_ExistingKey_Success()
+        {
+            // Arrange
+            string key = "existingKey";
+            string path = "user://secure_data/existingKey.dat";
+
+            // Create a file first
+            _mockFileSystem.SetFileContent(path, "test content");
+
+            // Verify file exists before clearing
+            AssertThat(_mockFileSystem.FileExists(path)).IsTrue();
+
+            // Act
+            bool result = _secureStorageWrapper.ClearValue(key);
+
+            // Assert
+            AssertThat(result).IsTrue();
+            AssertThat(_mockFileSystem.FileExists(path)).IsFalse();
+        }
+
+        [TestCase]
+        public void TestClearValue_NonExistentKey_ReturnsTrue()
+        {
+            // Arrange
+            string key = "nonExistentKey";
+            string path = "user://secure_data/nonExistentKey.dat";
+
+            // Verify file doesn't exist before test
+            AssertThat(_mockFileSystem.FileExists(path)).IsFalse();
+
+            // Act
+            bool result = _secureStorageWrapper.ClearValue(key);
+
+            // Assert
+            AssertThat(result).IsTrue(); // Should return true even if key doesn't exist
+            AssertThat(_mockFileSystem.FileExists(path)).IsFalse();
+        }
+
+        #endregion
+        #region Test HasKey
+
+        [TestCase]
+        public void TestHasKey_ExistingKey_ReturnsTrue()
+        {
+            // Arrange
+            string key = "existingKey";
+            string path = "user://secure_data/existingKey.dat";
+
+            // Create a file
+            _mockFileSystem.SetFileContent(path, "test content");
+
+            // Verify file exists before test
+            AssertThat(_mockFileSystem.FileExists(path)).IsTrue();
+
+            // Act
+            bool result = _secureStorageWrapper.HasKey(key);
+
+            // Assert
+            AssertThat(result).IsTrue();
+        }
+
+        [TestCase]
+        public void TestHasKey_NonExistentKey_ReturnsFalse()
+        {
+            // Arrange
+            string key = "nonExistentKey";
+            string path = "user://secure_data/nonExistentKey.dat";
+
+            // Verify file doesn't exist before test
+            AssertThat(_mockFileSystem.FileExists(path)).IsFalse();
+
+            // Act
+            bool result = _secureStorageWrapper.HasKey(key);
+
+            // Assert
+            AssertThat(result).IsFalse();
+        }
+        #endregion
     }
 }
