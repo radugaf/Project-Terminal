@@ -1,32 +1,212 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="0b0ac92a-e068-4dfd-960a-ac37522fd2f9" name="radug@PC 2025-03-30 23:59:24" runUser="PC\radug" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Times creation="2025-03-30T23:59:24.1772189+03:00" queuing="2025-03-30T23:59:24.1772190+03:00" start="2025-03-30T23:59:22.1133398+03:00" finish="2025-03-30T23:59:24.2118674+03:00" />
-  <TestSettings name="default" id="965a941e-fdc4-4018-ab54-7f630dcc904b">
-    <Deployment runDeploymentRoot="radug_PC_2025-03-30_23_59_24" />
+<TestRun id="c99e5d94-4eec-4d56-b4c7-885d514828cd" name="radug@PC 2025-04-01 01:03:17" runUser="PC\radug" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-04-01T01:03:17.7400779+03:00" queuing="2025-04-01T01:03:17.7400779+03:00" start="2025-04-01T01:03:15.7183057+03:00" finish="2025-04-01T01:03:18.1758269+03:00" />
+  <TestSettings name="default" id="adaaed67-dca5-43fb-b9b6-e833b3b3ab5a">
+    <Deployment runDeploymentRoot="radug_PC_2025-04-01_01_03_17" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="5f3173a2-1006-44f4-9217-5dfa6daf4805" testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" testName="TestStoreObject_NullObject_Fails" computerName="PC" duration="00:00:00.0150000" startTime="2025-03-30T23:59:23.9798130+03:00" endTime="2025-03-30T23:59:23.9804497+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5f3173a2-1006-44f4-9217-5dfa6daf4805" />
+    <UnitTestResult executionId="983d9d24-4577-4e3a-a5d1-d421336d4efa" testId="083ab0d1-ab4c-e0c8-6964-d0f11a6251d3" testName="TestRetrieveObject_ComplexObject" computerName="PC" duration="00:00:00.0160000" startTime="2025-04-01T01:03:17.7028971+03:00" endTime="2025-04-01T01:03:17.7029031+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="983d9d24-4577-4e3a-a5d1-d421336d4efa" />
+    <UnitTestResult executionId="23e2ae37-48b0-433d-ba0a-ac7e64126e3c" testId="1408b17d-44cd-7cdd-0f93-139b005d5654" testName="TestStoreObject_NullKey_Fails" computerName="PC" duration="00:00:00.0090000" startTime="2025-04-01T01:03:17.6610961+03:00" endTime="2025-04-01T01:03:17.6611009+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23e2ae37-48b0-433d-ba0a-ac7e64126e3c" />
+    <UnitTestResult executionId="885556ab-a0cb-4df8-8489-d53dda65becf" testId="5e9c7ffa-aba6-c4a1-be46-e877e551fd8d" testName="TestRetrieveValue_Integer_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.8153351+03:00" endTime="2025-04-01T01:03:17.8153402+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="885556ab-a0cb-4df8-8489-d53dda65becf" />
+    <UnitTestResult executionId="96aa4433-8809-4af6-a067-aebc5a36e00b" testId="0a771bbc-848e-c14c-2795-133759d3b56d" testName="TestRetrieveObject_InvalidJson_ReturnsDefault" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.7318839+03:00" endTime="2025-04-01T01:03:17.7318857+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96aa4433-8809-4af6-a067-aebc5a36e00b" />
+    <UnitTestResult executionId="04997f0c-a94b-4326-8e8d-27f0ed4faa22" testId="c76ec88b-2069-4f42-ebdd-99932f277499" testName="TestStoreValue_NullValue_CallsClearValue" computerName="PC" duration="00:00:00.0040000" startTime="2025-04-01T01:03:17.7943262+03:00" endTime="2025-04-01T01:03:17.7943281+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="04997f0c-a94b-4326-8e8d-27f0ed4faa22" />
+    <UnitTestResult executionId="b22dd6b7-9f88-437f-80ad-38b9604fbeb1" testId="132bb2ac-df9d-c459-b417-48a91e50a744" testName="TestStoreValue_Float_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7734741+03:00" endTime="2025-04-01T01:03:17.7734763+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b22dd6b7-9f88-437f-80ad-38b9604fbeb1" />
+    <UnitTestResult executionId="09bb8ace-f247-4559-8c7a-a12df90bc933" testId="b1662bf2-fd2f-dcc0-7c49-16aad20a27d7" testName="TestRetrieveValue_String_Success" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.8069181+03:00" endTime="2025-04-01T01:03:17.8069200+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="09bb8ace-f247-4559-8c7a-a12df90bc933" />
+    <UnitTestResult executionId="893bd24f-ac69-4497-a761-3a5750a102d7" testId="cab51616-cf6c-1a70-ff7e-0ae1e5a3be2e" testName="TestStoreValue_Boolean_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7653094+03:00" endTime="2025-04-01T01:03:17.7653155+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="893bd24f-ac69-4497-a761-3a5750a102d7" />
+    <UnitTestResult executionId="7efcedbb-5bb9-4fdc-a385-d205db4eb369" testId="a13ca9fd-fb85-b45c-e1a5-faf954d8261f" testName="TestRetrieveValue_Float_Success" computerName="PC" duration="00:00:00.0090000" startTime="2025-04-01T01:03:17.8335313+03:00" endTime="2025-04-01T01:03:17.8335355+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7efcedbb-5bb9-4fdc-a385-d205db4eb369" />
+    <UnitTestResult executionId="eb746c2b-a762-4576-9608-76dbf0c55996" testId="25620554-343c-9e73-e958-3c11ea51c476" testName="TestStoreValue_Integer_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7569041+03:00" endTime="2025-04-01T01:03:17.7569057+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb746c2b-a762-4576-9608-76dbf0c55996" />
+    <UnitTestResult executionId="07b870de-02b0-4b8b-872e-da459d9ae0ab" testId="767328c8-7b0b-2c9b-e71e-119743f122d6" testName="TestRetrieveValue_InvalidFormat_ReturnsDefault" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.8860016+03:00" endTime="2025-04-01T01:03:17.8860052+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="07b870de-02b0-4b8b-872e-da459d9ae0ab" />
+    <UnitTestResult executionId="dedd1268-1d98-4e4f-8b7a-9091e991530e" testId="416c781e-2bf0-0cee-cf15-0be00b7adc79" testName="TestRetrieveObject_PrimitiveType" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7402168+03:00" endTime="2025-04-01T01:03:17.7402189+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dedd1268-1d98-4e4f-8b7a-9091e991530e" />
+    <UnitTestResult executionId="bee3596f-3a42-482c-8f13-96b50e1dc030" testId="cad80f10-1148-a7e9-f872-ce25d1cc572c" testName="TestStoreObject_GenericObject_Success" computerName="PC" duration="00:00:00.0220000" startTime="2025-04-01T01:03:17.6518842+03:00" endTime="2025-04-01T01:03:17.6525098+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bee3596f-3a42-482c-8f13-96b50e1dc030" />
+    <UnitTestResult executionId="f131e632-8d5f-46b1-a5e0-eb1d9c04f48b" testId="8fcc4fa9-3290-ad18-da96-e44dea776a4f" testName="TestClearValue_ExistingKey_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.9069284+03:00" endTime="2025-04-01T01:03:17.9069304+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f131e632-8d5f-46b1-a5e0-eb1d9c04f48b" />
+    <UnitTestResult executionId="5d31e277-636a-4c2f-8178-3eb7e9682da3" testId="9da81a93-3499-60fa-993c-2e5de80d45a0" testName="TestRetrieveObject_EmptyJson_ReturnsDefault" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.7195167+03:00" endTime="2025-04-01T01:03:17.7195208+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d31e277-636a-4c2f-8178-3eb7e9682da3" />
+    <UnitTestResult executionId="58c2411c-4439-4351-b308-c2c05f0cbff8" testId="9ff4496a-9de2-beba-4e4a-207bd69e1682" testName="TestHasKey_ExistingKey_ReturnsTrue" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.9236158+03:00" endTime="2025-04-01T01:03:17.9236175+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58c2411c-4439-4351-b308-c2c05f0cbff8" />
+    <UnitTestResult executionId="2acac360-6aad-4ec9-824c-5125e7434640" testId="a7735502-29bf-8bf1-bc41-7a70abb503c1" testName="TestRetrieveValue_Boolean_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.8236796+03:00" endTime="2025-04-01T01:03:17.8236840+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2acac360-6aad-4ec9-824c-5125e7434640" />
+    <UnitTestResult executionId="6a903586-6e22-49c3-b330-380aeb0001f3" testId="e20d0f11-16fb-fbf9-1085-b767480808bd" testName="TestRetrieveObject_NonExistentKey_ReturnsDefault" computerName="PC" duration="00:00:00.0030000" startTime="2025-04-01T01:03:17.7068609+03:00" endTime="2025-04-01T01:03:17.7068654+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a903586-6e22-49c3-b330-380aeb0001f3" />
+    <UnitTestResult executionId="15fd5b29-ce3b-48bc-a414-7dd5ff036b87" testId="53fcba13-8bb6-3db6-395d-29a216e9f866" testName="TestStoreValue_DateTime_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7902033+03:00" endTime="2025-04-01T01:03:17.7902047+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15fd5b29-ce3b-48bc-a414-7dd5ff036b87" />
+    <UnitTestResult executionId="3ff0b69b-063a-4e73-9f07-0cd5579976ee" testId="703010d4-6f76-e574-19ac-e6214636773d" testName="TestStoreValue_String_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7487357+03:00" endTime="2025-04-01T01:03:17.7487421+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3ff0b69b-063a-4e73-9f07-0cd5579976ee" />
+    <UnitTestResult executionId="0a66be49-bb8d-45ae-9f20-7a039322c4ca" testId="1e2a9bf8-70a2-2e1a-33b0-559ff36d2f41" testName="TestRetrieveValue_Double_Success" computerName="PC" duration="00:00:00.0100000" startTime="2025-04-01T01:03:17.8443601+03:00" endTime="2025-04-01T01:03:17.8443631+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a66be49-bb8d-45ae-9f20-7a039322c4ca" />
+    <UnitTestResult executionId="dc354248-1d62-4028-896b-81b30a045b11" testId="e6e3567b-4ea9-84b3-800f-1f7f58d7af7a" testName="TestStoreValue_Double_Success" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.7818541+03:00" endTime="2025-04-01T01:03:17.7818577+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dc354248-1d62-4028-896b-81b30a045b11" />
+    <UnitTestResult executionId="beb86539-73a1-41c8-831a-39b22bc24048" testId="08365228-a10d-5a13-77c8-0368348773fc" testName="TestStoreObject_EmptyKey_Fails" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.6694148+03:00" endTime="2025-04-01T01:03:17.6694187+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="beb86539-73a1-41c8-831a-39b22bc24048" />
+    <UnitTestResult executionId="c597d75c-ad12-478d-8465-42ef7180703a" testId="9d9a9131-147f-3bdf-3c5a-dacdad0bd4af" testName="TestRetrieveValue_DateTime_Success" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.8570041+03:00" endTime="2025-04-01T01:03:17.8570093+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c597d75c-ad12-478d-8465-42ef7180703a" />
+    <UnitTestResult executionId="de2a90cf-e11e-483a-a84a-e4b5f731c84a" testId="b55fba28-be77-b8f9-e5bc-7ff849cca3c9" testName="TestClearValue_NonExistentKey_ReturnsTrue" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.9154049+03:00" endTime="2025-04-01T01:03:17.9154108+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de2a90cf-e11e-483a-a84a-e4b5f731c84a" />
+    <UnitTestResult executionId="1441306a-be0e-40ef-9499-75808c3d4672" testId="9137e876-60ce-9743-b162-68260de3e5c1" testName="TestRetrieveValue_TypeMismatch_ReturnsDefault" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.8985730+03:00" endTime="2025-04-01T01:03:17.8985749+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1441306a-be0e-40ef-9499-75808c3d4672" />
+    <UnitTestResult executionId="8cb47ff9-d5a2-4ee0-b59c-a8b37566d1f8" testId="94e1d4cd-a46c-8570-defb-01337ea5bcc1" testName="TestHasKey_NonExistentKey_ReturnsFalse" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.9319021+03:00" endTime="2025-04-01T01:03:17.9319071+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8cb47ff9-d5a2-4ee0-b59c-a8b37566d1f8" />
+    <UnitTestResult executionId="e052abd0-cd27-4d26-8712-9a779756e843" testId="de9c6b75-7f81-d4b1-0f65-36a9a12eb1ab" testName="TestRetrieveObject_Success" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.6860980+03:00" endTime="2025-04-01T01:03:17.6861000+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e052abd0-cd27-4d26-8712-9a779756e843" />
+    <UnitTestResult executionId="9992ab87-1aa4-454c-b8a6-de3925c0d62e" testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" testName="TestStoreObject_NullObject_Fails" computerName="PC" duration="00:00:00.0030000" startTime="2025-04-01T01:03:17.6734124+03:00" endTime="2025-04-01T01:03:17.6734143+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9992ab87-1aa4-454c-b8a6-de3925c0d62e" />
+    <UnitTestResult executionId="b118adc5-ad73-4c29-a731-a60e19b6be45" testId="364511c1-072c-6cac-6ed9-57b60af2be5e" testName="TestRetrieveValue_NonExistentKey_ReturnsDefault" computerName="PC" duration="00:00:00.0120000" startTime="2025-04-01T01:03:17.8693740+03:00" endTime="2025-04-01T01:03:17.8693797+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b118adc5-ad73-4c29-a731-a60e19b6be45" />
+    <UnitTestResult executionId="b6f48cc0-53e8-4e69-87c2-4bebea39f0c2" testId="622b5d4a-6169-9179-a1ed-d76bd2fc0dac" testName="TestRetrieveValue_EmptyContent_ReturnsDefault" computerName="PC" duration="00:00:00.0080000" startTime="2025-04-01T01:03:17.8776848+03:00" endTime="2025-04-01T01:03:17.8776899+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b6f48cc0-53e8-4e69-87c2-4bebea39f0c2" />
   </Results>
   <TestDefinitions>
+    <UnitTest name="TestRetrieveValue_NonExistentKey_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="364511c1-072c-6cac-6ed9-57b60af2be5e">
+      <Execution id="b118adc5-ad73-4c29-a731-a60e19b6be45" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_NonExistentKey_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_InvalidJson_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="0a771bbc-848e-c14c-2795-133759d3b56d">
+      <Execution id="96aa4433-8809-4af6-a067-aebc5a36e00b" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_InvalidJson_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_Float_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="a13ca9fd-fb85-b45c-e1a5-faf954d8261f">
+      <Execution id="7efcedbb-5bb9-4fdc-a385-d205db4eb369" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_Float_Success" />
+    </UnitTest>
+    <UnitTest name="TestHasKey_ExistingKey_ReturnsTrue" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="9ff4496a-9de2-beba-4e4a-207bd69e1682">
+      <Execution id="58c2411c-4439-4351-b308-c2c05f0cbff8" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestHasKey_ExistingKey_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_EmptyJson_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="9da81a93-3499-60fa-993c-2e5de80d45a0">
+      <Execution id="5d31e277-636a-4c2f-8178-3eb7e9682da3" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_EmptyJson_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_DateTime_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="9d9a9131-147f-3bdf-3c5a-dacdad0bd4af">
+      <Execution id="c597d75c-ad12-478d-8465-42ef7180703a" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_DateTime_Success" />
+    </UnitTest>
+    <UnitTest name="TestStoreObject_NullKey_Fails" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="1408b17d-44cd-7cdd-0f93-139b005d5654">
+      <Execution id="23e2ae37-48b0-433d-ba0a-ac7e64126e3c" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_NullKey_Fails" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_PrimitiveType" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="416c781e-2bf0-0cee-cf15-0be00b7adc79">
+      <Execution id="dedd1268-1d98-4e4f-8b7a-9091e991530e" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_PrimitiveType" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_String_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="703010d4-6f76-e574-19ac-e6214636773d">
+      <Execution id="3ff0b69b-063a-4e73-9f07-0cd5579976ee" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_String_Success" />
+    </UnitTest>
     <UnitTest name="TestStoreObject_NullObject_Fails" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="5b05749c-2e12-2ae6-0a43-abcd87407d0b">
-      <Execution id="5f3173a2-1006-44f4-9217-5dfa6daf4805" />
+      <Execution id="9992ab87-1aa4-454c-b8a6-de3925c0d62e" />
       <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_NullObject_Fails" />
+    </UnitTest>
+    <UnitTest name="TestHasKey_NonExistentKey_ReturnsFalse" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="94e1d4cd-a46c-8570-defb-01337ea5bcc1">
+      <Execution id="8cb47ff9-d5a2-4ee0-b59c-a8b37566d1f8" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestHasKey_NonExistentKey_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_Double_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="1e2a9bf8-70a2-2e1a-33b0-559ff36d2f41">
+      <Execution id="0a66be49-bb8d-45ae-9f20-7a039322c4ca" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_Double_Success" />
+    </UnitTest>
+    <UnitTest name="TestStoreObject_EmptyKey_Fails" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="08365228-a10d-5a13-77c8-0368348773fc">
+      <Execution id="beb86539-73a1-41c8-831a-39b22bc24048" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_EmptyKey_Fails" />
+    </UnitTest>
+    <UnitTest name="TestStoreObject_GenericObject_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="cad80f10-1148-a7e9-f872-ce25d1cc572c">
+      <Execution id="bee3596f-3a42-482c-8f13-96b50e1dc030" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreObject_GenericObject_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_Boolean_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="a7735502-29bf-8bf1-bc41-7a70abb503c1">
+      <Execution id="2acac360-6aad-4ec9-824c-5125e7434640" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_Boolean_Success" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_NullValue_CallsClearValue" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="c76ec88b-2069-4f42-ebdd-99932f277499">
+      <Execution id="04997f0c-a94b-4326-8e8d-27f0ed4faa22" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_NullValue_CallsClearValue" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_NonExistentKey_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="e20d0f11-16fb-fbf9-1085-b767480808bd">
+      <Execution id="6a903586-6e22-49c3-b330-380aeb0001f3" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_NonExistentKey_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_DateTime_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="53fcba13-8bb6-3db6-395d-29a216e9f866">
+      <Execution id="15fd5b29-ce3b-48bc-a414-7dd5ff036b87" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_DateTime_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_ComplexObject" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="083ab0d1-ab4c-e0c8-6964-d0f11a6251d3">
+      <Execution id="983d9d24-4577-4e3a-a5d1-d421336d4efa" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_ComplexObject" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_Double_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="e6e3567b-4ea9-84b3-800f-1f7f58d7af7a">
+      <Execution id="dc354248-1d62-4028-896b-81b30a045b11" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_Double_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_TypeMismatch_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="9137e876-60ce-9743-b162-68260de3e5c1">
+      <Execution id="1441306a-be0e-40ef-9499-75808c3d4672" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_TypeMismatch_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_EmptyContent_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="622b5d4a-6169-9179-a1ed-d76bd2fc0dac">
+      <Execution id="b6f48cc0-53e8-4e69-87c2-4bebea39f0c2" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_EmptyContent_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_Float_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="132bb2ac-df9d-c459-b417-48a91e50a744">
+      <Execution id="b22dd6b7-9f88-437f-80ad-38b9604fbeb1" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_Float_Success" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_Boolean_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="cab51616-cf6c-1a70-ff7e-0ae1e5a3be2e">
+      <Execution id="893bd24f-ac69-4497-a761-3a5750a102d7" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_Boolean_Success" />
+    </UnitTest>
+    <UnitTest name="TestClearValue_ExistingKey_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="8fcc4fa9-3290-ad18-da96-e44dea776a4f">
+      <Execution id="f131e632-8d5f-46b1-a5e0-eb1d9c04f48b" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestClearValue_ExistingKey_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_Integer_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="5e9c7ffa-aba6-c4a1-be46-e877e551fd8d">
+      <Execution id="885556ab-a0cb-4df8-8489-d53dda65becf" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_Integer_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveObject_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="de9c6b75-7f81-d4b1-0f65-36a9a12eb1ab">
+      <Execution id="e052abd0-cd27-4d26-8712-9a779756e843" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveObject_Success" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_InvalidFormat_ReturnsDefault" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="767328c8-7b0b-2c9b-e71e-119743f122d6">
+      <Execution id="07b870de-02b0-4b8b-872e-da459d9ae0ab" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_InvalidFormat_ReturnsDefault" />
+    </UnitTest>
+    <UnitTest name="TestRetrieveValue_String_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="b1662bf2-fd2f-dcc0-7c49-16aad20a27d7">
+      <Execution id="09bb8ace-f247-4559-8c7a-a12df90bc933" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestRetrieveValue_String_Success" />
+    </UnitTest>
+    <UnitTest name="TestStoreValue_Integer_Success" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="25620554-343c-9e73-e958-3c11ea51c476">
+      <Execution id="eb746c2b-a762-4576-9608-76dbf0c55996" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestStoreValue_Integer_Success" />
+    </UnitTest>
+    <UnitTest name="TestClearValue_NonExistentKey_ReturnsTrue" storage="c:\users\radug\documents\github\project-terminal\.godot\mono\temp\bin\debug\projectterminal.dll" id="b55fba28-be77-b8f9-e5bc-7ff849cca3c9">
+      <Execution id="de2a90cf-e11e-483a-a84a-e4b5f731c84a" />
+      <TestMethod codeBase="C:\Users\radug\Documents\GitHub\Project-Terminal\.godot\mono\temp\bin\Debug\ProjectTerminal.dll" adapterTypeName="executor://gdunit4.testadapter/" className="ProjectTerminal.Tests.SecureStorageWrapperTest" name="TestClearValue_NonExistentKey_ReturnsTrue" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
-    <TestEntry testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" executionId="5f3173a2-1006-44f4-9217-5dfa6daf4805" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="083ab0d1-ab4c-e0c8-6964-d0f11a6251d3" executionId="983d9d24-4577-4e3a-a5d1-d421336d4efa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1408b17d-44cd-7cdd-0f93-139b005d5654" executionId="23e2ae37-48b0-433d-ba0a-ac7e64126e3c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5e9c7ffa-aba6-c4a1-be46-e877e551fd8d" executionId="885556ab-a0cb-4df8-8489-d53dda65becf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0a771bbc-848e-c14c-2795-133759d3b56d" executionId="96aa4433-8809-4af6-a067-aebc5a36e00b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c76ec88b-2069-4f42-ebdd-99932f277499" executionId="04997f0c-a94b-4326-8e8d-27f0ed4faa22" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="132bb2ac-df9d-c459-b417-48a91e50a744" executionId="b22dd6b7-9f88-437f-80ad-38b9604fbeb1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b1662bf2-fd2f-dcc0-7c49-16aad20a27d7" executionId="09bb8ace-f247-4559-8c7a-a12df90bc933" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cab51616-cf6c-1a70-ff7e-0ae1e5a3be2e" executionId="893bd24f-ac69-4497-a761-3a5750a102d7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a13ca9fd-fb85-b45c-e1a5-faf954d8261f" executionId="7efcedbb-5bb9-4fdc-a385-d205db4eb369" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="25620554-343c-9e73-e958-3c11ea51c476" executionId="eb746c2b-a762-4576-9608-76dbf0c55996" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="767328c8-7b0b-2c9b-e71e-119743f122d6" executionId="07b870de-02b0-4b8b-872e-da459d9ae0ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="416c781e-2bf0-0cee-cf15-0be00b7adc79" executionId="dedd1268-1d98-4e4f-8b7a-9091e991530e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cad80f10-1148-a7e9-f872-ce25d1cc572c" executionId="bee3596f-3a42-482c-8f13-96b50e1dc030" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8fcc4fa9-3290-ad18-da96-e44dea776a4f" executionId="f131e632-8d5f-46b1-a5e0-eb1d9c04f48b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9da81a93-3499-60fa-993c-2e5de80d45a0" executionId="5d31e277-636a-4c2f-8178-3eb7e9682da3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9ff4496a-9de2-beba-4e4a-207bd69e1682" executionId="58c2411c-4439-4351-b308-c2c05f0cbff8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a7735502-29bf-8bf1-bc41-7a70abb503c1" executionId="2acac360-6aad-4ec9-824c-5125e7434640" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e20d0f11-16fb-fbf9-1085-b767480808bd" executionId="6a903586-6e22-49c3-b330-380aeb0001f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="53fcba13-8bb6-3db6-395d-29a216e9f866" executionId="15fd5b29-ce3b-48bc-a414-7dd5ff036b87" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="703010d4-6f76-e574-19ac-e6214636773d" executionId="3ff0b69b-063a-4e73-9f07-0cd5579976ee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e2a9bf8-70a2-2e1a-33b0-559ff36d2f41" executionId="0a66be49-bb8d-45ae-9f20-7a039322c4ca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e6e3567b-4ea9-84b3-800f-1f7f58d7af7a" executionId="dc354248-1d62-4028-896b-81b30a045b11" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="08365228-a10d-5a13-77c8-0368348773fc" executionId="beb86539-73a1-41c8-831a-39b22bc24048" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9d9a9131-147f-3bdf-3c5a-dacdad0bd4af" executionId="c597d75c-ad12-478d-8465-42ef7180703a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b55fba28-be77-b8f9-e5bc-7ff849cca3c9" executionId="de2a90cf-e11e-483a-a84a-e4b5f731c84a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9137e876-60ce-9743-b162-68260de3e5c1" executionId="1441306a-be0e-40ef-9499-75808c3d4672" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="94e1d4cd-a46c-8570-defb-01337ea5bcc1" executionId="8cb47ff9-d5a2-4ee0-b59c-a8b37566d1f8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="de9c6b75-7f81-d4b1-0f65-36a9a12eb1ab" executionId="e052abd0-cd27-4d26-8712-9a779756e843" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5b05749c-2e12-2ae6-0a43-abcd87407d0b" executionId="9992ab87-1aa4-454c-b8a6-de3925c0d62e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="364511c1-072c-6cac-6ed9-57b60af2be5e" executionId="b118adc5-ad73-4c29-a731-a60e19b6be45" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="622b5d4a-6169-9179-a1ed-d76bd2fc0dac" executionId="b6f48cc0-53e8-4e69-87c2-4bebea39f0c2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
   </TestEntries>
   <TestLists>
     <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
     <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
   </TestLists>
   <ResultSummary outcome="Completed">
-    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Counters total="31" executed="31" passed="31" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
       <StdOut>CheckGdUnit4ApiVersion gdUnit4Api, Version=4.3.1.0&#xD;
-Start executing tests, 1 TestCases total.&#xD;
+Start executing tests, 84 TestCases total.&#xD;
 Current directory set to: C:\Users\radug\Documents\GitHub\Project-Terminal&#xD;
-Run with args  --path . res://gdunit4_testadapter/TestAdapterRunner.tscn --testadapter --configfile="C:\Users\radug\Documents\GitHub\Project-Terminal\GdUnitRunner_8e8d826e-c868-44be-af98-4a05ba54878d.cfg" &#xD;
+Run with args  --path . res://gdunit4_testadapter/TestAdapterRunner.tscn --testadapter --configfile="C:\Users\radug\Documents\GitHub\Project-Terminal\GdUnitRunner_a3734539-69df-4ebc-a30b-77a285c8737c.cfg" &#xD;
 TestEventReportServer:: Wait for connecting GdUnit4 test report client.&#xD;
 TestEventReportServer:: TestAdapterReporter: Successfully connected to GdUnit4 test report server!&#xD;
 TestEventReportServer:: TestAdapterReporter: Disconnecting from GdUnit4 test report server.&#xD;

@@ -99,13 +99,7 @@ namespace ProjectTerminal.Globals.Wrappers
                 }
 
                 string json = _fileSystem.ReadAllText(filePath);
-
-                if (string.IsNullOrEmpty(json))
-                {
-                    return default;
-                }
-
-                return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+                return string.IsNullOrEmpty(json) ? default : JsonSerializer.Deserialize<T>(json, _jsonOptions);
             }
             catch (JsonException jsonEx)
             {
@@ -130,14 +124,11 @@ namespace ProjectTerminal.Globals.Wrappers
 
                 string filePath = GetPathForKey(key);
                 string typeName = value.GetType().FullName;
-                string stringValue;
-
-                if (value is string strValue)
-                    stringValue = strValue;
-                else if (value is int or float or double or bool or DateTime)
-                    stringValue = value.ToString();
-                else
-                    throw new ArgumentException($"Unsupported type: {value.GetType().Name}");
+                string stringValue = value is string strValue
+                    ? strValue
+                    : value is int or float or double or bool or DateTime
+                    ? value.ToString()
+                    : throw new ArgumentException($"Unsupported type: {value.GetType().Name}");
 
                 string content = $"{typeName}\n{stringValue}";
                 bool success = _fileSystem.WriteAllText(filePath, content);
@@ -212,13 +203,7 @@ namespace ProjectTerminal.Globals.Wrappers
             try
             {
                 string filePath = GetPathForKey(key);
-
-                if (_fileSystem.FileExists(filePath))
-                {
-                    return _fileSystem.DeleteFile(filePath);
-                }
-
-                return true;
+                return !_fileSystem.FileExists(filePath) || _fileSystem.DeleteFile(filePath);
             }
             catch (Exception ex)
             {
