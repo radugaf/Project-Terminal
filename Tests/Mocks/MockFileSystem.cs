@@ -5,18 +5,11 @@ using ProjectTerminal.Globals.Interfaces;
 
 namespace ProjectTerminal.Tests.Mocks
 {
-    public class MockFileSystem : IFileSystem
+    public class MockFileSystem(Logger logger) : IFileSystem
     {
-        private readonly Dictionary<string, string> _files = new();
-        private readonly HashSet<string> _directories = new();
-        private readonly Logger _logger;
-
-        public MockFileSystem(Logger logger)
-        {
-            _logger = logger;
-            // Initialize root directory
-            _directories.Add("user://");
-        }
+        private readonly Dictionary<string, string> _files = [];
+        private readonly HashSet<string> _directories = [];
+        private readonly Logger _logger = logger;
 
         public bool FileExists(string path)
         {
@@ -28,13 +21,13 @@ namespace ProjectTerminal.Tests.Mocks
         public string ReadAllText(string path)
         {
             string normalizedPath = NormalizePath(path);
-            if (!_files.ContainsKey(normalizedPath))
+            if (!_files.TryGetValue(normalizedPath, out string value))
             {
                 _logger.Debug($"MockFileSystem: ReadAllText({path}) => file not found");
                 return null;
             }
 
-            string content = _files[normalizedPath];
+            string content = value;
             _logger.Debug($"MockFileSystem: ReadAllText({path}) => length {content.Length}");
             return content;
         }
@@ -112,54 +105,39 @@ namespace ProjectTerminal.Tests.Mocks
             }
 
             // Find all files that start with this directory path
-            var result = _files.Keys
+            string[] result = [.. _files.Keys
                 .Where(filePath => filePath.StartsWith(normalizedPath))
-                .Select(filePath => GetFileName(filePath))
-                .ToArray();
+                .Select(filePath => GetFileName(filePath))];
 
             _logger.Debug($"MockFileSystem: GetFilesInDirectory({path}) => {result.Length} files");
             return result;
         }
 
         // Helper to normalize path separators
-        private string NormalizePath(string path)
-        {
-            return path.Replace("\\", "/");
-        }
+        private static string NormalizePath(string path) => path.Replace("\\", "/");
 
         // Get directory part of a path
-        private string GetDirectoryPath(string path)
+        private static string GetDirectoryPath(string path)
         {
             int lastSlash = path.LastIndexOf('/');
-            if (lastSlash <= 0)
-            {
-                return "user://";
-            }
-            return path.Substring(0, lastSlash);
+            return lastSlash <= 0 ? "user://" : path[..lastSlash];
         }
 
         // Get filename part of a path
-        private string GetFileName(string path)
+        private static string GetFileName(string path)
         {
             int lastSlash = path.LastIndexOf('/');
-            if (lastSlash < 0 || lastSlash == path.Length - 1)
-            {
-                return path;
-            }
-            return path.Substring(lastSlash + 1);
+            return lastSlash < 0 || lastSlash == path.Length - 1 ? path : path[(lastSlash + 1)..];
         }
 
         // Helper methods for testing to directly set file content
-        public void SetFileContent(string path, string content)
-        {
-            _files[NormalizePath(path)] = content;
-        }
+        public void SetFileContent(string path, string content) => _files[NormalizePath(path)] = content;
 
         // Helper to directly get file content for verification
         public string GetFileContent(string path)
         {
             string normalizedPath = NormalizePath(path);
-            return _files.ContainsKey(normalizedPath) ? _files[normalizedPath] : null;
+            return _files.TryGetValue(normalizedPath, out string value) ? value : null;
         }
 
         // Reset all mock state for clean test runs
@@ -167,7 +145,8 @@ namespace ProjectTerminal.Tests.Mocks
         {
             _files.Clear();
             _directories.Clear();
-            _directories.Add("user://");
+            // _directories.Add("user://");
+            // _directories.Add("user://secure_data");
         }
     }
 }
