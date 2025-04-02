@@ -36,7 +36,7 @@ public partial class AddressManager : Node
                 IsVerified = false
             };
 
-            ModeledResponse<Address> response = await _supabaseClient.From<Address>()
+            ModeledResponse<Address> response = await _supabaseClient.GetClient().From<Address>()
                 .Insert(address, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)

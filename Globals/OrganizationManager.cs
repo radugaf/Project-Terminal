@@ -60,7 +60,7 @@ public partial class OrganizationManager : Node
                 IsActive = true
             };
 
-            ModeledResponse<Organization> response = await _supabaseClient.From<Organization>()
+            ModeledResponse<Organization> response = await _supabaseClient.GetClient().From<Organization>()
                 .Insert(organization, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
@@ -121,7 +121,7 @@ public partial class OrganizationManager : Node
             };
 
             // Insert into database
-            ModeledResponse<Staff> response = await _supabaseClient.From<Staff>()
+            ModeledResponse<Staff> response = await _supabaseClient.GetClient().From<Staff>()
                 .Insert(staff, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)
@@ -166,7 +166,7 @@ public partial class OrganizationManager : Node
                 IsActive = false
             };
 
-            ModeledResponse<Location> response = await _supabaseClient.From<Location>()
+            ModeledResponse<Location> response = await _supabaseClient.GetClient().From<Location>()
                 .Insert(location, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage?.IsSuccessStatusCode != true)

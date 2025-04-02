@@ -71,7 +71,7 @@ public partial class TerminalManager : Node
                 ScreenScale = screenInfo["screen_scale"].AsString(),
             };
 
-            ModeledResponse<Terminal> response = await _supabaseClient.From<Terminal>()
+            ModeledResponse<Terminal> response = await _supabaseClient.GetClient().From<Terminal>()
                 .Insert(terminal, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)

@@ -4,18 +4,14 @@ using Supabase;
 using System.Threading.Tasks;
 using ProjectTerminal.Globals.Interfaces;
 using ProjectTerminal.Globals.Wrappers;
-using Supabase.Gotrue;
-using Supabase.Postgrest.Models;
-using Supabase.Postgrest.Responses;
-using Supabase.Realtime;
-using static Supabase.Gotrue.Constants;
-using Supabase.Interfaces;
 
 public partial class SupabaseClient : Node, ISupabaseClientWrapper
 {
     private Logger _logger;
-    private Supabase.Client _supabase;
+    private Client _supabase;
     private ISupabaseClientWrapper _wrapper;
+
+    public bool IsInitialized => _wrapper?.IsInitialized ?? false;
 
     [Signal]
     public delegate void ClientInitializedEventHandler();
@@ -60,7 +56,7 @@ public partial class SupabaseClient : Node, ISupabaseClientWrapper
             }
 
             // Create and configure Supabase client
-            _supabase = new Supabase.Client(supabaseUrl, supabaseKey, new SupabaseOptions
+            _supabase = new Client(supabaseUrl, supabaseKey, new SupabaseOptions
             {
                 AutoConnectRealtime = true,
                 AutoRefreshToken = true
@@ -84,22 +80,13 @@ public partial class SupabaseClient : Node, ISupabaseClientWrapper
     }
 
     // For testing purposes
-    public void InjectWrapper(ISupabaseClientWrapper wrapper)
-    {
-        _wrapper = wrapper ?? throw new ArgumentNullException(nameof(wrapper));
-    }
+    public void InjectWrapper(ISupabaseClientWrapper wrapper) => _wrapper = wrapper ?? throw new ArgumentNullException(nameof(wrapper));
 
-    // Delegate all interface methods to the wrapper implementation
-    public Task<Session> SignIn(string email, string password) => _wrapper.SignIn(email, password);
-    public Task<Session> SignUp(string email, string password) => _wrapper.SignUp(email, password);
-    public Task<Session> SignIn(SignInType type, string credential) => _wrapper.SignIn(type, credential);
-    public Task<Session> VerifyOTP(string phone, string otpCode, MobileOtpType type) => _wrapper.VerifyOTP(phone, otpCode, type);
-    public Task<Session> RefreshSession() => _wrapper.RefreshSession();
-    public Task SignOut() => _wrapper.SignOut();
-    public Task SetSession(string accessToken, string refreshToken) => _wrapper.SetSession(accessToken, refreshToken);
-    public Task<User> Update(UserAttributes attributes) => _wrapper.Update(attributes);
-    public ISupabaseTable<T, RealtimeChannel> From<T>() where T : BaseModel, new() => _wrapper.From<T>();
-    public Task<BaseResponse> Rpc(string procedureName, object parameters) => _wrapper.Rpc(procedureName, parameters);
-    public Task<TResponse> Rpc<TResponse>(string procedureName, object parameters) => _wrapper.Rpc<TResponse>(procedureName, parameters);
-    public Task Initialize() => _wrapper.Initialize();
+    // Access to client for other managers
+    public Client GetClient() => _wrapper?.GetClient() ??
+        throw new InvalidOperationException("Supabase client is not initialized");
+
+    // Implement interface methods
+    public Task Initialize() => _wrapper?.Initialize() ??
+        throw new InvalidOperationException("Wrapper is not initialized");
 }

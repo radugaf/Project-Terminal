@@ -35,7 +35,7 @@ public partial class CategoryManager : Node
                 OrganizationId = _organizationManager.GetOrganizationId()
             };
 
-            ModeledResponse<Category> response = await _supabaseClient.From<Category>()
+            ModeledResponse<Category> response = await _supabaseClient.GetClient().From<Category>()
                 .Insert(category, new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
 
             if (response == null || response.ResponseMessage.IsSuccessStatusCode != true)
