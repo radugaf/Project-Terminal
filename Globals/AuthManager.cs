@@ -7,7 +7,6 @@ using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
 using System.Collections.Generic;
 using ProjectTerminal.Globals.Interfaces;
-using ProjectTerminal.Globals.Wrappers;
 
 public partial class AuthManager : Node
 {
@@ -80,7 +79,7 @@ public partial class AuthManager : Node
             else
             {
                 // Use the interface method instead of Auth property
-                await _supabaseClient.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                await _supabaseClient.GetClient().Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
                 _logger.Info("AuthManager: Session synced with Supabase client");
             }
         }
@@ -150,7 +149,7 @@ public partial class AuthManager : Node
     {
         try
         {
-            ModeledResponse<Staff> response = await _supabaseClient.From<Staff>()
+            ModeledResponse<Staff> response = await _supabaseClient.GetClient().From<Staff>()
                 .Where(s => s.UserId == userId)
                 .Get();
 
@@ -243,7 +242,7 @@ public partial class AuthManager : Node
                 else
                 {
                     // Use interface method instead of Auth property
-                    await _supabaseClient.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
+                    await _supabaseClient.GetClient().Auth.SetSession(_currentSession.AccessToken, _currentSession.RefreshToken);
                 }
             }
             // No need for the else clause as we're using the OnClientInitialized signal handler
@@ -281,7 +280,7 @@ public partial class AuthManager : Node
         try
         {
             // Sign up with Supabase Auth
-            Session session = await _supabaseClient.SignUp(email, password);
+            Session session = await _supabaseClient.GetClient().Auth.SignUp(email, password);
 
             if (session?.User == null)
             {
@@ -317,7 +316,7 @@ public partial class AuthManager : Node
 
         try
         {
-            Session session = await _supabaseClient.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
+            Session session = await _supabaseClient.GetClient().Auth.VerifyOTP(phoneNumber, otpCode, MobileOtpType.SMS);
 
             if (session?.User == null)
             {
@@ -325,7 +324,7 @@ public partial class AuthManager : Node
                 return null;
             }
 
-            await _supabaseClient.SetSession(session.AccessToken, session.RefreshToken);
+            await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken);
 
             _isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
             _secureStorage.StoreValue(USER_NEW_STATE_KEY, _isNewUser);
@@ -363,7 +362,7 @@ public partial class AuthManager : Node
             var attrs = new UserAttributes { Email = email.Trim() };
 
             // Update user email
-            User response = await _supabaseClient.Update(attrs) ??
+            User response = await _supabaseClient.GetClient().Auth.Update(attrs) ??
                 throw new Exception("Failed to update user email");
 
             _logger.Info($"AuthManager: Email updated successfully for user {CurrentUser.Id}");
@@ -405,7 +404,7 @@ public partial class AuthManager : Node
 
         try
         {
-            await _supabaseClient.SignIn(SignInType.Phone, phoneNumber);
+            await _supabaseClient.GetClient().Auth.SignIn(SignInType.Phone, phoneNumber);
             _logger.Debug($"AuthManager: OTP sent to {phoneNumber}");
         }
         catch (Exception ex)
@@ -427,7 +426,7 @@ public partial class AuthManager : Node
 
         try
         {
-            Session refreshedSession = await _supabaseClient.RefreshSession();
+            Session refreshedSession = await _supabaseClient.GetClient().Auth.RefreshSession();
 
             if (refreshedSession != null)
             {
@@ -465,7 +464,7 @@ public partial class AuthManager : Node
         try
         {
             if (_isClientInitialized && _currentSession != null)
-                await _supabaseClient.SignOut();
+                await _supabaseClient.GetClient().Auth.SignOut();
         }
         catch (Exception ex)
         {
@@ -486,7 +485,7 @@ public partial class AuthManager : Node
 
         try
         {
-            Session session = await _supabaseClient.SignIn(email, password);
+            Session session = await _supabaseClient.GetClient().Auth.SignIn(email, password);
 
             if (session?.User == null)
             {
