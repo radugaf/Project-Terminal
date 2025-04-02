@@ -5,6 +5,8 @@ using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
 using Supabase.Postgrest;
 using Supabase.Gotrue;
+using ProjectTerminal.Globals.Services;
+
 public partial class OrganizationManager : Node
 {
     private const string ORGANIZATION_ID = "organization_id";
