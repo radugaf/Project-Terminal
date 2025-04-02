@@ -5,6 +5,7 @@ using ProjectTerminal.Resources;
 using Supabase.Postgrest.Responses;
 using Supabase.Postgrest;
 using Godot.Collections;
+using ProjectTerminal.Globals.Services;
 
 public partial class TerminalManager : Node
 {

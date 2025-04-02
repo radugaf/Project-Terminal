@@ -2,6 +2,8 @@ using Godot;
 using System;
 using ProjectTerminal.Resources;
 using System.Collections.Generic;
+using ProjectTerminal.Globals.Services;
+
 
 public partial class BrandNewUser : Control
 {

@@ -1,6 +1,7 @@
 using Godot;
 using System.Text.RegularExpressions;
 using Supabase.Gotrue;
+using ProjectTerminal.Globals.Services;
 
 public partial class Login : Control
 {
