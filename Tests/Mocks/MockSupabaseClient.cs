@@ -76,7 +76,7 @@ namespace ProjectTerminal.Tests.Mocks
             ClientMock.Setup(c => c.Postgrest).Returns(PostgrestMock.Object);
 
             // Setup auth methods
-            SetupDefaultAuthBehavior();
+            // SetupDefaultAuthBehavior();
         }
 
         private void SetupDefaultAuthBehavior()

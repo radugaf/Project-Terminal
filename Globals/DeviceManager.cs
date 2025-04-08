@@ -1,8 +1,7 @@
 using Godot;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using Godot.Collections;
+
 public partial class DeviceManager : Node
 {
     // Signals
@@ -90,8 +89,6 @@ public partial class DeviceManager : Node
 
         // Mark as initialized
         _initialized = true;
-
-        GD.Print("DeviceManager: Initialized successfully");
     }
 
     // Public Methods
@@ -144,9 +141,9 @@ public partial class DeviceManager : Node
     /// Returns a Dictionary with all device information.
     /// Helpful for diagnostics and sending device info to the server.
     /// </summary>
-    public Godot.Collections.Dictionary GetDeviceInfo()
+    public Dictionary GetDeviceInfo()
     {
-        var basicInfo = new Godot.Collections.Dictionary
+        var basicInfo = new Dictionary
         {
             { "device_id", DeviceId },
             { "device_unique_id", DeviceUniqueId },
@@ -158,27 +155,27 @@ public partial class DeviceManager : Node
             { "is_emulator", IsEmulator }
         };
 
-        var hardwareInfo = new Godot.Collections.Dictionary
+        var hardwareInfo = new Dictionary
         {
             { "processor_name", ProcessorName },
             { "storage_total", StorageTotal },
             { "storage_available", StorageAvailable }
         };
 
-        var networkInfo = new Godot.Collections.Dictionary
+        var networkInfo = new Dictionary
         {
             { "network_status", (int)NetworkStatus },
             { "ip_address", IpAddress },
             { "mac_address", MacAddress }
         };
 
-        var screenSizeInfo = new Godot.Collections.Dictionary
+        var screenSizeInfo = new Dictionary
         {
             { "width", ScreenSize.X },
             { "height", ScreenSize.Y }
         };
 
-        var screenInfo = new Godot.Collections.Dictionary
+        var screenInfo = new Dictionary
         {
             { "screen_dpi", ScreenDpi },
             { "screen_size", screenSizeInfo },
@@ -187,7 +184,7 @@ public partial class DeviceManager : Node
             { "screen_scale", ScreenScale }
         };
 
-        var result = new Godot.Collections.Dictionary
+        var result = new Dictionary
         {
             { "basic_info", basicInfo },
             { "hardware_info", hardwareInfo },
@@ -240,7 +237,7 @@ public partial class DeviceManager : Node
     /// </summary>
     public string RunDiagnostics()
     {
-        var diagnostics = "=== DEVICE MANAGER DIAGNOSTICS ===\n";
+        string diagnostics = "=== DEVICE MANAGER DIAGNOSTICS ===\n";
         diagnostics += $"Current Time (UTC): {Time.GetDatetimeStringFromSystem(true)}\n";
 
         // Check system
@@ -255,10 +252,10 @@ public partial class DeviceManager : Node
 
         // Check storage
         diagnostics += "\n--- STORAGE ---\n";
-        var storageTotalGb = (float)StorageTotal / (1024 * 1024 * 1024);
-        var storageAvailableGb = (float)StorageAvailable / (1024 * 1024 * 1024);
-        var storageUsedGb = ((float)StorageTotal - StorageAvailable) / (1024 * 1024 * 1024);
-        var storagePercent = StorageTotal == 0 ? 0.0f : (float)(StorageTotal - StorageAvailable) / (float)StorageTotal * 100.0f;
+        float storageTotalGb = (float)StorageTotal / (1024 * 1024 * 1024);
+        float storageAvailableGb = (float)StorageAvailable / (1024 * 1024 * 1024);
+        float storageUsedGb = ((float)StorageTotal - StorageAvailable) / (1024 * 1024 * 1024);
+        float storagePercent = StorageTotal == 0 ? 0.0f : (float)(StorageTotal - StorageAvailable) / (float)StorageTotal * 100.0f;
 
         diagnostics += $"Total: {storageTotalGb:F2} GB\n";
         diagnostics += $"Available: {storageAvailableGb:F2} GB\n";
@@ -302,7 +299,7 @@ public partial class DeviceManager : Node
     /// <summary>
     /// Keep screen on to prevent sleep (for kiosk mode)
     /// </summary>
-    public void SetScreenAlwaysOn(bool enable)
+    public static void SetScreenAlwaysOn(bool enable)
     {
         DisplayServer.ScreenSetKeepOn(enable);
     }
@@ -312,10 +309,10 @@ public partial class DeviceManager : Node
     /// <summary>
     /// Generate a stable device ID based on hardware info
     /// </summary>
-    private string GenerateDeviceId()
+    private static string GenerateDeviceId()
     {
         // Combine unique identifiers to create a stable ID
-        var baseString = $"{OS.GetName()}_{OS.GetModelName()}_{OS.GetStaticMemoryUsage()}";
+        string baseString = $"{OS.GetName()}_{OS.GetModelName()}_{OS.GetStaticMemoryUsage()}";
 
         // Create a hash
         return baseString.GetHashCode().ToString().Replace("-", "");
@@ -324,7 +321,7 @@ public partial class DeviceManager : Node
     /// <summary>
     /// Check if device is rooted/jailbroken (basic detection)
     /// </summary>
-    private bool CheckIfRooted()
+    private static bool CheckIfRooted()
     {
         // Very basic check for rooted devices
         switch (OS.GetName())
@@ -339,7 +336,7 @@ public partial class DeviceManager : Node
                     "/data/local/su"
                 ];
 
-                foreach (var path in suPaths)
+                foreach (string path in suPaths)
                 {
                     var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
                     if (file != null)
@@ -351,16 +348,16 @@ public partial class DeviceManager : Node
                 break;
 
             case "iOS":
-                var jbPaths = new[]
-                {
+                string[] jbPaths =
+                [
                     "/Applications/Cydia.app",
                     "/Library/MobileSubstrate/MobileSubstrate.dylib",
                     "/bin/bash",
                     "/usr/sbin/sshd",
                     "/etc/apt"
-                };
+                ];
 
-                foreach (var path in jbPaths)
+                foreach (string path in jbPaths)
                 {
                     var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
                     if (file != null)
@@ -384,9 +381,9 @@ public partial class DeviceManager : Node
         {
             case "Android":
                 // Check common emulator indicators
-                if (DeviceModel.ToLower().Contains("sdk") ||
-                    DeviceModel.ToLower().Contains("emulator") ||
-                    DeviceModel.ToLower().Contains("android sdk"))
+                if (DeviceModel.Contains("sdk", StringComparison.CurrentCultureIgnoreCase) ||
+                    DeviceModel.Contains("emulator", StringComparison.CurrentCultureIgnoreCase) ||
+                    DeviceModel.Contains("android sdk", StringComparison.CurrentCultureIgnoreCase))
                 {
                     return true;
                 }
@@ -400,7 +397,7 @@ public partial class DeviceManager : Node
 
             case "iOS":
                 // Check for simulator indicators (very basic)
-                if (DeviceModel.ToLower().Contains("simulator"))
+                if (DeviceModel.Contains("simulator", StringComparison.CurrentCultureIgnoreCase))
                 {
                     return true;
                 }
@@ -427,7 +424,7 @@ public partial class DeviceManager : Node
         else
         {
             // Use UI manager data if available
-            var uiInfo = _uiManager.GetInfoAsDictionary();
+            Dictionary uiInfo = _uiManager.GetInfoAsDictionary();
             ScreenSize = (Vector2I)uiInfo["window_size"];
             IsTouchscreen = (bool)uiInfo["is_touchscreen"];
 
@@ -437,7 +434,7 @@ public partial class DeviceManager : Node
                 var screens = (Godot.Collections.Array)uiInfo["screens"];
                 if (screens.Count > 0)
                 {
-                    var firstScreen = (Godot.Collections.Dictionary)screens[0];
+                    var firstScreen = (Dictionary)screens[0];
                     ScreenDpi = (float)firstScreen["dpi"];
                     ScreenOrientation = (int)firstScreen["orientation"];
                 }
@@ -456,11 +453,11 @@ public partial class DeviceManager : Node
     /// </summary>
     private void UpdateNetworkInfo()
     {
-        var oldNetworkStatus = NetworkStatus;
-        var oldIpAddress = IpAddress;
+        NetworkType oldNetworkStatus = NetworkStatus;
+        string oldIpAddress = IpAddress;
 
         // Get list of IP addresses
-        var addresses = IP.GetLocalAddresses();
+        string[] addresses = IP.GetLocalAddresses();
 
         // Determine connection type and select an appropriate IP
         NetworkStatus = NetworkType.None;
@@ -470,7 +467,7 @@ public partial class DeviceManager : Node
         {
             // Mobile platform network detection
             // Check if we have any non-localhost IPs
-            foreach (var addr in addresses)
+            foreach (string addr in addresses)
             {
                 if (addr != "127.0.0.1" && addr != "::1" && !addr.Contains(':'))
                 {
@@ -483,7 +480,7 @@ public partial class DeviceManager : Node
         else
         {
             // Desktop platform network detection
-            foreach (var addr in addresses)
+            foreach (string addr in addresses)
             {
                 if (addr != "127.0.0.1" && addr != "::1" && !addr.Contains(':'))
                 {
@@ -538,7 +535,7 @@ public partial class DeviceManager : Node
     /// <summary>
     /// Check if the device is running on a mobile platform
     /// </summary>
-    private bool IsMobilePlatform()
+    private static bool IsMobilePlatform()
     {
         string osName = OS.GetName();
         return osName == "Android" || osName == "iOS";

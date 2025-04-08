@@ -1,0 +1,59 @@
+[gd_resource type="Theme" load_steps=10 format=3 uid="uid://j72gem5xrylw"]
+
+[ext_resource type="StyleBox" uid="uid://ynp02klibb3f" path="res://Resources/Themes/Button_Hover_StyleBoxFlat.tres" id="1_bt8c6"]
+[ext_resource type="StyleBox" uid="uid://j7rvxcru2wg8" path="res://Resources/Themes/Button_Normal_StyleBoxFlat.tres" id="2_i3055"]
+[ext_resource type="StyleBox" uid="uid://b4fjmwuuumcn2" path="res://Resources/Themes/Button_Pressed_StyleBoxFlat.tres" id="3_eed1a"]
+[ext_resource type="StyleBox" uid="uid://c64nwjekxcpyi" path="res://Resources/Themes/CheckBox_Hover_StyleBoxFlat.tres" id="4_5e1ph"]
+[ext_resource type="StyleBox" uid="uid://cy2kjxhb4smj5" path="res://Resources/Themes/CheckBox_Normal_StyleBoxFlat.tres" id="5_a21ha"]
+[ext_resource type="StyleBox" uid="uid://dwawf6u6d8bhk" path="res://Resources/Themes/CheckBox_Pressed_StyleBox.tres" id="6_1ngtu"]
+[ext_resource type="StyleBox" uid="uid://blbkms22x565s" path="res://Resources/Themes/LineEdit_Normal_StyleBoxFlat.tres" id="7_vfy6s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bt8c6"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3055"]
+bg_color = Color(0.6, 0.905882, 0.6, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[resource]
+default_font_size = 27
+Button/colors/font_color = Color(0.113725, 0.109804, 0.101961, 1)
+Button/colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(0.113725, 0.109804, 0.101961, 1)
+Button/styles/disabled = null
+Button/styles/focus = null
+Button/styles/hover = ExtResource("1_bt8c6")
+Button/styles/normal = ExtResource("2_i3055")
+Button/styles/pressed = ExtResource("3_eed1a")
+CheckBox/colors/font_color = Color(0.113725, 0.109804, 0.101961, 1)
+CheckBox/colors/font_focus_color = Color(0.113725, 0.109804, 0.101961, 1)
+CheckBox/colors/font_hover_color = Color(0.113725, 0.109804, 0.101961, 1)
+CheckBox/colors/font_hover_pressed_color = Color(0.113725, 0.109804, 0.101961, 1)
+CheckBox/colors/font_pressed_color = Color(0.113725, 0.109804, 0.101961, 1)
+CheckBox/styles/hover = ExtResource("4_5e1ph")
+CheckBox/styles/normal = ExtResource("5_a21ha")
+CheckBox/styles/pressed = ExtResource("6_1ngtu")
+Label/colors/font_color = Color(0.113725, 0.113725, 0.113725, 1)
+LineEdit/colors/caret_color = Color(0.113725, 0.109804, 0.101961, 1)
+LineEdit/colors/clear_button_color = Color(0.113725, 0.109804, 0.101961, 1)
+LineEdit/colors/font_color = Color(0.113725, 0.109804, 0.101961, 1)
+LineEdit/colors/font_outline_color = Color(0.113725, 0.109804, 0.101961, 1)
+LineEdit/colors/font_placeholder_color = Color(0.113725, 0.109804, 0.101961, 1)
+LineEdit/styles/focus = null
+LineEdit/styles/normal = ExtResource("7_vfy6s")
+LineEdit/styles/read_only = null
+LinkButton/colors/font_color = Color(0.356863, 0.607843, 0.835294, 1)
+LinkButton/colors/font_focus_color = Color(0.356863, 0.607843, 0.835294, 1)
+LinkButton/colors/font_hover_color = Color(0.356863, 0.607843, 0.835294, 1)
+LinkButton/colors/font_pressed_color = Color(0.113725, 0.109804, 0.101961, 1)
+ProgressBar/colors/font_color = Color(0, 0, 0, 1)
+ProgressBar/styles/background = SubResource("StyleBoxFlat_bt8c6")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_i3055")

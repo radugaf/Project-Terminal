@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Project-Terminal"
-run/main_scene="uid://dra1rnfronsh6"
+run/main_scene="uid://kxi0ierqiojp"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -19,10 +19,10 @@ config/icon="res://icon.svg"
 
 Logger="*res://Globals/Logger.cs"
 EnvLoader="*res://Globals/EnvLoader.gd"
+SupabaseClient="*res://Globals/SupabaseClient.cs"
 UiManager="*res://Globals/UIManager.cs"
 SecureStorage="*res://Globals/SecureStorage.cs"
 DeviceManager="*res://Globals/DeviceManager.cs"
-SupabaseClient="*res://Globals/SupabaseClient.cs"
 AuthManager="*res://Globals/Services/AuthManager.cs"
 TerminalManager="*res://Globals/TerminalManager.cs"
 OrganizationManager="*res://Globals/OrganizationManager.cs"

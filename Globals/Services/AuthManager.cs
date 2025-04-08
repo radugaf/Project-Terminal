@@ -75,7 +75,7 @@ namespace ProjectTerminal.Globals.Services
         {
             _sessionCheckTimer = new Timer();
             AddChild(_sessionCheckTimer);
-            _sessionCheckTimer.WaitTime = 600;
+            _sessionCheckTimer.WaitTime = 300;
             _sessionCheckTimer.Timeout += ValidateSessionHealth;
             _sessionCheckTimer.Start();
         }
@@ -161,31 +161,45 @@ namespace ProjectTerminal.Globals.Services
 
         public void ValidateSessionHealth()
         {
-            _logger.Debug("AuthManager: Validating session health");
-
             var session = _sessionManager.CurrentSession;
             if (session == null || !_isClientInitialized)
             {
-                _logger.Debug("AuthManager: No session to validate or client not initialized");
                 return;
             }
 
             try
             {
                 DateTime? expiresAt = _sessionManager.GetSessionExpiryTime();
+                bool isPersistent = _sessionManager.IsPersistentSession;
 
                 if (expiresAt.HasValue)
                 {
                     TimeSpan timeUntilExpiry = expiresAt.Value - _timeProvider.UtcNow;
                     int refreshThreshold = _sessionManager.GetRefreshThresholdSeconds();
 
-                    if (timeUntilExpiry.TotalSeconds < refreshThreshold)
+                    // For persistent sessions, also consider time since last refresh
+                    if (isPersistent)
+                    {
+                        // Get time since last refresh (could add this to SessionManager)
+                        TimeSpan timeSinceLastRefresh = _timeProvider.UtcNow - _sessionManager.GetLastRefreshTime();
+
+                        // Refresh if approaching expiry OR if we haven't refreshed in a while
+                        if (timeUntilExpiry.TotalSeconds < refreshThreshold ||
+                            timeSinceLastRefresh.TotalHours > 12)
+                        {
+                            _logger.Info($"AuthManager: Refreshing persistent session (expires in {timeUntilExpiry.TotalSeconds}s, last refresh {timeSinceLastRefresh.TotalHours}h ago)");
+                            _ = RefreshSessionAsync();
+                            return;
+                        }
+                    }
+                    // Standard refresh logic for non-persistent or approaching expiry
+                    else if (timeUntilExpiry.TotalSeconds < refreshThreshold)
                     {
                         _logger.Info($"AuthManager: Token expires in {timeUntilExpiry.TotalSeconds}s, refreshing");
                         _ = RefreshSessionAsync();
                     }
 
-                    _logger.Debug($"AuthManager: Session expires in {timeUntilExpiry.TotalHours} hours, persistent: {_sessionManager.IsPersistentSession}");
+                    _logger.Debug($"AuthManager: Session expires in {timeUntilExpiry.TotalHours:F1} hours, persistent: {isPersistent}");
                 }
             }
             catch (Exception ex)
@@ -225,7 +239,7 @@ namespace ProjectTerminal.Globals.Services
 
         public async Task<bool> RefreshSessionAsync()
         {
-            var session = _sessionManager.CurrentSession;
+            Session session = _sessionManager.CurrentSession;
             if (session == null || string.IsNullOrEmpty(session.RefreshToken) || !_isClientInitialized)
             {
                 _logger.Warn("AuthManager: No refresh token available or client not initialized");

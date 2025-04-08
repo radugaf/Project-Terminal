@@ -1,7 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://bua0504jacnfi"]
 
-[ext_resource type="Theme" uid="uid://uudjgk6qwr8m" path="res://Resources/base_theme.tres" id="1_v8vkq"]
 [ext_resource type="Script" uid="uid://csr4frbsjvou3" path="res://Scenes/AdminPanel/AdminPanel.cs" id="2_bksi2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v8vkq"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
 
 [node name="AdminPanel" type="Control"]
 layout_mode = 3
@@ -10,40 +12,44 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_v8vkq")
 script = ExtResource("2_bksi2")
 
-[node name="Navigation" type="ColorRect" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.154
-anchor_bottom = 1.0
-offset_right = 0.319977
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(1, 1, 0.647059, 1)
+anchor_right = 0.1541
+anchor_bottom = 1.00019
+offset_right = 0.128052
+offset_bottom = -0.200073
+theme_override_styles/panel = SubResource("StyleBoxFlat_v8vkq")
+metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Navigation"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
-offset_right = 295.0
-offset_bottom = 1080.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="DashboardButton" type="Button" parent="Navigation/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="DashboardButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Dashboard"
 
-[node name="ItemsButton" type="Button" parent="Navigation/VBoxContainer"]
+[node name="ItemsButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Items"
 
-[node name="StaffButton" type="Button" parent="Navigation/VBoxContainer"]
+[node name="StaffButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Staff"
 
-[node name="ExitButton" type="Button" parent="Navigation/VBoxContainer"]
+[node name="ExitButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Exit"

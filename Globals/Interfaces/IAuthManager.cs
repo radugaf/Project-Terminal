@@ -37,6 +37,7 @@ namespace ProjectTerminal.Globals.Interfaces
         void SetUserNewState(bool isNew);
         bool GetUserNewState();
         int GetRefreshThresholdSeconds();
+        DateTime GetLastRefreshTime();
     }
 
     // Time abstraction for testability

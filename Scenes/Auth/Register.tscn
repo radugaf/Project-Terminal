@@ -1,0 +1,249 @@
+[gd_scene load_steps=10 format=3 uid="uid://j6xkicnq4asf"]
+
+[ext_resource type="Theme" uid="uid://j72gem5xrylw" path="res://Resources/Themes/Main/GeneralTheme.tres" id="1_u1vlx"]
+[ext_resource type="Script" uid="uid://bwr41nvgqgw13" path="res://Scenes/Auth/Register.cs" id="2_nmldi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sixlq"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_76aki"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vt8nt"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.0588235)
+shadow_size = 15
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="FontVariation" id="FontVariation_uchyk"]
+
+[sub_resource type="Theme" id="Theme_sixlq"]
+default_font = SubResource("FontVariation_uchyk")
+default_font_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1pfeg"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3p1ym"]
+content_margin_left = 15.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="Register" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_u1vlx")
+script = ExtResource("2_nmldi")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sixlq")
+
+[node name="ProgressContainer" type="MarginContainer" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.922
+anchor_right = 1.0
+anchor_bottom = 0.108667
+offset_left = 0.259155
+offset_right = 0.5
+offset_bottom = -0.360008
+grow_horizontal = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/ProgressContainer"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/ProgressContainer/CenterContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_76aki")
+
+[node name="ProgressBar" type="ProgressBar" parent="Panel/ProgressContainer/CenterContainer/PanelContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 1
+value = 50.0
+
+[node name="CenterContentContainer" type="CenterContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/CenterContentContainer"]
+custom_minimum_size = Vector2(580, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vt8nt")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 75
+theme_override_constants/margin_top = 75
+theme_override_constants/margin_right = 75
+theme_override_constants/margin_bottom = 75
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LogoContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 50
+
+[node name="LogoLabel" type="Label" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LogoContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme = SubResource("Theme_sixlq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_1pfeg")
+text = "REGISTER"
+
+[node name="EmailOrPhoneContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="EmailOrPhoneLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/EmailOrPhoneContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Email or Phone (+40...)"
+clear_button_enabled = true
+
+[node name="PasswordContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="PasswordLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/PasswordContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Password"
+clear_button_enabled = true
+secret = true
+
+[node name="ConfirmPasswordContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="ConfirmPasswordLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/ConfirmPasswordContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Password Confirm"
+clear_button_enabled = true
+secret = true
+
+[node name="OtpCodeContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="OtpCodeLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/OtpCodeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "123456"
+clear_button_enabled = true
+secret = true
+
+[node name="StatusContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_bottom = 10
+
+[node name="StatusLabel" type="Label" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/StatusContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(430, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3p1ym")
+text = "Status Label"
+autowrap_mode = 3
+
+[node name="ButtonContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="RegisterButton" type="Button" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Register
+"
+
+[node name="LoginContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LoginContainer"]
+layout_mode = 2
+
+[node name="QuestionLabel" type="Label" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LoginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Already registered? "
+
+[node name="LoginLinkButton" type="LinkButton" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LoginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Login"
