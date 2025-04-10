@@ -1,0 +1,318 @@
+[gd_scene load_steps=10 format=3 uid="uid://73t3ox1mobsf"]
+
+[ext_resource type="Theme" uid="uid://j72gem5xrylw" path="res://Resources/Themes/Main/GeneralTheme.tres" id="1_1iupf"]
+[ext_resource type="Script" uid="uid://bhjk1b60hyuyo" path="res://Scenes/Onboarding/OnboardingForm.cs" id="2_qu4qd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_62e2m"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qtu10"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ee4bf"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.0588235)
+shadow_size = 15
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="FontVariation" id="FontVariation_1iupf"]
+
+[sub_resource type="Theme" id="Theme_kbped"]
+default_font = SubResource("FontVariation_1iupf")
+default_font_size = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fj5cn"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iy58a"]
+content_margin_left = 15.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="OnboardingForm" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_1iupf")
+script = ExtResource("2_qu4qd")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_62e2m")
+
+[node name="ProgressContainer" type="MarginContainer" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.922
+anchor_right = 1.0
+anchor_bottom = 0.108667
+offset_left = 0.259155
+offset_right = 0.5
+offset_bottom = -0.360008
+grow_horizontal = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/ProgressContainer"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/ProgressContainer/CenterContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qtu10")
+
+[node name="ProgressBar" type="ProgressBar" parent="Panel/ProgressContainer/CenterContainer/PanelContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 1
+value = 50.0
+
+[node name="CenterContentContainer" type="CenterContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Panel/CenterContentContainer"]
+custom_minimum_size = Vector2(580, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ee4bf")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 75
+theme_override_constants/margin_top = 75
+theme_override_constants/margin_right = 75
+theme_override_constants/margin_bottom = 75
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LogoContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 50
+
+[node name="LogoLabel" type="Label" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LogoContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme = SubResource("Theme_kbped")
+theme_override_styles/normal = SubResource("StyleBoxFlat_fj5cn")
+text = "Let's get to know each other!"
+
+[node name="FirstNameContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="FirstNameLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/FirstNameContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "First Name"
+clear_button_enabled = true
+
+[node name="LastNameContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="LastNameLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LastNameContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Last Name"
+clear_button_enabled = true
+
+[node name="EmailContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="EmailLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/EmailContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Email"
+clear_button_enabled = true
+
+[node name="PhoneContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="PhoneLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/PhoneContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Phone"
+clear_button_enabled = true
+
+[node name="BusinessNameContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="BusinessNameLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/BusinessNameContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Business Name SRL"
+clear_button_enabled = true
+
+[node name="BusinessTypeContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="BusinessTypeOptionButton" type="OptionButton" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/BusinessTypeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="UseThisDeviceContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="UseThisDeviceCheckBox" type="CheckBox" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/UseThisDeviceContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Use this device as a terminal"
+
+[node name="LocationNameContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="LocationNameLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/LocationNameContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Location Name"
+clear_button_enabled = true
+
+[node name="CityContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="CityLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/CityContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "City"
+clear_button_enabled = true
+
+[node name="AddressContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="AddressLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/AddressContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Address"
+clear_button_enabled = true
+
+[node name="PostalCodeContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="PostalCodeLineEdit" type="LineEdit" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/PostalCodeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Postal Code"
+clear_button_enabled = true
+
+[node name="StatusContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/margin_bottom = 10
+
+[node name="StatusLabel" type="Label" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/StatusContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(430, 0)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_iy58a")
+text = "Status Label"
+autowrap_mode = 3
+
+[node name="ButtonContainer" type="MarginContainer" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="SubmitButton" type="Button" parent="Panel/CenterContentContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Submit"

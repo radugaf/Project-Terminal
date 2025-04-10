@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://bua0504jacnfi"]
+[gd_scene load_steps=4 format=3 uid="uid://bua0504jacnfi"]
 
 [ext_resource type="Script" uid="uid://csr4frbsjvou3" path="res://Scenes/AdminPanel/AdminPanel.cs" id="2_bksi2"]
+[ext_resource type="PackedScene" uid="uid://c0dig1qwn1wq6" path="res://Scenes/Header.tscn" id="2_nmhq5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v8vkq"]
 bg_color = Color(0.980392, 0.972549, 0.964706, 1)
@@ -17,6 +18,7 @@ script = ExtResource("2_bksi2")
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
+anchor_top = 0.118519
 anchor_right = 0.1541
 anchor_bottom = 1.00019
 offset_right = 0.128052
@@ -49,17 +51,23 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Staff"
 
-[node name="ExitButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Exit"
+text = "Settings"
 
 [node name="ContentContainer" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.154
+anchor_top = 0.119
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 0.319977
+anchor_bottom = 0.990741
+offset_left = 0.320007
+offset_top = -0.520004
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Header" parent="." instance=ExtResource("2_nmhq5")]
+layout_mode = 1

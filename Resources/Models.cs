@@ -150,10 +150,6 @@ namespace ProjectTerminal.Resources
         [Column("terminal_name")]
         public string TerminalName { get; set; }
 
-        [Column("terminal_type")]
-        [EnumDataType(typeof(TerminalType))]
-        public string TerminalType { get; set; }
-
         [Column("device_id")]
         public string DeviceId { get; set; }
 
@@ -321,20 +317,6 @@ namespace ProjectTerminal.Resources
 
         [EnumMember(Value = "salon")]
         Salon
-    }
-
-
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum TerminalType
-    {
-        [EnumMember(Value = "checkout")]
-        Checkout,
-        [EnumMember(Value = "kitchen")]
-        Kitchen,
-        [EnumMember(Value = "manager")]
-        Manager,
-        [EnumMember(Value = "inventory")]
-        Inventory
     }
 
 

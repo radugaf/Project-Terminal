@@ -75,7 +75,7 @@ namespace ProjectTerminal.Globals.Services
         {
             _sessionCheckTimer = new Timer();
             AddChild(_sessionCheckTimer);
-            _sessionCheckTimer.WaitTime = 300;
+            _sessionCheckTimer.WaitTime = 10;
             _sessionCheckTimer.Timeout += ValidateSessionHealth;
             _sessionCheckTimer.Start();
         }
@@ -102,7 +102,7 @@ namespace ProjectTerminal.Globals.Services
                 }
                 else
                 {
-                    await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken);
+                    await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken, true);
                     _logger.Info("AuthManager: Session synced with Supabase client");
                 }
             }
@@ -116,7 +116,7 @@ namespace ProjectTerminal.Globals.Services
 
         private async void LoadUserSessionAsync()
         {
-            _logger.Debug("AuthManager: Loading saved session");
+            _logger.Debug("AuthManager: Trying to load user session");
 
             try
             {
@@ -127,26 +127,44 @@ namespace ProjectTerminal.Globals.Services
                     return;
                 }
 
-                bool needsRefresh = _sessionManager.IsSessionExpired();
-
-                if (_isClientInitialized)
+                // Check if session is severely expired
+                DateTime? expiryTime = _sessionManager.GetSessionExpiryTime();
+                if (expiryTime.HasValue && (expiryTime.Value - _timeProvider.UtcNow).TotalDays < -30)
                 {
-                    if (needsRefresh && !string.IsNullOrEmpty(session.RefreshToken))
-                    {
-                        await RefreshSessionAsync();
-                    }
-                    else
-                    {
-                        await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken);
-                    }
+                    _logger.Warn("AuthManager: Loaded severely expired session, clearing");
+                    _sessionManager.ClearSession();
+                    EmitSessionChanged();
+                    return;
                 }
 
-                _logger.Info($"AuthManager: Session loaded successfully, persistent: {_sessionManager.IsPersistentSession}");
+                // Try to set up session with Supabase client
+                if (_isClientInitialized)
+                {
+                    try
+                    {
+                        await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken, true);
+
+                        // Proactively refresh if approaching expiry or expired but recoverable
+                        if (expiryTime.HasValue && (expiryTime.Value - _timeProvider.UtcNow).TotalHours < 24)
+                        {
+                            _ = RefreshSessionAsync();
+                        }
+
+                        _logger.Info($"AuthManager: Session loaded successfully, persistent: {_sessionManager.IsPersistentSession}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error($"AuthManager: Failed to set session: {ex.Message}");
+                        _sessionManager.ClearSession();
+                        EmitSessionChanged();
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _logger.Error($"AuthManager: Session loading failed: {ex.Message}");
                 _sessionManager.ClearSession();
+                EmitSessionChanged();
             }
         }
 
@@ -161,9 +179,10 @@ namespace ProjectTerminal.Globals.Services
 
         public void ValidateSessionHealth()
         {
-            var session = _sessionManager.CurrentSession;
+            Session session = _sessionManager.CurrentSession;
             if (session == null || !_isClientInitialized)
             {
+                _logger.Debug("AuthManager: No session to validate or client not initialized");
                 return;
             }
 
@@ -177,25 +196,30 @@ namespace ProjectTerminal.Globals.Services
                     TimeSpan timeUntilExpiry = expiresAt.Value - _timeProvider.UtcNow;
                     int refreshThreshold = _sessionManager.GetRefreshThresholdSeconds();
 
-                    // For persistent sessions, also consider time since last refresh
-                    if (isPersistent)
+                    // Check if token is already expired
+                    if (timeUntilExpiry.TotalSeconds < 0)
                     {
-                        // Get time since last refresh (could add this to SessionManager)
-                        TimeSpan timeSinceLastRefresh = _timeProvider.UtcNow - _sessionManager.GetLastRefreshTime();
-
-                        // Refresh if approaching expiry OR if we haven't refreshed in a while
-                        if (timeUntilExpiry.TotalSeconds < refreshThreshold ||
-                            timeSinceLastRefresh.TotalHours > 12)
+                        // If severely expired (more than 30 days), clear session and force re-login
+                        if (timeUntilExpiry.TotalDays < -30)
                         {
-                            _logger.Info($"AuthManager: Refreshing persistent session (expires in {timeUntilExpiry.TotalSeconds}s, last refresh {timeSinceLastRefresh.TotalHours}h ago)");
-                            _ = RefreshSessionAsync();
+                            _logger.Warn($"AuthManager: Session severely expired ({timeUntilExpiry.TotalDays:F1} days), clearing session");
+                            _sessionManager.ClearSession();
+                            EmitSessionChanged();
+                            return;
+                        }
+
+                        // For moderately expired sessions, attempt refresh if we have a refresh token
+                        if (!string.IsNullOrEmpty(session.RefreshToken) && isPersistent)
+                        {
+                            _logger.Info($"AuthManager: Attempting to recover expired session (expired {Math.Abs(timeUntilExpiry.TotalHours):F1}h ago)");
+                            _ = RefreshSessionWithRecoveryAsync();
                             return;
                         }
                     }
-                    // Standard refresh logic for non-persistent or approaching expiry
+                    // Standard proactive refresh logic for valid tokens
                     else if (timeUntilExpiry.TotalSeconds < refreshThreshold)
                     {
-                        _logger.Info($"AuthManager: Token expires in {timeUntilExpiry.TotalSeconds}s, refreshing");
+                        _logger.Info($"AuthManager: Token expires in {timeUntilExpiry.TotalSeconds:F1}s, refreshing");
                         _ = RefreshSessionAsync();
                     }
 
@@ -205,18 +229,30 @@ namespace ProjectTerminal.Globals.Services
             catch (Exception ex)
             {
                 _logger.Error($"AuthManager: Session validation error: {ex.Message}");
+            }
+        }
 
-                if (session?.RefreshToken != null)
-                {
-                    try
-                    {
-                        _ = RefreshSessionAsync();
-                    }
-                    catch
-                    {
-                        _logger.Warn("AuthManager: Failed to refresh session during recovery");
-                    }
-                }
+        private async Task<bool> RefreshSessionWithRecoveryAsync()
+        {
+            try
+            {
+                bool refreshSuccess = await RefreshSessionAsync();
+                if (refreshSuccess)
+                    return true;
+
+                _logger.Info("AuthManager: Standard refresh failed, attempting recovery flow");
+
+                // Recovery failed, clear session and notify UI
+                _sessionManager.ClearSession();
+                EmitSessionChanged();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"AuthManager: Recovery refresh failed: {ex.Message}");
+                _sessionManager.ClearSession();
+                EmitSessionChanged();
+                return false;
             }
         }
 
@@ -248,6 +284,18 @@ namespace ProjectTerminal.Globals.Services
 
             try
             {
+                _logger.Debug("AuthManager: Attempting to refresh session");
+                // Attempt to refresh the session using the Supabase client
+                try
+                {
+                    await _supabaseClient.GetClient().Auth.RefreshToken();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"AuthManager: Failed to set session: {ex.Message}");
+                    return false;
+                }
+
                 Session refreshedSession = await _supabaseClient.GetClient().Auth.RefreshSession();
 
                 if (refreshedSession != null)
@@ -270,10 +318,7 @@ namespace ProjectTerminal.Globals.Services
             }
         }
 
-        public bool IsLoggedIn()
-        {
-            return CurrentUser != null && !_sessionManager.IsSessionExpired();
-        }
+        public bool IsLoggedIn() => CurrentUser != null && !_sessionManager.IsSessionExpired();
 
         #endregion
 
@@ -374,7 +419,7 @@ namespace ProjectTerminal.Globals.Services
                     return null;
                 }
 
-                await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken);
+                await _supabaseClient.GetClient().Auth.SetSession(session.AccessToken, session.RefreshToken, true);
 
                 bool isNewUser = !await IsUserPartOfAnyOrganizationAsync(session.User.Id);
                 _sessionManager.SetUserNewState(isNewUser);

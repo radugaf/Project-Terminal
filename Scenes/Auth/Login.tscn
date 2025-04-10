@@ -32,10 +32,10 @@ shadow_color = Color(0, 0, 0, 0.0588235)
 shadow_size = 15
 shadow_offset = Vector2(0, 4)
 
-[sub_resource type="FontVariation" id="FontVariation_3knqi"]
+[sub_resource type="FontVariation" id="FontVariation_te6dc"]
 
 [sub_resource type="Theme" id="Theme_0fbet"]
-default_font = SubResource("FontVariation_3knqi")
+default_font = SubResource("FontVariation_te6dc")
 default_font_size = 30
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fj5cn"]

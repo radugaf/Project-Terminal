@@ -8,7 +8,7 @@ public partial class AdminPanel : Control
     private Button _dashboardButton;
     private Button _itemsButton;
     private Button _staffButton;
-    private Button _exitButton;
+    private Button _settingsButton;
 
     // Services
     private AdminPanelService _adminService;
@@ -24,7 +24,7 @@ public partial class AdminPanel : Control
         _dashboardButton = GetNode<Button>("%DashboardButton");
         _itemsButton = GetNode<Button>("%ItemsButton");
         _staffButton = GetNode<Button>("%StaffButton");
-        _exitButton = GetNode<Button>("%ExitButton");
+        _settingsButton = GetNode<Button>("%SettingsButton");
 
         // Initialize services
         InitializeServices();
@@ -81,6 +81,9 @@ public partial class AdminPanel : Control
 
         _contentManager.RegisterContent("AddCategory",
             GD.Load<PackedScene>("res://Scenes/AdminPanel/AddCategory.tscn"));
+
+        _contentManager.RegisterContent("Settings",
+            GD.Load<PackedScene>("res://Scenes/AdminPanel/Settings.tscn"));
     }
 
     private void ConnectSignals()
@@ -92,7 +95,7 @@ public partial class AdminPanel : Control
         _itemsButton.Pressed += async () => await _contentManager.ShowContentAsync("Items");
         _staffButton.Pressed += async () => await _contentManager.ShowContentAsync("Staff");
         _dashboardButton.Pressed += async () => await _contentManager.ShowContentAsync("Dashboard");
-        _exitButton.Pressed += OnExitButtonPressed;
+        _settingsButton.Pressed += async () => await _contentManager.ShowContentAsync("Settings");
     }
 
     private void OnContentChanged(string contentId, Control contentNode)
@@ -100,7 +103,7 @@ public partial class AdminPanel : Control
         _logger.Info($"AdminPanel: Content changed to: {contentId}");
 
         // Update the UI to reflect the active section - only for top-level sections
-        if (contentId == "Dashboard" || contentId == "Items" || contentId == "Staff")
+        if (contentId == "Dashboard" || contentId == "Items" || contentId == "Staff" || contentId == "Settings")
         {
             UpdateActiveButton(contentId);
         }
@@ -125,11 +128,9 @@ public partial class AdminPanel : Control
             case "Staff":
                 _staffButton.ThemeTypeVariation = "ActiveButton";
                 break;
+            case "Settings":
+                _settingsButton.ThemeTypeVariation = "ActiveButton";
+                break;
         }
-    }
-
-    private void OnExitButtonPressed()
-    {
-        GetTree().CallDeferred("change_scene_to_file", "res://Scenes/Home.tscn");
     }
 }

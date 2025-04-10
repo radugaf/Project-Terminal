@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ProjectTerminal.Globals.Services;
 using Supabase.Gotrue;
+
 public partial class Login : Control
 {
 
@@ -52,6 +53,12 @@ public partial class Login : Control
         GetUIReferences();
         ConnectSignals();
         SetInitialState();
+
+        if (_authManager.IsLoggedIn())
+        {
+            _logger.Info("LoginTwo: User already logged in, navigating to appropriate screen");
+            CallDeferred(nameof(NavigateAfterLogin));
+        }
     }
 
     private void InitializeServices()
@@ -307,7 +314,7 @@ public partial class Login : Control
         try
         {
             // Use AuthManager to handle email login
-            var session = await _authManager.LoginWithEmailAsync(email, password, _rememberMeCheckBox.ButtonPressed);
+            Session session = await _authManager.LoginWithEmailAsync(email, password, _rememberMeCheckBox.ButtonPressed);
 
             if (session != null)
             {
@@ -430,7 +437,7 @@ public partial class Login : Control
 
         if (_authManager.IsNewUser)
         {
-            NavigateToScene("res://Scenes/Onboarding/BrandNewUser.tscn");
+            NavigateToScene("res://Scenes/Onboarding/OnboardingForm.tscn");
         }
         else
         {
@@ -438,8 +445,5 @@ public partial class Login : Control
         }
     }
 
-    private void NavigateToScene(string scenePath)
-    {
-        GetTree().ChangeSceneToFile(scenePath);
-    }
+    private void NavigateToScene(string scenePath) => GetTree().ChangeSceneToFile(scenePath);
 }

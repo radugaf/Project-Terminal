@@ -14,8 +14,10 @@ public partial class OrganizationManager : Node
     private SupabaseClient _supabaseClient;
     private AuthManager _authManager;
     private SecureStorage _secureStorage;
+    private string _orgName;
 
     public User CurrentUser => _authManager.CurrentUser;
+    public string OrgName => _orgName;
 
     [Signal]
     public delegate void OrganizationCreatedEventHandler(string organizationId);
@@ -82,6 +84,9 @@ public partial class OrganizationManager : Node
 
             _secureStorage.StoreValue(ORGANIZATION_ID, organizationId);
             _logger.Info($"OrganizationManager: Organization ID '{organizationId}' stored in secure storage");
+
+            _orgName = response.Model?.Name;
+            _logger.Info($"OrganizationManager: Organization name set to '{_orgName}'");
 
             EmitSignal(SignalName.OrganizationCreated, organizationId);
             return organizationId;

@@ -1,0 +1,87 @@
+[gd_scene load_steps=6 format=3 uid="uid://c0dig1qwn1wq6"]
+
+[ext_resource type="Theme" uid="uid://j72gem5xrylw" path="res://Resources/Themes/Main/GeneralTheme.tres" id="1_lnl3m"]
+[ext_resource type="Script" uid="uid://de3l04neje4d" path="res://Scenes/Header.cs" id="2_08p1g"]
+[ext_resource type="Texture2D" uid="uid://dbu05i0m7a1ii" path="res://icon.svg" id="2_wbakl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_plsi3"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q4rle"]
+bg_color = Color(0.980392, 0.972549, 0.964706, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="Header" type="Control"]
+layout_mode = 3
+anchor_right = 1.0
+anchor_bottom = 0.118519
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme = ExtResource("1_lnl3m")
+script = ExtResource("2_08p1g")
+metadata/_edit_use_anchors_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_plsi3")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LogoButton" type="TextureButton" parent="PanelContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture_normal = ExtResource("2_wbakl")
+stretch_mode = 5
+
+[node name="SearchLineEdit" type="LineEdit" parent="PanelContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+placeholder_text = "Search..."
+
+[node name="OrgContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/HBoxContainer/OrgContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_q4rle")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/HBoxContainer/OrgContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="OrgNameLabel" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/OrgContainer/PanelContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Business Name SRL"

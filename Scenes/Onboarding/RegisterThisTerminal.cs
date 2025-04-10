@@ -17,7 +17,6 @@ public partial class RegisterThisTerminal : Control
     private LineEdit _streetOneLineEdit;
     private LineEdit _streetTwoLineEdit;
     private LineEdit _postalCodeLineEdit;
-    private OptionButton _terminalTypeOptionButton;
     private Label _statusLabel;
     private Button _submitButton;
 
@@ -41,12 +40,8 @@ public partial class RegisterThisTerminal : Control
         _streetOneLineEdit = GetNode<LineEdit>("%StreetOneLineEdit");
         _streetTwoLineEdit = GetNode<LineEdit>("%StreetTwoLineEdit");
         _postalCodeLineEdit = GetNode<LineEdit>("%PostalCodeLineEdit");
-        _terminalTypeOptionButton = GetNode<OptionButton>("%TerminalTypeOptionButton");
         _statusLabel = GetNode<Label>("%StatusLabel");
         _submitButton = GetNode<Button>("%SubmitButton");
-
-        // Populate terminal type options
-        PopulateTerminalTypes();
 
         _submitButton.Pressed += OnSubmitButtonPressed;
     }
@@ -83,12 +78,10 @@ public partial class RegisterThisTerminal : Control
         );
 
         // 3. Create terminal
-        var terminalType = (TerminalType)_terminalTypeOptionButton.Selected;
         Terminal newTerminal = await _terminalManager.CreateTerminalAsync(
             _organizationManager.GetOrganizationId(),
             locationId,
-            $"{_locationNameLineEdit.Text} {terminalType}",
-            terminalType
+            $"{_locationNameLineEdit.Text}"
         );
 
         _logger.Info("RegisterThisTerminal: Terminal registered successfully");
@@ -106,20 +99,6 @@ public partial class RegisterThisTerminal : Control
         }
     }
 
-    private void PopulateTerminalTypes()
-    {
-        _terminalTypeOptionButton.Clear();
-
-        // Add enum values to dropdown
-        foreach (TerminalType type in Enum.GetValues(typeof(TerminalType)))
-        {
-            _terminalTypeOptionButton.AddItem(type.ToString());
-        }
-
-        // Set default selection
-        if (_terminalTypeOptionButton.ItemCount > 0)
-            _terminalTypeOptionButton.Select(0);
-    }
 
     private bool ValidateInputs()
     {

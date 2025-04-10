@@ -11,6 +11,7 @@ namespace ProjectTerminal.Globals.Services
         private const string SessionExpiryKey = "session_expiry_timestamp";
         private const string UserNewStateKey = "user_new_state";
         private const string PersistentSessionKey = "is_persistent_session";
+        private const string LastRefreshTimeKey = "session_last_refresh_timestamp";
         private const int StandardRefreshThresholdSeconds = 300; // 5 minutes
         private const int PersistentRefreshThresholdSeconds = 3600 * 12; // 12 hours
         private DateTime _lastRefreshTime;
@@ -58,8 +59,9 @@ namespace ProjectTerminal.Globals.Services
                 {
                     DateTime expiryTime = _timeProvider.UtcNow.AddSeconds(session.ExpiresIn);
                     _storage.StoreValue(SessionExpiryKey, expiryTime.ToString("o"));
-
+                    UpdateLastRefreshTime();
                     _logger.Debug($"SessionManager: Session saved with expiry at {expiryTime}. Persistent: {isPersistent}");
+
                 }
             }
             catch (Exception ex)
@@ -89,7 +91,7 @@ namespace ProjectTerminal.Globals.Services
                     return Task.FromResult<Session>(null);
                 }
 
-                _logger.Info($"SessionManager: Valid session retrieved User ID: {sessionFromStorage.User.Id}, Token Valid: {!string.IsNullOrEmpty(sessionFromStorage.AccessToken)}");
+                _logger.Debug($"SessionManager: Valid session retrieved User ID: {sessionFromStorage.User.Id}, Token Valid: {!string.IsNullOrEmpty(sessionFromStorage.AccessToken)}");
 
                 _currentSession = sessionFromStorage;
                 _logger.Debug("SessionManager: Current session updated with retrieved session");
@@ -109,34 +111,31 @@ namespace ProjectTerminal.Globals.Services
                 {
                     if (DateTime.TryParse(storedTime, out DateTime time))
                     {
-                        _lastRefreshTime = time.Kind == DateTimeKind.Utc ?
-                            time : DateTime.SpecifyKind(time, DateTimeKind.Utc);
+                        _lastRefreshTime = time.Kind == DateTimeKind.Utc ? time : DateTime.SpecifyKind(time, DateTimeKind.Utc);
                         _logger.Debug($"SessionManager: Last refresh time loaded: {_lastRefreshTime} (UTC)");
-                    }
-                    else
-                    {
-                        _logger.Warn($"SessionManager: Could not parse stored refresh time: '{storedTime}'");
                     }
                 }
 
                 var context = new Dictionary<string, object>
-        {
-            { "session_expires_in", sessionFromStorage.ExpiresIn },
-            { "has_token", !string.IsNullOrEmpty(sessionFromStorage.AccessToken) },
-            { "is_new_user", _isNewUser },
-            { "last_refresh_time", _lastRefreshTime }
-        };
-                _logger.Info("SessionManager: Session loaded successfully", context);
+                    {
+                        { "session_expires_in", sessionFromStorage.ExpiresIn },
+                        { "has_token", !string.IsNullOrEmpty(sessionFromStorage.AccessToken) },
+                        { "is_new_user", _isNewUser },
+                        { "is_expired", IsSessionExpired() },
+                        { "session_expiry_time", GetSessionExpiryTime() },
+                        { "last_refresh_time", _lastRefreshTime }
+                    };
+                _logger.Debug("SessionManager: Session loaded successfully", context);
 
                 return Task.FromResult(sessionFromStorage);
             }
             catch (Exception ex)
             {
                 var context = new Dictionary<string, object>
-        {
-            { "exception_type", ex.GetType().Name },
-            { "stack_trace", ex.StackTrace }
-        };
+                    {
+                        { "exception_type", ex.GetType().Name },
+                        { "stack_trace", ex.StackTrace }
+                    };
                 _logger.LogException(ex, "SessionManager: Session loading failed");
                 _logger.Debug("SessionManager: Returning null session due to exception", context);
                 return Task.FromResult<Session>(null);
@@ -169,8 +168,9 @@ namespace ProjectTerminal.Globals.Services
                 string storedTimestamp = _storage.RetrieveValue<string>(SessionExpiryKey);
                 if (DateTime.TryParse(storedTimestamp, out DateTime timestamp))
                 {
-                    return timestamp.Kind == DateTimeKind.Utc ?
-                        timestamp : DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
+                    return timestamp.Kind == DateTimeKind.Utc
+                        ? timestamp
+                        : DateTime.SpecifyKind(timestamp, DateTimeKind.Utc);
                 }
             }
 
@@ -188,19 +188,21 @@ namespace ProjectTerminal.Globals.Services
 
         public DateTime GetLastRefreshTime()
         {
-            string storedTime = _storage.RetrieveValue<string>("last_refresh_time");
-            if (!string.IsNullOrEmpty(storedTime) && DateTime.TryParse(storedTime, out DateTime time))
-            {
-                return time.Kind == DateTimeKind.Utc ?
-                    time : DateTime.SpecifyKind(time, DateTimeKind.Utc);
-            }
-            return _timeProvider.UtcNow.AddDays(-1); // Default to a day ago if not found
+            string timestamp = _storage.RetrieveValue<string>(LastRefreshTimeKey);
+            return string.IsNullOrEmpty(timestamp) || !DateTime.TryParse(timestamp, out DateTime lastRefresh)
+                ? _timeProvider.UtcNow.AddDays(-1) // Default to yesterday if not found
+                : DateTime.SpecifyKind(lastRefresh, DateTimeKind.Utc);
         }
 
         public bool IsSessionExpired()
         {
             DateTime? expiryTime = GetSessionExpiryTime();
             return expiryTime.HasValue && _timeProvider.UtcNow > expiryTime.Value;
+        }
+
+        public void UpdateLastRefreshTime()
+        {
+            _storage.StoreValue(LastRefreshTimeKey, _timeProvider.UtcNow.ToString("o"));
         }
 
         public void SetUserNewState(bool isNew)
@@ -218,5 +220,6 @@ namespace ProjectTerminal.Globals.Services
         {
             return IsPersistentSession ? PersistentRefreshThresholdSeconds : StandardRefreshThresholdSeconds;
         }
+
     }
 }

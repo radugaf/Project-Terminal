@@ -14,7 +14,8 @@ public partial class TerminalManager : Node
     private SupabaseClient _supabaseClient;
     private AuthManager _authManager;
     private Node _deviceManager;
-
+    private string _terminalName;
+    public string TerminalName => _terminalName;
 
     [Signal]
     public delegate void TerminalCreatedEventHandler(string terminalId);
@@ -30,7 +31,7 @@ public partial class TerminalManager : Node
         _authManager = GetNode<AuthManager>("/root/AuthManager");
     }
 
-    public async Task<Terminal> CreateTerminalAsync(string organizationId, string locationId, string terminalName, TerminalType terminalType)
+    public async Task<Terminal> CreateTerminalAsync(string organizationId, string locationId, string terminalName)
     {
         try
         {
@@ -55,7 +56,6 @@ public partial class TerminalManager : Node
                 OrganizationId = organizationId,
                 LocationId = locationId,
                 TerminalName = terminalName,
-                TerminalType = terminalType.ToString().ToLower(),
                 DeviceId = basicInfo["device_unique_id"].AsString(),
                 Active = true,
                 RegisteredBy = _authManager.CurrentUser.Id,
@@ -84,6 +84,9 @@ public partial class TerminalManager : Node
             string terminalId = response.Model?.Id;
             _logger.Info($"TerminalManager: Terminal created with ID: {terminalId}");
 
+            _terminalName = response.Model?.TerminalName;
+            _logger.Debug($"TerminalManager: Terminal name set to '{_terminalName}'");
+
             EmitSignal(SignalName.TerminalCreated, terminalId);
             return response.Model;
         }
@@ -92,11 +95,6 @@ public partial class TerminalManager : Node
             _logger.Error($"TerminalManager: Failed to create terminal: {ex.Message}");
             throw;
         }
-    }
-
-    private void SetupDependencies()
-    {
-
     }
 
     public static string RunTerminalDiagnostics()
