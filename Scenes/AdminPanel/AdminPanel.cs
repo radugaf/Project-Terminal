@@ -84,6 +84,7 @@ public partial class AdminPanel : Control
 
         _contentManager.RegisterContent("Settings",
             GD.Load<PackedScene>("res://Scenes/AdminPanel/Settings.tscn"));
+
     }
 
     private void ConnectSignals()

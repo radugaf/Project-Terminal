@@ -100,7 +100,7 @@ public partial class Login : Control
 
         // Connect button signals
         _loginButton.Pressed += OnLoginButtonPressed;
-        _registerLinkButton.Pressed += () => NavigateToScene("res://Scenes/Register.tscn");
+        _registerLinkButton.Pressed += () => NavigateToScene("res://Scenes/Auth/Register.tscn");
     }
 
     private void OnEmailOrPhoneFocusExited()

@@ -456,7 +456,7 @@ public partial class Register : Control
 
         if (_authManager.IsNewUser)
         {
-            NavigateToScene("res://Scenes/Onboarding/BrandNewUser.tscn");
+            NavigateToScene("res://Scenes/Onboarding/OnboardingForm.tscn");
         }
         else
         {
